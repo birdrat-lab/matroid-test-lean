@@ -2,4 +2,4 @@
 .lake/
 
 #manuscript should not be public
-.tex
+main.tex
