@@ -1,293 +1,517 @@
-# Matroid Formalization Pilot
+# Normalized vs. Raw Dependency Comparison
 
-This repository develops a reusable Lean library for the matroid theory required by the matroid/span-program manuscript.
+This repository is currently performing a **dependency-analysis comparison pass** for the matroid/span-program manuscript.
 
-The immediate objective is methodological: construct an auditable manuscript-to-Lean dependency pipeline before attempting substantial formal proofs.
+The purpose of this pass is to compare two independently produced descriptions of the manuscript's matroid dependencies:
 
-The Matroid library should ultimately provide the complete matroid-facing API required by the manuscript, including matroid facts first used outside the manuscript's background section.
+1. the normalized matroid dependency ledger;
+2. the older raw manuscript-wide dependency graph.
 
-## 1. Sources of authority
+This pass is analytical only.
 
-`Manuscript/main.tex` is the frozen manuscript snapshot for this repository.
+Do not write Lean.
 
-Do not modify files under `Manuscript/`.
+Do not inspect mathlib.
 
-The manuscript is the authority for determining what mathematical statements and dependencies the formalization must support. External audits, previous ledgers, and dependency graphs are evidence for comparison, not ground truth.
+Do not design or modify the future Matroid library.
 
-Use exact TeX labels whenever possible. Displayed numbering may be recorded for readability, but TeX labels are the stable manuscript identifiers.
+Do not attempt proofs.
 
-When a required fact has no TeX label of its own, record the exact TeX label of each result whose statement or proof uses it, together with enough local context to recover the use from `Manuscript/main.tex`.
+Do not compute the final entry-node graph yet.
 
-Do not fabricate labels. Do not silently strengthen, weaken, generalize, or replace manuscript statements.
+The only objective is to compare the two dependency analyses faithfully and identify discrepancies that require manuscript adjudication.
 
-## 2. Scope of the Matroid library
+---
 
-`Matroid/` is intended to become the reusable matroid library required by the full manuscript.
+# 1. Source of authority
 
-A definition, theorem, construction, or auxiliary fact belongs in this library when its mathematical content is matroid-theoretic independently of span programs, adversary bounds, quantum query complexity, witness energies, or application-specific optimization.
+The frozen manuscript is:
 
-Facts may belong in this library even if they first appear much later in the manuscript.
+    Manuscript/main.tex
 
-`Matroid/` may depend on mathlib. It must not depend on span-program, adversary-bound, quantum-query, or application-specific definitions.
+The manuscript is the final authority for determining:
 
-Use mathlib's `Matroid` type as the foundational matroid object. Do not introduce a competing foundational matroid structure.
+- what mathematical facts are stated;
+- what facts proofs actually use;
+- whether a claimed dependency is real;
+- and how discrepancies between the two analyses should be interpreted.
 
-`Matroid/Matroid.lean` is the public import point. Internal implementation may be divided under `Matroid/Internal/`.
+Neither the normalized ledger nor the raw dependency graph is ground truth.
 
-## 3. What counts as a dependency
+Do not alter manuscript mathematics to make the two analyses agree.
 
-The ledger is a mathematical dependency ledger, not an inventory of labeled manuscript statements.
+Use exact TeX labels whenever possible.
 
-Include every distinct matroid-theoretic fact, construction, or object on which a manuscript argument materially relies, whether or not that fact:
+Do not fabricate labels.
 
-- has its own theorem, proposition, lemma, or definition environment;
-- has a TeX label;
-- is stated in the matroid-background section;
-- is explicitly cited;
-- is described as standard or well known;
-- appears only inside prose or a proof;
-- is imported from external matroid literature;
-- or is used implicitly without being named.
+For an unlabeled dependency used inside a proof, record the TeX label of the result whose proof uses it and enough context to recover the relevant step from `Manuscript/main.tex`.
 
-For every proof, ask: if all external matroid knowledge were removed, what matroid facts would be needed to justify the proof?
+---
 
-During dependency extraction, record the theorem actually required by the manuscript. Do not recursively reconstruct the entire literature proof behind an imported theorem. Its prerequisites can be refined later if it must be proved locally.
+# 2. Artifacts being compared
 
-## 4. Preserve the blind baseline
+## 2.1 Normalized ledger
 
-`Matroid/LEDGER.md` is the raw blind extraction produced before consulting any external dependency audit.
-
-Once the blind extraction has been accepted as a baseline, **do not edit it to improve agreement with later analyses**.
-
-Methodological repairs belong in a new file:
+The normalized matroid dependency specification is:
 
     Matroid/LEDGER_NORMALIZED.md
 
-The normalized ledger may split, merge, re-scope, or clarify blind entries, but every normalized row must record which blind IDs it came from.
+It contains normalized `N###` entries.
 
-Use normalized IDs `N001`, `N002`, ... rather than reusing or renumbering the blind `M###` IDs.
+These entries were produced by:
 
-If blind entries are merged, list all source IDs. If a blind entry is split, each child row should cite the same source ID and explain the split.
+- first extracting manuscript-wide matroid requirements blindly;
+- then splitting compound obligations;
+- merging genuine duplicates;
+- separating application context from reusable matroid mathematics;
+- and clarifying provenance and scope.
 
-## 5. Normalize granularity before external comparison
+Treat `LEDGER_NORMALIZED.md` as frozen during this pass.
 
-A normalized ledger entry should be close to an atomic mathematical declaration that could reasonably become one Lean theorem, definition, or structure interface.
+Do not modify it.
 
-Split a blind entry when it bundles logically independent facts that may have different hypotheses, different downstream uses, or different formal-library provenance. Examples include bundles such as closure extensivity/monotonicity/idempotence/exchange or represented rank/closure/circuit characterizations.
+The earlier blind extraction:
 
-Do not split merely for cosmetic reasons. Closely coupled equivalent formulations may remain together when one Lean declaration can naturally expose them.
+    Matroid/LEDGER.md
 
-Merge entries only when they are genuinely the same mathematical obligation. Preserve all manuscript uses and all original blind IDs in the merged row.
+is preserved for provenance and may be consulted when necessary to understand how a normalized entry arose, but it is not the primary object being compared.
 
-When equivalence is plausible but not established, keep the entries separate and mark the relationship for review.
+---
 
-## 6. Scope classification
+## 2.2 Raw dependency graph
 
-Every normalized entry must have a `Scope` field with one of:
+The older independent dependency analysis is represented by:
 
-- `CORE_MATROID`: a purely matroid-theoretic object or fact suitable for the reusable Matroid library;
-- `MATROID_INTERFACE`: a purely matroid-theoretic lemma or reformulation introduced because an application needs it, but stated without span-program, adversary, quantum, or optimization-specific objects;
-- `APPLICATION_CONTEXT`: a manuscript claim whose full statement belongs outside the Matroid library, but which contains or motivates a matroid obligation that should be extracted separately;
-- `OUT_OF_SCOPE_CONTEXT`: contextual material that does not itself belong in the Matroid library and yields no additional matroid API obligation;
-- `SCOPE_UNRESOLVED`: boundary unclear and requires human review.
+    Audit/dependency_graph_raw.csv
+    Audit/dependency_graph_raw_edges.csv
 
-Do not place an adversary-value, witness-energy, or span-program optimization theorem in the Matroid public API merely because its proof uses matroid facts. Extract the matroid-side obligation into its own `CORE_MATROID` or `MATROID_INTERFACE` row and classify the full application theorem as context.
+`dependency_graph_raw.csv` is the primary node table.
 
-## 7. Separate mathematical provenance from formalization source
+It contains one row per raw dependency node.
 
-Do not use `MATHLIB_CANDIDATE` as mathematical provenance.
+Its fields include:
 
-Each normalized entry must have two separate fields.
+- `raw_node_id`
+- `raw_node_name`
+- `raw_node_type`
+- `raw_cluster`
+- `tex_label`
+- `display_number`
+- `raw_description`
+- `indegree`
+- `outdegree`
+- `incoming_raw_node_ids`
+- `incoming_dependency_types`
+- `outgoing_raw_node_ids`
+- `outgoing_dependency_types`
 
-### Mathematical provenance
+`dependency_graph_raw_edges.csv` is the companion edge table.
 
-Use one of:
+It contains one row per dependency arrow and preserves the full raw graph structure.
 
-- `MANUSCRIPT_DEFINITION`
-- `MANUSCRIPT_PROVED`
-- `EXTERNAL_CITED`
-- `EXTERNAL_UNCITED_STANDARD`
-- `CERTIFICATE_DERIVED`
-- `PROVENANCE_UNRESOLVED`
+Its fields include:
 
-This field answers: where does the mathematics come from in the manuscript's epistemic structure?
+- `raw_edge_id`
+- source node metadata;
+- target node metadata;
+- `dependency_type`
 
-### Formalization source
+Use the node table for semantic matching.
 
-Use one of:
+Use the edge table when the surrounding dependency structure helps interpret a node.
 
-- `NOT_CHECKED`
-- `MATHLIB_EXACT`
-- `MATHLIB_BRIDGE`
-- `LOCAL_PROOF`
-- `LOCAL_CERTIFICATE`
-- `FORMALIZATION_SOURCE_UNRESOLVED`
+The raw graph is manuscript-wide, not matroid-only.
 
-This field answers: how will the Lean project obtain the result?
+It therefore contains:
 
-During normalization before mathlib reconnaissance, the normal value is `NOT_CHECKED`.
+- matroid facts;
+- non-matroid mathematics;
+- definitions;
+- manuscript results;
+- external obligations;
+- certificate/data nodes;
+- and other formalization-oriented interfaces.
 
-Do not mark `MATHLIB_EXACT` or `MATHLIB_BRIDGE` without identifying the exact fully qualified declaration(s).
+Do not assume every raw node should have a normalized matroid counterpart.
 
-## 8. Normalized ledger schema
+---
 
-Each normalized row should record at least:
+# 3. Meaning of "raw"
 
-- normalized ID `N###`;
-- blind source ID(s) `M###`;
-- concise name;
-- atomic mathematical requirement;
-- exact TeX label where stated/defined, if any;
-- exact TeX labels of material uses;
-- use type: explicit reference/invocation or semantic inference;
-- scope classification;
-- mathematical provenance;
-- formalization source;
-- formalization status;
-- notes on hypotheses, equivalences, splits/merges, ambiguity, and manuscript context.
+The term **raw dependency graph** means:
 
-Recommended formalization statuses:
+> the older independent manuscript-wide dependency analysis before the present normalized matroid-ledger process.
 
-- `IDENTIFIED`
-- `STATEMENT_DESIGN`
-- `LEAN_STATED`
-- `MATHLIB_MATCH`
-- `BRIDGE_PROVED`
-- `PROVED_LOCAL`
-- `COMPLETE`
+"Raw" does not mean naive or purely syntactic.
 
-## 9. Freeze normalization before revealing held-out audits
+The raw graph may already contain:
 
-The normalization pass must be performed without consulting Astra or any other previous dependency audit.
+- semantic proof dependencies;
+- manually reviewed edges;
+- bundled external facts;
+- inferred dependencies;
+- certificate nodes;
+- and other interpretation.
 
-During normalization, do not inspect directories designated as held-out audit material.
+Preserve its structure as an independent historical analysis.
 
-After the normalized ledger has been reviewed and committed, create a marker file:
+Do not rewrite raw nodes to resemble normalized entries.
 
-    Matroid/NORMALIZATION_FROZEN
+---
 
-The marker should record the Git commit hash containing the frozen normalized ledger.
+# 4. Purpose of the comparison
 
-Do not consult held-out audit artifacts unless:
+The comparison asks:
 
-1. `Matroid/NORMALIZATION_FROZEN` exists; and
-2. the current task explicitly requests an external-audit comparison.
+> Does the normalized matroid dependency ledger account for the matroid dependencies independently visible in the raw manuscript-wide graph?
 
-This separation is intentional and part of the experiment.
+This is a validation and discrepancy-discovery exercise.
 
-## 10. Astra comparison methodology
+It is not an attempt to maximize numerical agreement.
 
-Held-out Astra artifacts, when supplied, should live under a clearly separated path such as:
+Agreement increases confidence that a requirement was independently recovered.
 
-    Audit/AstraHeldout/
+Disagreement identifies manuscript locations that require closer inspection.
 
-Treat them as an independent prior analysis, not as truth.
+The manuscript determines the resolution.
 
-The comparison must be semantic. Do not compare only names or IDs.
+---
 
-For each normalized matroid requirement, determine whether Astra contains the same mathematical obligation, a coarser bundle containing it, a finer decomposition of it, or no corresponding obligation.
+# 5. Comparison must be semantic
 
-For Astra nodes not matched to a normalized entry, determine whether they represent:
+Do not compare only names, labels, or strings.
 
-- a genuinely missed matroid dependency;
-- non-matroid context;
-- a certificate/data node;
-- an implementation/interface node;
-- a duplicate or equivalent formulation;
-- or a granularity difference.
+Compare mathematical content.
 
-Use these comparison categories:
+A normalized entry may correspond to:
 
-- `AGREEMENT`
-- `CODEX_ONLY_CANDIDATE`
-- `ASTRA_ONLY_CANDIDATE`
-- `GRANULARITY_MISMATCH`
-- `SCOPE_MISMATCH`
-- `FORMULATION_MISMATCH`
-- `DUPLICATE_OR_EQUIVALENT`
-- `UNRESOLVED`
+    one raw node
+    several raw nodes
+    part of one raw node
+    several parts of several raw nodes
+    no raw node
 
-A comparison category is not an adjudication. Every nontrivial discrepancy must be checked against `Manuscript/main.tex`.
+Likewise, one raw node may correspond to several normalized entries.
 
-## 11. Comparison outputs
+Many such cases are granularity differences, not errors.
 
-Do not overwrite `LEDGER.md` or `LEDGER_NORMALIZED.md` during the Astra comparison.
+Compare:
 
-Write comparison results separately, preferably:
+- hypotheses;
+- conclusions;
+- mathematical objects involved;
+- manuscript proof role;
+- and exact TeX evidence.
 
-    Matroid/ASTRA_COMPARISON.md
-    Matroid/ASTRA_MAPPING.csv
+---
 
-`ASTRA_COMPARISON.md` should summarize methodology, counts, major discrepancy families, and human-review items.
+# 6. Comparison classifications
 
-`ASTRA_MAPPING.csv` should provide a row-level crosswalk between normalized IDs and Astra node IDs, including comparison category and manuscript evidence.
+Use the following classifications.
 
-If the comparison reveals a likely omission or error in the normalized ledger, record a proposed correction in the report. Do not silently edit the frozen ledger.
+## `AGREEMENT`
 
-After human adjudication, a later task may create a new version of the working ledger.
+The normalized entry and raw node or nodes identify substantially the same mathematical obligation at compatible granularity.
 
-## 12. Reproducibility
+## `GRANULARITY_MISMATCH`
 
-Every dependency claim should be recoverable from the frozen manuscript.
+Both analyses identify the same underlying mathematics, but one bundles facts that the other splits.
 
-The desired chain is:
+This is not automatically an error.
 
-    frozen manuscript
-        ↓
-    exact TeX label / proof location
-        ↓
-    blind ledger
-        ↓
-    normalized ledger
-        ↓
-    external-audit comparison
-        ↓
-    human adjudication
-        ↓
-    Lean declaration
-        ↓
-    kernel-checked proof
+## `NORMALIZED_ONLY_CANDIDATE`
 
-Preserve uncertainty and provenance at each stage.
+A normalized entry has no clear raw counterpart.
 
-## 13. Lean workflow and trust boundary
+Possible explanations include:
 
-Do not begin proofs merely because a fact has been identified.
+- the normalized extraction found a dependency the raw graph missed;
+- the normalized ledger over-extracted context;
+- the raw graph encoded the dependency only indirectly;
+- or the match has not yet been found.
 
-The intended progression is:
+Check the manuscript before drawing a conclusion.
 
-    IDENTIFIED
-        ↓
-    mathematical statement fixed
-        ↓
-    Lean statement elaborates
-        ↓
-    formal-library support investigated
-        ↓
-    bridge or proof supplied
-        ↓
-    COMPLETE
+## `RAW_ONLY_CANDIDATE`
 
-Do not introduce `axiom`, `sorry`, or `admit` unless explicitly requested for a temporary conditional interface.
+A raw matroid-relevant node has no clear normalized counterpart.
 
-Do not change the public API merely to make a proof easier without documenting the discrepancy.
+Possible explanations include:
 
-Before declaring Lean implementation work complete, run:
+- a missing normalized requirement;
+- a coarse raw external bundle;
+- an obsolete or unnecessary dependency;
+- an implementation-oriented raw node rather than a mathematical obligation;
+- or a missed match.
 
-    lake build
+Check the manuscript before proposing a correction.
 
-Computational evidence is not itself proof. If finite certificates are used later, distinguish certificate data, verified checker, checker soundness, and final mathematical theorem.
+## `SCOPE_MISMATCH`
 
-## 14. Working style
+The two analyses identify related material but disagree about whether it belongs in the matroid dependency specification.
 
-Favor small, auditable changes.
+## `FORMULATION_MISMATCH`
 
-Do not perform large architectural rewrites unless requested.
+Both analyses appear to refer to the same manuscript dependency but extract materially different mathematical statements.
 
-Do not modify unrelated files.
+These cases require manuscript inspection.
 
-Do not silently broaden the scope of a task.
+## `DUPLICATE_OR_EQUIVALENT`
 
-If manuscript evidence is insufficient, record uncertainty rather than guessing.
+The apparent discrepancy is caused by equivalent formulations or duplicated obligations.
 
-The purpose of this pilot is not merely to obtain Lean code. It is to construct a reproducible process connecting manuscript mathematics, dependency discovery, independent audit comparison, formal-library reconciliation, and machine-checked proof.
+Explain the claimed equivalence.
+
+Do not merely assert it.
+
+## `NON_MATROID_RAW_NODE`
+
+The raw node is outside the scope of the normalized matroid ledger.
+
+Examples may include:
+
+- adversary-bound facts;
+- general optimization;
+- ordinary linear algebra;
+- quantum-query statements;
+- certificate data;
+- application-specific definitions.
+
+## `UNRESOLVED`
+
+The relationship cannot be determined confidently.
+
+Preserve the uncertainty.
+
+---
+
+# 7. Required comparison procedure
+
+Perform the comparison in both directions.
+
+## Pass A: normalized to raw
+
+For every `N###` entry in:
+
+    Matroid/LEDGER_NORMALIZED.md
+
+determine:
+
+1. whether a corresponding raw node or node group exists;
+2. which `raw_node_id` values correspond;
+3. the comparison classification;
+4. the exact manuscript evidence;
+5. whether the difference is substantive or merely structural.
+
+Every normalized entry must appear in the final mapping, including entries with no raw match.
+
+---
+
+## Pass B: raw to normalized
+
+Inspect every raw node that is plausibly matroid-related.
+
+Determine whether it:
+
+- matches a normalized entry;
+- participates in a granularity mismatch;
+- is non-matroid;
+- is merely an implementation/certificate/context node;
+- or represents a possible omission from the normalized ledger.
+
+Do not limit this pass to raw nodes that already have obvious normalized matches.
+
+The purpose of the reverse pass is to detect things the normalized extraction may have missed.
+
+---
+
+# 8. Manuscript adjudication
+
+For every nontrivial discrepancy, inspect `Manuscript/main.tex`.
+
+Record:
+
+- the relevant TeX label or labels;
+- the proof or statement location;
+- whether the dependency is explicit or inferred semantically;
+- what mathematical fact the manuscript actually requires;
+- whether the normalized ledger represents it;
+- whether the raw graph represents it;
+- and which interpretation appears better supported.
+
+Do not silently modify either source artifact.
+
+If the manuscript does not clearly resolve the issue, classify it as `UNRESOLVED`.
+
+---
+
+# 9. Required output files
+
+Do not modify:
+
+    Matroid/LEDGER.md
+    Matroid/LEDGER_NORMALIZED.md
+    Audit/dependency_graph_raw.csv
+    Audit/dependency_graph_raw_edges.csv
+    Manuscript/main.tex
+
+Create exactly these primary comparison artifacts:
+
+    Matroid/NORMALIZED_VS_RAW_MAPPING.csv
+    Matroid/NORMALIZED_VS_RAW_COMPARISON.md
+
+---
+
+# 10. Mapping CSV
+
+`Matroid/NORMALIZED_VS_RAW_MAPPING.csv` should support many-to-many relationships.
+
+Use one row per normalized/raw relationship.
+
+Recommended columns:
+
+    normalized_id
+    normalized_name
+    raw_node_id
+    raw_node_name
+    classification
+    tex_labels
+    use_type
+    semantic_comparison
+    manuscript_adjudication
+    proposed_action
+    confidence
+
+If a normalized entry has no raw counterpart, include a row with an empty `raw_node_id`.
+
+If a raw matroid-relevant node has no normalized counterpart, include a row with an empty `normalized_id`.
+
+Do not discard unmatched items.
+
+---
+
+# 11. Comparison report
+
+`Matroid/NORMALIZED_VS_RAW_COMPARISON.md` should contain the following sections.
+
+## Method
+
+Describe:
+
+- which files were compared;
+- that the analyses were independently produced;
+- that matching was semantic rather than textual;
+- and that `Manuscript/main.tex` was used for adjudication.
+
+## Summary
+
+Report:
+
+- total normalized entries examined;
+- total raw nodes examined;
+- number of raw nodes judged matroid-relevant;
+- clear agreements;
+- granularity mismatches;
+- normalized-only candidates;
+- raw-only candidates;
+- scope mismatches;
+- formulation mismatches;
+- duplicate/equivalent cases;
+- unresolved cases;
+- non-matroid raw nodes.
+
+Do not call these accuracy scores.
+
+There is no independent gold-standard dependency graph.
+
+## Major discrepancy families
+
+Group related discrepancies.
+
+Examples may include:
+
+- closure/circuit facts;
+- represented matroid facts;
+- minor operations;
+- duality;
+- regular matroids;
+- totally unimodular representation facts;
+- 1-, 2-, or 3-sum structure;
+- R10-specific facts;
+- graphic/cographic facts;
+- source-matroid constructions.
+
+Use whatever families actually arise from the comparison.
+
+## Systematic methodological differences
+
+Identify patterns in how the two analyses behaved.
+
+For example:
+
+- one analysis bundled standard external mathematics more aggressively;
+- one extracted more implicit proof obligations;
+- one preserved more application context;
+- one produced finer atomic statements;
+- one represented definitions separately while the other folded them into theorem nodes.
+
+This section is important.
+
+## Proposed corrections
+
+List possible changes to the normalized ledger, but do not apply them.
+
+Separate:
+
+- clear corrections;
+- likely corrections;
+- optional granularity refinements;
+- unresolved issues requiring human review.
+
+For each proposed correction, cite the normalized ID, raw node ID where relevant, and manuscript TeX evidence.
+
+---
+
+# 12. No downstream work in this pass
+
+Do not proceed beyond the comparison.
+
+In particular, do not:
+
+- edit the normalized ledger;
+- create an adjudicated ledger;
+- construct a new dependency graph;
+- compute indegree-zero entry nodes;
+- inspect mathlib;
+- write Lean statements;
+- write Lean proofs;
+- alter module structure;
+- propose implementation files;
+- or begin formalization.
+
+Those are separate later phases.
+
+The output of this task is the comparison itself.
+
+Stop after producing and validating:
+
+    Matroid/NORMALIZED_VS_RAW_MAPPING.csv
+    Matroid/NORMALIZED_VS_RAW_COMPARISON.md
+
+---
+
+# 13. Quality standard
+
+The comparison should be auditable.
+
+A reviewer should be able to start from any row in the mapping and answer:
+
+1. what normalized requirement is being discussed;
+2. what raw graph node or nodes it was compared against;
+3. what manuscript text supports the relationship;
+4. why the classification was chosen;
+5. and whether any correction is being proposed.
+
+Prefer explicit uncertainty to forced agreement.
+
+The purpose of this pass is to discover where the two independent dependency analyses agree and disagree before any further formalization work begins.
