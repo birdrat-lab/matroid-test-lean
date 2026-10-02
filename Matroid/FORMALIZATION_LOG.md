@@ -569,3 +569,39 @@ The manuscript definition `def:graphic-cographic` explicitly denotes the cograph
 ## Resulting active frontier
 
 The current frontier was recomputed mechanically from the updated ledger and direct-edge CSV after all four primary targets were assessed. It has 196 active requirements, 29 complete requirements, and 30 unresolved nodes whose direct active prerequisites are complete. Seven frontier nodes were newly exposed by N025/N043. N062 is now held behind the corrected N061 → N062 edge; N261 is excluded after re-scoping. The complete current list and remaining descendant counts are in `Matroid/FRONTIER.md`. No newly exposed target was formalized in this pass.
+
+# Structural-depth pass: shallow layer
+
+The initial mechanical depth table had one complete depth-0 requirement and two unresolved depth-1 requirements, N061 and N080. The depth-2 set was not started because N061 remains active and unresolved. No dependency edge changed during this pass: the cut/cycle comparison below belongs to the proof of N061, rather than a distinct manuscript dependency.
+
+## N061 — graphic matroid, depth 1
+
+- **Ledger ID:** N061
+- **Structural depth:** 1
+- **TeX label:** `def:graphic-cographic`
+- **Requirement:** A finite graph has a matroid on its edges whose independent sets are precisely the edge sets containing no graph cycle.
+- **Manuscript proof status:** MANUSCRIPT_DEFINITION
+- **Manuscript construction plan:** Use actual labeled edges as the ground type. A forest can be characterized by each selected edge admitting a cut isolating it from all other selected edges (the bridge criterion); show this agrees with absence of graph cycles, then establish matroid exchange.
+- **Lean declaration:** `Graph.edgeCutMatroid`, `Graph.edgeCutMatroid_indep_iff` (partial construction).
+- **Formalization source:** FORMALIZATION_SOURCE_UNRESOLVED for the full manuscript requirement; the cut-based partial construction is a LOCAL_PROOF.
+- **Mathlib declarations used:** `Graph`, `Graph.edgeCut_symmDiff`, `Graph.edgeSet`, `Matroid.ofFiniteClosure`, `Matroid.SteinitzExchange`.
+- **Deviation from manuscript route:** Exchange is established through symmetric differences of edge cuts and the N080 closure construction, avoiding a direct forest augmentation proof. The mathematical identification with cycle-free forests remains to be formalized.
+- **Result:** BLOCKED_MATHLIB_INFRASTRUCTURE. The pinned multigraph `Graph` API provides cuts but no walk/cycle predicate or theorem that an edge cut isolating every selected edge is equivalent to absence of cycles. The candidate matroid is not asserted as N061 complete.
+- **Build status:** `lake build` passed with the partial construction.
+- **Notes:** The edge ground type is the subtype of `G.edgeSet`, retaining loops and parallel edge labels. The missing comparison is a proof-route bridge within N061, so no new canonical ledger row or direct edge was introduced.
+
+## N080 — finite closure-exchange representation, depth 1
+
+- **Ledger ID:** N080
+- **Structural depth:** 1
+- **TeX label:** `def:matroidal-query-system`
+- **Requirement:** A finite closure operator satisfying Steinitz exchange is the closure of a matroid.
+- **Manuscript proof status:** MANUSCRIPT_STATEMENT_ONLY
+- **Manuscript proof plan:** Define independence by excluding each element from the closure of the remaining elements. Exchange preserves independence when an element lies outside the current closure. Extend independent sets maximally; their closures span the specified set. Minimal spanning sets satisfy basis exchange, so mathlib constructs a matroid. Finally use the exact independence predicate and matroid basis closure to recover the original closure on every set.
+- **Lean declaration:** `Matroid.ofFiniteClosure`, `Matroid.ofFiniteClosure_indep_iff`, `Matroid.ofFiniteClosure_closure`.
+- **Formalization source:** LOCAL_PROOF
+- **Mathlib declarations used:** `ClosureOperator`, `Matroid.ofIsBaseOfFinite`, `Matroid.IsBasis.mem_of_insert_indep`, `Matroid.Indep.mem_closure_iff'`.
+- **Deviation from manuscript route:** The manuscript states the query matroid's existence without proof. Lean supplies a finite basis-exchange construction. The query set is the finite index type (or the subtype of a finite query set), so the matroid ground is `univ` on that type.
+- **Result:** COMPLETE; the construction and equality of closure operators are kernel checked.
+- **Build status:** `lake build` passed.
+- **Notes:** This proves both required obligations: matroid construction and exact recovery of the supplied closure. It adds no new foundational matroid type.

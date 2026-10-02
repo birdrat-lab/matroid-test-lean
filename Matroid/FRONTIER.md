@@ -1,64 +1,41 @@
-# Current Matroid formalization frontier
+# Current Matroid structural-depth frontier
 
-Computed on 2026-10-02 from `Matroid/LEDGER.md` and `Matroid/DEPENDENCY_EDGES.csv` after the subject-module reorganization and primary blocker pass. Active scopes are `CORE_MATROID` and `MATROID_INTERFACE`. A frontier node is active, unresolved, and has every direct active prerequisite at `COMPLETE`.
+Computed mechanically from `Matroid/LEDGER.md` and `Matroid/DEPENDENCY_EDGES.csv` after the depth-1 pass. Only `CORE_MATROID` and `MATROID_INTERFACE` rows are active. Depth is the length of the longest directed prerequisite chain ending at each node; nodes with no active prerequisite have depth 0. `Matroid/DEPTHS.csv` records every active node and its direct prerequisites.
 
-Active requirements: **196**. Complete: **29**. Current unresolved frontier: **30**. The archived pass-2 frontier had **27** nodes; **7** are newly exposed here. N261 is preserved in the ledger as `OUT_OF_SCOPE_CONTEXT` and excluded.
+At the start of this pass, the minimum unresolved depth was **1**, containing N061 and N080. N080 is now complete. The final minimum unresolved depth remains **1**, containing **N061 Graphic matroid**. The depth-2 set was not started.
 
-## Completed blocker results
+## Minimum unresolved depth
 
-| ID | Result | Manuscript evidence | Effect |
-| --- | --- | --- | --- |
-| N025 | `COMPLETE`: `Matroid.contract_rank_toNat_eq_sub` | `def:matroid-minors` | Discharges one direct prerequisite for 14 children and reaches 25 descendants. |
-| N043 | `COMPLETE`: `Matroid.vectorMatroid` and its independence/ground/representation API | `def:vector-matroid` | Discharges one direct prerequisite for 10 children and reaches 70 descendants. |
-| N061 | `BLOCKED_MATHLIB_INFRASTRUCTURE` | `def:graphic-cographic` | Multigraph forest/cycle theory and augmentation remain to be supplied. |
-| N062 | `BLOCKED_MATHLIB_INFRASTRUCTURE` | `def:graphic-cographic` | Requires N061 and a graph bond/graphic cocircuit correspondence. |
+| ID | Name | Status | Direct prerequisites | Manuscript label |
+| --- | --- | --- | --- | --- |
+| N061 | Graphic matroid | `STATEMENT_DESIGN`; `BLOCKED_MATHLIB_INFRASTRUCTURE` | N001 (`COMPLETE`) | `def:graphic-cographic` |
 
-## Remaining blockers
+## Focused depth-1 blocker
 
-The descendant counts below are transitive reachability counts in the active edge graph. The child lists are direct outgoing edges; a descendant may have other incomplete prerequisites as well.
+`Graph.edgeCutMatroid` now constructs a matroid on the subtype of actual labeled graph edges. Its independence theorem says each selected edge admits a graph cut containing that edge and no other selected edge. The cut family is closed under symmetric difference, which gives Steinitz exchange for the corresponding closure operator.
 
-| ID | Direct active children | Transitive descendants | Current constraint |
-| --- | --- | ---: | --- |
-| N061 | `N062`, `N071`, `N135`, `N172`, `N174`, `N176`, `N207`, `N224`, `N225`, `N258`, `N264`, `N267` | 22 | The pinned multigraph `Graph` API has no cycle/forest predicate or forest augmentation theorem for edge sets; simple-graph acyclicity would change the manuscript graph model. |
-| N062 | `N071`, `N135`, `N173`, `N175`, `N176`, `N224`, `N225` | 13 | The new N061 → N062 definitional edge makes N061 a prerequisite; the bond/cocircuit bridge is also absent. |
+**Unfinished N061 statement:** `def:graphic-cographic` specifies independent sets by absence of graph cycles. The pinned mathlib multigraph `Graph` API has edge cuts and bonds but no walk/cycle predicate or cycle-free/bridge equivalence. A Lean proof that the cut-isolation criterion is equivalent to a cycle-free edge set is still required before N061 can be marked `COMPLETE`. This comparison is part of the construction proof, not a separate manuscript dependency; no new ledger node or edge was added.
 
-N062 is **not** in the frontier because N061 remains incomplete. N080 is an independent unresolved frontier node with no recorded descendants; it was outside the optional work condition for this pass.
+`Matroid.ofFiniteClosure` and `Matroid.ofFiniteClosure_closure` complete N080. They construct a finite matroid from a Steinitz-exchange closure and prove that its closure equals the supplied operator on every set.
 
-## Newly exposed frontier
+## Active-node counts by structural depth
 
-This table lists **all** current unresolved active frontier nodes. “New” means absent from the archived pass-2 resulting frontier; “Retained” means present there. No node in this table was formalized as part of this frontier recomputation.
+| Depth | Active | Complete | Unresolved |
+| ---: | ---: | ---: | ---: |
+| 0 | 1 | 1 | 0 |
+| 1 | 9 | 8 | 1 |
+| 2 | 19 | 7 | 12 |
+| 3 | 12 | 1 | 11 |
+| 4 | 19 | 2 | 17 |
+| 5 | 32 | 10 | 22 |
+| 6 | 25 | 1 | 24 |
+| 7 | 21 | 0 | 21 |
+| 8 | 21 | 0 | 21 |
+| 9 | 24 | 0 | 24 |
+| 10 | 9 | 0 | 9 |
+| 11 | 3 | 0 | 3 |
+| 12 | 1 | 0 | 1 |
 
-| ID | Name | Direct active prerequisites | Exposure |
-| --- | --- | --- | --- |
-| N005 | Extension to a full basis | `N004` | Retained |
-| N013 | Flat rank test | `N006`, `N012` | Retained |
-| N014 | Spanning basis forces full flat | `N002`, `N012` | Retained |
-| N017 | Hyperplane | `N012` | Retained |
-| N024 | Deletion | `N023` | Retained |
-| N028 | Contraction composition | `N025` | New after N025/N043 |
-| N030 | Spanned target contracts to loop | `N007`, `N021`, `N025` | New after N025/N043 |
-| N033 | Modular pair of flats | `N006`, `N012` | Retained |
-| N036 | Single-element extension | `N023` | Retained |
-| N044 | Represented rank | `N006`, `N043` | New after N025/N043 |
-| N046 | Represented circuits | `N015`, `N043` | New after N025/N043 |
-| N047 | Projective equivalence | `N042` | Retained |
-| N049 | Represented contraction | `N025`, `N043` | New after N025/N043 |
-| N051 | Regularity | `N042` | Retained |
-| N056 | TU pivot and standard form | `N042` | Retained |
-| N057 | TU identity augmentation | `N042` | Retained |
-| N061 | Graphic matroid | `N001` | Retained |
-| N064 | Regular one-sum construction | `N063` | Retained |
-| N080 | Finite closure-exchange representation | `N001` | Retained |
-| N097 | Flat-lattice join | `N007`, `N012` | Retained |
-| N106 | Positive support by target circuits | `N015`, `N081`, `N105` | Retained |
-| N111 | Nonzero column rescaling | `N043` | New after N025/N043 |
-| N112 | Ambient linear isomorphism | `N043` | New after N025/N043 |
-| N125 | TU weighted basis determinant | `N042`, `N122` | Retained |
-| N130 | Corank-one uniform target circuit | `N015`, `N129` | Retained |
-| N131 | Rank-one uniform target closure | `N007`, `N129` | Retained |
-| N143 | Negative restriction coloop | `N007`, `N022`, `N023` | Retained |
-| N214 | R10 target loop or coloop ratio | `N021`, `N022`, `N122` | Retained |
-| N243 | Free response generators form basis | `N002`, `N020` | Retained |
-| N266 | Weighted triangle signature | `N001`, `N007`, `N158` | Retained |
+## Held depth-2 layer
 
-The N061 → N062 dependency correction removes N062 from the former frontier; completing N025 and N043 removes those two nodes while exposing seven others. Re-scoping N261 removes it from active calculations.
+Twelve active depth-2 requirements remain unresolved: `N024`, `N036`, `N046`, `N047`, `N051`, `N056`, `N057`, `N062`, `N111`, `N112`, `N130`, `N258`. This list is informational; no depth-2 target snapshot was frozen or attacked because depth 1 is unresolved.

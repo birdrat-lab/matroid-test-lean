@@ -1,49 +1,47 @@
-# Matroid Lean Reorganization and High-Leverage Blocker Pass
+# Complete the Matroid Formalization Through Topological Depth 2
 
-This repository is formalizing the matroid mathematics required by the manuscript from the bottom of an audited dependency graph upward.
+This repository formalizes the matroid mathematics required by the manuscript using an audited internal dependency DAG.
 
-The first foundational Lean boundary has been completed.
+The governing policy is now:
 
-A subsequent full-frontier pass completed most of the exposed targets but left several blockers.
+> **Always prioritize smaller topological dependency depth. Do not begin new work at depth `d + 1` while an active unresolved requirement remains at depth `d`.**
 
-This task has exactly two phases:
+This task should clear the remaining shallow layer and, if successful, formalize the complete active depth-2 layer.
 
-1. reorganize the existing Lean source tree by mathematical subject;
-2. attack the highest-leverage unresolved blockers.
-
-Do not recursively continue into newly exposed frontier nodes during this task.
-
-The intended workflow is:
+The procedure is:
 
 ```text
-reorganize existing code without changing mathematics
+recompute structural depths
         ↓
-verify build
+clear all unresolved depth-1 nodes
         ↓
-repair blocker-related dependency metadata
+recompute / validate depths
         ↓
-attack N025, N043, N061, N062
+if and only if depth 1 is clear:
+freeze the unresolved depth-2 target set
         ↓
-update ledger and formalization log
+attack all depth-2 targets
         ↓
-recompute resulting frontier
+update ledger / log / graph if justified
         ↓
-report it
+recompute minimum unresolved depth
         ↓
 STOP
 ```
 
+Do not proceed to depth 3 during this task.
+
 ---
 
-# 1. Mathematical source of truth
+# 1. Sources of truth
 
-The frozen manuscript is:
+The mathematical source is:
 
 ```text
 Manuscript/main.tex
 ```
 
-The canonical formalization specification is:
+The canonical requirement inventory is:
 
 ```text
 Matroid/LEDGER.md
@@ -55,602 +53,523 @@ The direct internal prerequisite graph is:
 Matroid/DEPENDENCY_EDGES.csv
 ```
 
-The formalization history is recorded in:
+The formalization record is:
 
 ```text
 Matroid/FORMALIZATION_LOG.md
 ```
 
-For every theorem or construction implemented in this task:
+The manuscript determines what mathematics must be formalized.
 
-1. read the canonical ledger entry;
-2. inspect the exact manuscript statement and surrounding proof or derivation;
-3. determine the manuscript proof plan;
-4. only then inspect mathlib;
-5. implement a manuscript-faithful Lean statement;
-6. document any meaningful deviation in proof route.
+The ledger determines the currently accepted requirement set.
 
-Use exact TeX labels for provenance.
+The edge table determines direct internal prerequisites.
 
-Do not silently strengthen, weaken, or replace manuscript statements.
+Lean/mathlib determine how those requirements are discharged, but not what they mean.
 
 ---
 
-# 2. Phase A: reorganize Lean source by mathematics
+# 2. Structural topological depth
 
-The current Lean source contains filenames reflecting implementation chronology, such as:
+Compute the topological depth of every active Matroid requirement mechanically from `DEPENDENCY_EDGES.csv`.
+
+For active node `v`, define:
 
 ```text
-Basic.lean
-Frontier2.lean
+depth(v) = 0
 ```
 
-These names should not remain part of the long-term source organization.
+when `v` has no active internal prerequisites.
 
-Lean files should be organized by mathematical subject, not by formalization pass.
-
-Historical information about when a declaration was implemented belongs in:
+Otherwise:
 
 ```text
-Matroid/FORMALIZATION_LOG.md
-logs/
+depth(v) = 1 + max(depth(u))
 ```
 
-not in module names.
-
----
-
-# 3. Remove the chronological `Internal` organization
-
-If the current source tree contains:
+over all active direct prerequisites:
 
 ```text
-Matroid/Internal/Basic.lean
-Matroid/Internal/Frontier2.lean
+u → v
 ```
 
-move their declarations into mathematically named modules directly under:
+Only active Matroid requirements count.
+
+Rows scoped only as:
 
 ```text
-Matroid/
+APPLICATION_CONTEXT
+OUT_OF_SCOPE_CONTEXT
 ```
 
-The desired structure after reorganization is approximately:
+do not participate in the active DAG.
+
+Do not use:
+
+- manuscript section number;
+- formalization pass number;
+- chronological frontier number;
+- shortest distance from a root;
+- downstream count
+
+as substitutes for topological depth.
+
+The relevant depth is the **longest direct-prerequisite-chain depth** defined above.
+
+---
+
+# 3. Depth takes priority over leverage
+
+The ordering policy is lexicographic:
 
 ```text
-Matroid/
-├── Matroid.lean
-├── RankClosure.lean
-├── Representation.lean
-├── Cycles.lean
-├── Colored.lean
-├── Uniform.lean
-├── Pointed.lean
-├── WeightedBases.lean
-├── ThreeSum.lean
-├── Minors.lean
-├── Graphic.lean
-│
-├── LEDGER.md
-├── DEPENDENCY_EDGES.csv
-├── ENTRY_NODES.md
-├── FORMALIZATION_LOG.md
-└── ...
+1. smaller topological depth
+2. only then downstream leverage or convenience
 ```
 
-Only create modules that contain actual declarations.
+A low-leverage depth-1 theorem must be addressed before an attractive depth-2 theorem.
 
-Do not create empty placeholder modules merely to anticipate future work.
+Do not bypass a shallow unresolved node because:
 
-If `Matroid/Internal/` becomes empty, remove it.
+- it has no descendants;
+- it is difficult;
+- a deeper branch is easier;
+- a deeper branch has more downstream nodes.
+
+This policy is intended to eliminate foundational debt.
 
 ---
 
-# 4. Expected relocation of existing declarations
+# 4. Historical deeper completions remain valid
 
-Reorganize existing declarations according to mathematical content.
+Earlier passes completed some nodes at depths greater than the current minimum unresolved depth.
 
-The expected placement is approximately:
+Do not undo those results.
 
-## `Matroid/RankClosure.lean`
+However, do not use their existence as justification for performing **new** work deeper than the current minimum unresolved depth.
 
-Existing basis/rank/closure bridges, including declarations corresponding to:
+The invariant is:
+
+> new formalization work always begins at the minimum unresolved active structural depth.
+
+---
+
+# 5. Produce a depth table
+
+At the beginning of this task, create or update:
 
 ```text
-N003
-N006
-N007
-N016
+Matroid/DEPTHS.csv
 ```
 
-and related local helpers.
-
-Examples currently include declarations analogous to:
+with at least:
 
 ```text
-isBasis_ncard_eq
-isBasis_eRk_eq_ncard
-indep_ncard_le_isBasis_ncard
-mem_closure_iff_eRk_insert_eq
-mem_closure_iff_exists_circuit_sdiff
+id
+name
+scope
+status
+depth
+direct_prerequisites
+complete_prerequisites
+incomplete_prerequisites
 ```
 
----
+Compute this mechanically from the canonical ledger and edge table.
 
-## `Matroid/Cycles.lean`
-
-Circuit/cycle operations and results such as the existing circuit-union material.
-
----
-
-## `Matroid/Colored.lean`
-
-The colored-matroid definitions or wrappers introduced for the completed frontier.
-
----
-
-## `Matroid/Representation.lean`
-
-Representation-related declarations such as:
+Also record in:
 
 ```text
-Represents
-RepresentableOver
+Matroid/FRONTIER.md
 ```
 
-and the new N043 work described below.
+the current minimum unresolved structural depth and all unresolved nodes at that depth.
+
+Do not manually assign depths.
 
 ---
 
-## `Matroid/Uniform.lean`
+# 6. Expected current minimum unresolved depth
 
-Uniform-matroid declarations and bridges.
-
----
-
-## `Matroid/Pointed.lean`
-
-Pointed-matroid and target-support material, including declarations analogous to:
+For the current repository state, the expected minimum unresolved depth is:
 
 ```text
-minimal_spanning_iff_circuit
-positiveTargetSupport
+depth 1
 ```
 
----
-
-## `Matroid/WeightedBases.lean`
-
-Weighted basis-sum definitions and related elementary API.
-
----
-
-## `Matroid/ThreeSum.lean`
-
-The five-class triangle/3-sum boundary result corresponding to N158 and its local helpers.
-
----
-
-## `Matroid/Minors.lean`
-
-Restriction/contraction mathematics, including completed minor-related material and the N025 blocker.
-
----
-
-## `Matroid/Graphic.lean`
-
-Graphic and cographic matroid constructions corresponding to N061 and N062.
-
----
-
-# 5. Reorganization must not change mathematics
-
-Phase A is a source-layout refactor only.
-
-During the reorganization:
-
-- preserve declaration names unless a name is genuinely misleading;
-- preserve theorem statements;
-- preserve proof bodies;
-- preserve ledger IDs and manuscript provenance;
-- update imports only as necessary;
-- do not opportunistically simplify or rewrite proofs.
-
-The objective is to make the source tree mathematically legible without mixing refactoring with theorem changes.
-
-After reorganization, run:
+with:
 
 ```text
-lake build
-```
-
-Do not begin Phase B until the reorganized repository builds successfully.
-
-Record the reorganization briefly in `FORMALIZATION_LOG.md`, but do not create fake ledger entries for file moves.
-
----
-
-# 6. Public import point
-
-`Matroid/Matroid.lean` remains the public umbrella import.
-
-It should import the mathematically named modules needed to expose the current project API.
-
-A downstream user should continue to be able to write:
-
-```lean
-import Matroid.Matroid
-```
-
-Do not force downstream code to know the historical organization of the formalization.
-
-Avoid unnecessary import cycles.
-
----
-
-# 7. Phase B: high-leverage blocker pass
-
-After the source reorganization builds, attack these unresolved targets:
-
-```text
-N025  Contraction rank
-N043  Vector matroid
 N061  Graphic matroid
-N062  Cographic matroid
+N080  Finite closure-exchange representation
 ```
 
-These are the primary targets of this pass because they block substantial downstream portions of the dependency graph.
+This is a sanity check only.
 
-Do not automatically attack every newly exposed node after completing them.
+Recompute it.
+
+If the computed result differs, investigate the ledger and edge table before doing proof work.
+
+Do not alter the graph merely to reproduce this expected result.
 
 ---
 
-# 8. Dependency-graph repair: N061 → N062
+# 7. Phase A — clear depth 1 completely
 
-Before formalizing N062, inspect its manuscript definition.
-
-The manuscript defines the cographic matroid through duality from the graphic matroid.
-
-Therefore verify whether the direct edge:
+Before touching any unresolved depth-2 node, attempt to discharge:
 
 ```text
-N061 → N062
+N061  Graphic matroid
+N080  Finite closure-exchange representation
 ```
 
-is absent from:
+Both must receive serious focused treatment.
 
-```text
-Matroid/DEPENDENCY_EDGES.csv
-```
+Do not treat previous blocker reports as final conclusions.
 
-If absent, add it with the appropriate edge type and manuscript evidence.
-
-The expected type is likely:
-
-```text
-DEFINITIONAL
-```
-
-because the cographic construction is stated in terms of the graphic matroid and duality.
-
-Do not add the edge mechanically without checking the exact manuscript formulation.
-
-Record the correction in `FORMALIZATION_LOG.md`.
+The earlier attempts identified where the missing work lies; this pass should now attack that work directly.
 
 ---
 
-# 9. Scope correction: N261
+# 8. Universal proof workflow
 
-N261 was exposed as a frontier node but the previous pass found that its content is fundamentally a matrix/TU row-restriction statement rather than a reusable matroid API fact.
-
-Reinspect:
-
-```text
-N261
-```
-
-against `Manuscript/main.tex`.
-
-If that assessment remains correct:
-
-- change its scope so that it is no longer an active Matroid formalization node;
-- preserve the ledger entry for provenance;
-- record clearly that it belongs to a future matrix/TU formalization layer;
-- remove it from active Matroid frontier calculations.
-
-Do not delete the entry.
-
-Do not write Lean for N261 in this pass.
-
-If manuscript inspection instead reveals a distinct pure matroid statement hidden inside N261, extract that fact explicitly rather than forcing the matrix theorem into the Matroid library.
-
----
-
-# 10. Proof-guided workflow for blockers
-
-For each of N025, N043, N061, and N062, follow:
+For every theorem or construction target, use this order:
 
 ```text
 ledger entry
     ↓
-exact manuscript statement
+exact manuscript statement / definition
     ↓
-manuscript proof / derivation
+manuscript proof or surrounding derivation
     ↓
-mathematical proof plan
+mathematical proof/construction plan
     ↓
-mathlib reconnaissance
+inspect pinned mathlib
     ↓
-Lean statement
+Lean design
     ↓
-proof / construction
+implementation
     ↓
 lake build
     ↓
-ledger + log update
+ledger and formalization-log update
 ```
 
-Do not begin with mathlib search.
+Do not begin from mathlib theorem search.
 
-The manuscript determines what must be formalized.
+First fix the mathematical requirement from the manuscript.
 
 ---
 
-# 11. Manuscript proof classifications
+# 9. Manuscript proof classifications
 
 Use:
 
 ```text
+MANUSCRIPT_DEFINITION
 MANUSCRIPT_PROOF
 MANUSCRIPT_SKETCH
 MANUSCRIPT_STATEMENT_ONLY
-MANUSCRIPT_DEFINITION
 ```
 
-as appropriate.
+For each theorem-like target, record a concise mathematical proof plan before Lean implementation.
 
-For theorem-like targets, record a mathematical proof plan before implementation.
+When the manuscript has no proof, say so.
 
-For construction targets, record:
-
-- the mathematical object being constructed;
-- the intended ground type;
-- the independence structure;
-- why the construction satisfies the matroid axioms;
-- how the resulting object corresponds to the manuscript definition.
+Do not retroactively describe a Lean proof as though it were present in the manuscript.
 
 ---
 
-# 12. N025 — contraction rank
+# 10. N061 — Graphic matroid
 
-N025 is a high-priority blocker.
+N061 states:
 
-Formalize the manuscript's contraction-rank requirement faithfully.
+> A graph's graphic matroid has forests as independent sets.
 
-Before implementation:
-
-1. inspect the exact manuscript formulation;
-2. inspect the existing project definitions and mathlib contraction API;
-3. identify whether the desired result is:
-   - already exact in mathlib;
-   - obtainable by a short rank/cardinality bridge;
-   - or requires a local proof.
-
-Prefer:
+The manuscript provenance is:
 
 ```text
-MATHLIB_EXACT
+def:graphic-cographic
 ```
 
-or:
+Previous work established that the pinned mathlib does not provide a ready-made graphic-matroid constructor for the manuscript's general graph model.
 
-```text
-MATHLIB_BRIDGE
-```
+The previous blocker analysis also found that:
 
-when possible.
+- the manuscript graph model must not be silently replaced by a simple graph if loops or parallel edges matter;
+- mathlib's general `Graph α β` type can represent labeled edges, loops, and parallel edges;
+- the missing infrastructure is primarily the forest/cycle independence theory and augmentation needed to construct the matroid.
 
-If a local proof is required, follow the manuscript's mathematical derivation where available.
+This pass should attack that infrastructure directly.
 
-Do not introduce an alternative contraction definition merely to make the theorem easier.
+## Requirements
 
-Place project-local declarations in:
+First determine exactly what graph generality `def:graphic-cographic` requires.
 
-```text
-Matroid/Minors.lean
-```
+Then construct or recover a mathematically faithful graphic matroid.
 
-unless manuscript inspection strongly indicates another mathematical home.
-
----
-
-# 13. N043 — vector matroid
-
-N043 is the representation-side construction of a matroid from a finite vector configuration.
-
-This is a high-priority blocker.
-
-Use mathlib's existing matroid abstraction and construction machinery.
-
-Do not introduce a competing foundational `Matroid` type.
-
-Before implementation:
-
-1. inspect the manuscript definition;
-2. identify the intended ground set/index type;
-3. formulate independence as linear independence of the corresponding vectors;
-4. inspect mathlib for an existing vector/linear-independence matroid constructor;
-5. if no exact constructor is available, use the appropriate general matroid-construction interface rather than rebuilding the whole theory.
-
-The final project-facing object must correspond transparently to the manuscript's vector matroid.
-
-Record precisely how the Lean construction matches the manuscript definition.
-
-Put this work in:
-
-```text
-Matroid/Representation.lean
-```
-
----
-
-# 14. N061 — graphic matroid
-
-N061 is the construction of the graphic matroid.
-
-Before implementing it, inspect the manuscript's graph conventions carefully.
-
-In particular determine whether the manuscript requires:
-
-- ordinary graphs;
-- multigraphs;
-- loops;
-- parallel edges;
-- a specified edge ground type.
-
-Do not silently replace the manuscript's graph model with a simpler graph type that changes the associated cycle matroid.
-
-Inspect mathlib's graph types only after the manuscript requirements are fixed.
-
-The intended graphic matroid should have:
+The intended interface is:
 
 ```text
 ground elements = graph edges
 independent sets = forests
 ```
 
-or the exact manuscript-equivalent formulation.
+or the exact equivalent supported by the manuscript.
 
-Use existing graph/forest theory from mathlib where possible.
+Prefer existing graph theory from mathlib where available.
 
-Do not manually reprove large amounts of graph theory if existing definitions suffice.
+If an appropriate matroid constructor from an independence predicate is useful, use the existing mathlib Matroid construction infrastructure rather than defining a competing matroid structure.
 
-If no suitable ready-made graphic-matroid constructor exists, construct it using a mathematically appropriate matroid-construction API and prove the required augmentation/exchange property.
+The central mathematical obligation is the augmentation/exchange property for forests.
 
-Place the resulting code in:
+## Missing-prerequisite rule
 
-```text
-Matroid/Graphic.lean
-```
+If resolving N061 reveals a **substantive reusable mathematical theorem** that is genuinely missing from `LEDGER.md`, do not hide it inside an opaque local helper.
 
-Record any meaningful mismatch between manuscript graph conventions and mathlib graph types.
+Instead:
 
----
+1. determine whether it is truly a manuscript/formalization requirement;
+2. add a canonical ledger entry if justified;
+3. add the direct dependency edge;
+4. recompute structural depths.
 
-# 15. N062 — cographic matroid
+If the new prerequisite lies at depth 1 or lower, it becomes part of the current shallow layer and must be addressed before depth 2.
 
-Do not attempt N062 independently of N061.
+Routine implementation lemmas need not become ledger nodes.
 
-First complete or adequately establish the graphic matroid construction.
-
-Then implement the manuscript's cographic matroid through matroid duality.
-
-Prefer the conceptual construction:
-
-```text
-cographic(G) = (graphic(G))*
-```
-
-when this matches the manuscript.
-
-Use mathlib's existing matroid dual operation.
-
-Do not build the cographic matroid from scratch through cut spaces unless the manuscript actually requires a different formulation.
-
-Record the exact dependency on N061.
-
-Place the construction in:
-
-```text
-Matroid/Graphic.lean
-```
-
-unless the amount of dual-specific material later justifies a separate module.
+Document the distinction.
 
 ---
 
-# 16. N080 is not a primary target
+# 11. N080 — Finite closure-exchange representation
 
-N080 remains an unresolved standalone theorem concerning finite closure/exchange representation.
+N080 states:
 
-It currently has little or no downstream blocking effect.
+> A finite extensive, monotone, idempotent closure satisfying Steinitz exchange is the closure of a matroid.
 
-Do not prioritize it ahead of N025, N043, N061, or N062.
+Its manuscript context is associated with:
 
-If all four high-leverage blockers complete cleanly and substantial task budget remains, N080 may be investigated.
+```text
+def:matroidal-query-system
+```
 
-However:
+The manuscript treats this as standard but does not provide a proof.
 
-- do not allow N080 to delay completion of this pass;
-- do not start downstream frontier nodes after resolving it.
+The previous pass found no exact mathlib constructor from these closure axioms.
 
-If attempted, use the same manuscript → mathlib → Lean discipline.
+Therefore treat N080 as a real local theorem-construction problem, not merely a theorem-search problem.
+
+## Preferred mathematical route
+
+Begin from the supplied finite closure operator and define the corresponding independence notion in a mathematically standard way.
+
+Possible proof routes should be evaluated from the closure axioms themselves, for example through exchange-compatible independent sets or bases.
+
+The required result is not merely:
+
+> some matroid exists.
+
+The resulting matroid must have **the supplied closure operator**.
+
+Therefore the proof has two essential obligations:
+
+```text
+1. construct a matroid satisfying augmentation;
+2. prove its matroid closure equals the original closure.
+```
+
+Do not mark N080 complete after proving only the first.
+
+Use manuscript terminology and the existing project conventions.
+
+Record clearly which standard theorem or argument supplies the missing implication.
 
 ---
 
-# 17. Blocker outcomes
+# 12. No depth-2 work while depth 1 remains active and unresolved
 
-For each primary blocker, one of the following outcomes is acceptable:
+After serious attempts on N061 and N080, recompute the active minimum unresolved depth.
+
+Proceed to Phase B only if there is **no active unresolved depth-1 node**.
+
+Acceptable reasons for a former depth-1 row to leave the active unresolved set are:
 
 ```text
 COMPLETE
-BLOCKED_MATHLIB_INFRASTRUCTURE
-BLOCKED_STATEMENT
-BLOCKED_SCOPE
-BLOCKED_PROOF
 ```
 
-A blocker classification must be accompanied by a precise explanation.
+or a justified specification correction such as:
 
-Do not use a blocker status merely because the proof is inconvenient.
+```text
+re-scoped out of the active Matroid graph
+```
 
-Continue with independent targets after one target blocks.
+or:
+
+```text
+replaced by newly identified more primitive ledger requirements
+```
+
+In the latter case, formalize those newly identified shallow requirements first.
+
+A blocker status by itself does **not** authorize moving deeper.
+
+If either N061 or N080 remains a valid active unresolved depth-1 requirement at the end of the attempt:
+
+```text
+STOP
+```
+
+Do not attack depth 2.
+
+Produce a focused blocker report instead.
 
 ---
 
-# 18. Formalization log
+# 13. Phase B — validate the depth-2 layer
 
-Continue:
+If depth 1 has been completely cleared, recompute structural depths before continuing.
 
-```text
-Matroid/FORMALIZATION_LOG.md
-```
-
-For every primary target record:
+The expected unresolved active depth-2 nodes are:
 
 ```text
-Ledger ID:
-TeX label:
-Requirement:
-Manuscript proof status:
-Manuscript proof plan:
-Lean declaration:
-Formalization source:
-Mathlib declarations used:
-Deviation from manuscript proof:
-Result:
-Downstream effect:
-Build status:
-Notes:
+N024  Deletion
+N036  Single-element extension
+N046  Represented circuits
+N047  Projective equivalence
+N051  Regularity
+N056  TU pivot and standard form
+N057  TU identity augmentation
+N062  Cographic matroid
+N111  Nonzero column rescaling
+N112  Ambient linear isomorphism
+N130  Corank-one uniform target circuit
+N258  Incidence representation of a graphic matroid
 ```
 
-For constructions, adapt the proof-plan field to record the construction plan.
+This list is a sanity check.
 
-The log should make clear why a blocker was or was not discharged.
+The mechanically recomputed DAG is authoritative.
+
+If the set differs, document why.
 
 ---
 
-# 19. Ledger updates
+# 14. Freeze depth 2 before formalizing it
 
-Update the corresponding rows in:
+Once depth 1 is clear and depth 2 has been recomputed, freeze the target set in:
 
 ```text
-Matroid/LEDGER.md
+Matroid/FRONTIER.md
 ```
 
-only when justified.
+under:
 
-Use formalization sources:
+```text
+## Depth-2 target snapshot
+```
+
+Record for every target:
+
+```text
+ID
+name
+direct prerequisites
+manuscript provenance
+current status
+```
+
+Do not add newly exposed depth-2 nodes later in the same pass without first determining whether the graph changed because of a legitimate specification repair.
+
+---
+
+# 15. Attack the entire depth-2 layer
+
+Attempt every unresolved active node at structural depth 2.
+
+Do not prioritize one mathematical branch over another by downstream count until all depth-2 nodes have at least been seriously attempted.
+
+Within depth 2, downstream leverage may determine ordering, but not inclusion.
+
+The target is to **clear the depth**, not merely maximize descendant release.
+
+---
+
+# 16. Depth-2 targets: expected mathematical character
+
+The expected depth-2 set contains several different categories.
+
+## Elementary definitions / constructions
+
+```text
+N024  Deletion
+N036  Single-element extension
+N051  Regularity
+```
+
+Prefer exact existing mathlib concepts when they faithfully match the manuscript.
+
+Do not introduce redundant project definitions unnecessarily.
+
+## Representation facts
+
+```text
+N046  Represented circuits
+N047  Projective equivalence
+N111  Nonzero column rescaling
+N112  Ambient linear isomorphism
+```
+
+These should build on the already completed vector-matroid/representation foundations.
+
+Preserve indexed-element multiplicity where the manuscript requires it.
+
+## Totally unimodular facts
+
+```text
+N056  TU pivot and standard form
+N057  TU identity augmentation
+```
+
+Treat these as exact matrix claims.
+
+For N057 especially, the ledger currently records:
+
+```text
+STATEMENT_DESIGN
+```
+
+Do not formalize an unnecessarily broad theorem merely because the prose says "identity augmentation."
+
+Read the displayed block matrices actually used by the manuscript and formalize the narrow statement required there unless a clean general theorem is both correct and useful.
+
+## Graphic/cographic facts
+
+```text
+N062  Cographic matroid
+N258  Incidence representation of a graphic matroid
+```
+
+These are only available once N061 is complete.
+
+For N062, use the manuscript definition through duality and verify the minimal-cut circuit characterization rather than merely defining an abstract dual.
+
+For N258, prove that the edge-incidence vector configuration realizes the same cycle dependencies as the newly established graphic matroid.
+
+## Uniform-matroid fact
+
+```text
+N130  Corank-one uniform target circuit
+```
+
+Preserve the indexed target/ground-set formulation used by the manuscript.
+
+---
+
+# 17. Use the established formalization-source categories
+
+For every completed target record one of:
 
 ```text
 MATHLIB_EXACT
@@ -658,21 +577,17 @@ MATHLIB_BRIDGE
 LOCAL_PROOF
 ```
 
-and statuses consistent with the existing ledger scheme.
+Use `MATHLIB_EXACT` only when the existing formal object or theorem really matches the manuscript requirement.
 
-Use `COMPLETE` only when:
+Use `MATHLIB_BRIDGE` when a local manuscript-facing statement translates from an existing theorem.
 
-- the manuscript-facing requirement has been fully discharged;
-- provenance is recorded;
-- and the repository builds.
-
-For N261, update scope rather than pretending it failed formalization.
+Use `LOCAL_PROOF` when substantive proof work is supplied here.
 
 ---
 
-# 20. No placeholders
+# 18. Do not force completion
 
-Do not use:
+No use of:
 
 ```text
 sorry
@@ -680,111 +595,177 @@ admit
 axiom
 ```
 
-to close a blocker.
+is permitted to claim a target complete.
 
-If a theorem cannot be completed, leave the repository buildable and document the blocker.
+If a depth-2 target fails after a serious attempt, record the precise failure.
 
-Do not add permanent assumptions merely to expose downstream nodes.
+Possible blocker categories include:
+
+```text
+BLOCKED_STATEMENT
+BLOCKED_MATHLIB_INFRASTRUCTURE
+BLOCKED_PROOF
+BLOCKED_SCOPE
+MISSING_PREREQUISITE
+```
+
+However, because this task is enforcing strict breadth-first depth completion, an unresolved valid depth-2 requirement means:
+
+> depth 2 is not complete.
+
+Do not move to depth 3.
 
 ---
 
-# 21. Recompute the frontier once
+# 19. Missing prerequisite discovery
 
-After:
+Formalization may reveal that the current DAG omitted a direct prerequisite.
 
-- the source reorganization is complete;
-- N261 has been re-scoped;
-- the N061 → N062 edge has been corrected if necessary;
-- and all four primary blockers have been attempted;
+If so:
 
-recompute the active unresolved frontier mechanically from:
+1. distinguish a routine implementation helper from a substantive mathematical requirement;
+2. if substantive, add or refine the ledger entry;
+3. add the direct dependency edge;
+4. record manuscript evidence;
+5. recompute depths.
+
+Do not preserve an incorrect depth assignment merely to finish the planned pass.
+
+If a new node is inserted at depth less than or equal to the current working depth, it must be handled before the project advances beyond that depth.
+
+This rule is essential.
+
+Formalization is allowed to correct the dependency model.
+
+---
+
+# 20. Dependency-edge discipline
+
+When modifying:
 
 ```text
-Matroid/LEDGER.md
 Matroid/DEPENDENCY_EDGES.csv
 ```
 
-Create or update:
+add only direct prerequisites.
+
+The direction is:
 
 ```text
-Matroid/FRONTIER.md
+prerequisite → dependent
 ```
 
-with:
+Do not add transitive edges.
 
-## Completed blocker results
-
-List the outcome for:
+Every new edge must record:
 
 ```text
-N025
-N043
-N061
-N062
+edge_type
+tex_evidence
+justification
+confidence
 ```
 
-## Remaining blockers
+Use:
 
-List any unresolved primary blockers and the descendants they continue to block.
+```text
+DEFINITIONAL
+PROOF
+```
 
-## Newly exposed frontier
+as the primary edge types.
 
-List all active unresolved nodes whose direct internal prerequisites are now complete.
-
-Do not formalize those newly exposed nodes during this task.
+Document every graph correction in `FORMALIZATION_LOG.md`.
 
 ---
 
-# 22. Historical pass artifacts
+# 21. Lean source organization
 
-Chronological frontier artifacts such as:
+Continue organizing Lean files by mathematical subject, not by pass number or frontier depth.
 
-```text
-FRONTIER_PASS_2.md
-```
-
-should not remain part of the long-term active mathematical API.
-
-Once their information has been incorporated into the formalization log and current frontier state, move them under an appropriate logs directory such as:
+Do not create files named:
 
 ```text
-logs/formalization/
+Depth1.lean
+Depth2.lean
+Frontier3.lean
+Pass4.lean
 ```
 
-Preserve them for methodological history.
-
-Do not delete historical evidence.
-
-The active `Matroid/` directory should emphasize:
+Put declarations into mathematically appropriate modules such as:
 
 ```text
-mathematical Lean modules
-canonical ledger
-dependency graph
-current frontier
-formalization log
+RankClosure.lean
+Minors.lean
+Representation.lean
+Graphic.lean
+Regular.lean
+Uniform.lean
 ```
 
-rather than past pass numbers.
+Create a new mathematical module only when the content warrants it.
+
+Chronology belongs in logs, not filenames.
 
 ---
 
-# 23. Files that must remain fixed
+# 22. Formalization log
 
-Do not modify:
+Continue:
 
 ```text
-Manuscript/main.tex
-logs/dependency_audit/
+Matroid/FORMALIZATION_LOG.md
 ```
 
-except to read them.
+For each target record:
 
-Do not rewrite historical ledgers or audit artifacts.
+```text
+Ledger ID:
+Structural depth:
+TeX label:
+Requirement:
+Manuscript proof status:
+Manuscript proof/construction plan:
+Lean declaration:
+Formalization source:
+Mathlib declarations used:
+Deviation from manuscript route:
+Result:
+Build status:
+Notes:
+```
 
-`Matroid/DEPENDENCY_EDGES.csv` may be modified only for justified graph corrections discovered in this pass, particularly the N061 → N062 issue.
+For blocked targets, explain the exact missing mathematical step.
 
-Document every such correction.
+For graph corrections, record:
+
+```text
+old prerequisite structure
+new prerequisite structure
+reason
+manuscript evidence
+```
+
+---
+
+# 23. Ledger updates
+
+Update:
+
+```text
+Matroid/LEDGER.md
+```
+
+only for targets actually investigated in this task or for justified specification corrections.
+
+Use `COMPLETE` only when:
+
+- the exact manuscript-facing requirement has been discharged;
+- provenance is recorded;
+- the formalization source is known;
+- and `lake build` succeeds.
+
+Do not mark a row complete merely because a related stronger or weaker theorem exists.
 
 ---
 
@@ -796,33 +777,89 @@ Run:
 lake build
 ```
 
-after the source reorganization.
+after meaningful groups of changes.
 
-Run it repeatedly during blocker work.
+Run it after finishing the depth-1 work.
 
-Run it again before finishing.
+If Phase B begins, run it repeatedly during depth-2 work.
 
-The repository must finish in a buildable state.
+Run it once more before finishing.
+
+The repository must remain buildable.
 
 ---
 
-# 25. Stop condition
+# 25. End-of-pass depth audit
 
-This task is complete when:
+At the end, regenerate `Matroid/DEPTHS.csv` from the final ledger and edge table.
 
-1. chronological Lean files have been reorganized into mathematically named modules;
-2. the reorganized source tree builds;
-3. N261 has been re-adjudicated and re-scoped if appropriate;
-4. the N061 → N062 dependency has been checked and corrected if appropriate;
-5. N025 has been attempted;
-6. N043 has been attempted;
-7. N061 has been attempted;
-8. N062 has been attempted after N061;
-9. every result or blocker is recorded in the ledger and formalization log;
-10. `lake build` succeeds;
-11. the resulting active frontier has been recomputed and recorded;
-12. no newly exposed frontier node has been formalized.
+Then report in `Matroid/FRONTIER.md`:
 
-Stop at that point.
+```text
+minimum unresolved structural depth
+unresolved nodes at that depth
+number of active nodes by depth
+number complete by depth
+number unresolved by depth
+```
 
-Do not begin another general frontier pass.
+If depth 2 has been completely cleared, identify the resulting depth-3 target set.
+
+Do not formalize any depth-3 node.
+
+If depth 1 or depth 2 remains unresolved, state that explicitly.
+
+---
+
+# 26. Stop conditions
+
+There are two possible successful stopping modes.
+
+## A. Depth 1 does not clear
+
+If N061, N080, or a newly discovered shallower prerequisite remains a valid active unresolved node:
+
+- document the blocker precisely;
+- keep the repository buildable;
+- recompute depths;
+- stop.
+
+Do not perform depth-2 work.
+
+## B. Depth 1 clears
+
+Then attempt the complete unresolved depth-2 layer.
+
+After every depth-2 target has been attempted:
+
+- update ledger and log;
+- recompute depths;
+- report whether depth 2 is fully clear;
+- identify the next minimum unresolved depth;
+- stop.
+
+Do not begin depth 3.
+
+---
+
+# 27. Completion objective
+
+The desired outcome of this task is:
+
+```text
+all active depths < 2 complete
+        +
+all active depth-2 nodes attempted
+```
+
+The strongest successful outcome is:
+
+```text
+depth 0: clear
+depth 1: clear
+depth 2: clear
+```
+
+with the next unresolved structural depth identified but untouched.
+
+The purpose of this pass is to establish and test strict breadth-first formalization by dependency depth.
