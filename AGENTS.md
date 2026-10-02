@@ -1,34 +1,34 @@
-# Final Matroid Ledger and Entry-Node Analysis
+# First Lean Formalization Pass
 
-This repository is currently completing the **mathematical specification phase** of the matroid formalization project.
+This repository is now beginning the Lean formalization phase of the matroid/span-program project.
 
-The previous passes have already:
+The manuscript dependency inventory has already been extracted, audited, adjudicated, and organized into an internal dependency graph.
 
-- extracted matroid requirements from the manuscript;
-- normalized those requirements;
-- compared the normalized ledger against an independent raw dependency graph;
-- and identified a small number of local corrections and additions.
+The canonical mathematical specification is:
 
-This pass has two objectives only:
+```text
+Matroid/LEDGER.md
+```
 
-1. produce one canonical adjudicated matroid ledger;
-2. determine the internal matroid dependency graph and identify the entry nodes from which Lean formalization should begin.
+The internal prerequisite graph is:
 
-This pass must **not write Lean**.
+```text
+Matroid/DEPENDENCY_EDGES.csv
+```
 
-Do not inspect mathlib.
+The identified mathematical starting points are summarized in:
 
-Do not attempt proofs.
+```text
+Matroid/ENTRY_NODES.md
+```
 
-Do not edit any `.lean` file.
+This pass should formalize only the first small basis/rank/closure/circuit boundary described below.
 
-Do not design implementation modules.
-
-Stop once the final ledger, dependency edge table, and entry-node report have been produced and validated.
+Do not expand into regular matroids, sums, R10, modular cuts, represented matroids, or application-specific material.
 
 ---
 
-# 1. Source of mathematical authority
+# 1. Mathematical source of truth
 
 The frozen manuscript is:
 
@@ -36,567 +36,487 @@ The frozen manuscript is:
 Manuscript/main.tex
 ```
 
-The manuscript is the final authority for:
+For every ledger requirement implemented in Lean:
 
-- mathematical statements;
-- hypotheses;
-- proof dependencies;
-- and the intended scope of the results.
+1. read the exact manuscript definition, theorem, proposition, or proof location first;
+2. preserve the manuscript's mathematical meaning and hypotheses;
+3. use the exact TeX label as provenance;
+4. inspect the surrounding proof or explanatory prose before choosing a Lean proof strategy.
 
-The historical ledgers and dependency audits are evidence about the manuscript, not substitutes for it.
+Do not silently replace the manuscript statement with a stronger, weaker, or merely similar theorem because it is easier to formalize.
 
-When a discrepancy remains between historical artifacts, inspect `Manuscript/main.tex`.
-
-Use exact TeX labels whenever possible.
-
-Do not fabricate labels.
-
-Do not silently strengthen, weaken, or generalize a manuscript claim.
+If a more general mathlib theorem is used internally, the exported project-facing statement should still match the mathematical requirement recorded in the ledger.
 
 ---
 
-# 2. Archive the completed audit process
+# 2. Proof-guided formalization
 
-The repository currently contains several artifacts from earlier dependency-analysis stages.
+The Lean development should be informed by the mathematical derivations already present in the manuscript.
 
-These should no longer remain active working specifications.
+Before searching mathlib for a theorem, determine the manuscript proof status of the target.
 
-Move them into:
-
-```text
-logs/dependency_audit/
-```
-
-Preserve their contents.
-
-Use `git mv` when possible so history remains easy to follow.
-
-The desired organization is:
+Use one of:
 
 ```text
-logs/dependency_audit/
-├── README.md
-├── blind/
-│   ├── LEDGER_BLIND.md
-│   └── BLIND_EXTRACTION_REPORT.md
-├── normalization/
-│   ├── LEDGER_NORMALIZED.md
-│   └── NORMALIZATION_FROZEN
-├── comparison/
-│   ├── NORMALIZED_VS_RAW_COMPARISON.md
-│   └── NORMALIZED_VS_RAW_MAPPING.csv
-└── raw_graph/
-    ├── dependency_graph_raw.csv
-    └── dependency_graph_raw_edges.csv
+MANUSCRIPT_PROOF
+MANUSCRIPT_SKETCH
+MANUSCRIPT_STATEMENT_ONLY
 ```
 
-Specifically:
+## `MANUSCRIPT_PROOF`
+
+The manuscript contains a substantive proof.
+
+First summarize the proof into its mathematical steps.
+
+Prefer a Lean proof whose structure follows those steps.
+
+Mathlib lemmas may discharge individual steps.
+
+If the final Lean proof follows a materially different route, record the deviation and why it was preferable.
+
+## `MANUSCRIPT_SKETCH`
+
+The manuscript gives a derivation, named principle, or compressed argument but not a complete proof.
+
+Treat the manuscript derivation as the preferred proof plan.
+
+Fill missing routine details using standard mathematics or mathlib.
+
+Record what had to be supplied beyond the manuscript.
+
+## `MANUSCRIPT_STATEMENT_ONLY`
+
+The manuscript states the result but provides no real derivation.
+
+Do not invent a manuscript proof.
+
+Use standard mathematics and mathlib as appropriate, while recording that the formal proof is additional proof engineering rather than a transcription of an existing manuscript proof.
+
+---
+
+# 3. Read manuscript before mathlib
+
+For every theorem-like target, follow this order:
 
 ```text
-Matroid/LEDGER.md
-    → logs/dependency_audit/blind/LEDGER_BLIND.md
-
-Matroid/BLIND_EXTRACTION_REPORT.md
-    → logs/dependency_audit/blind/BLIND_EXTRACTION_REPORT.md
-
-Matroid/LEDGER_NORMALIZED.md
-    → logs/dependency_audit/normalization/LEDGER_NORMALIZED.md
-
-Matroid/NORMALIZATION_FROZEN
-    → logs/dependency_audit/normalization/NORMALIZATION_FROZEN
-
-Matroid/NORMALIZED_VS_RAW_COMPARISON.md
-    → logs/dependency_audit/comparison/NORMALIZED_VS_RAW_COMPARISON.md
-
-Matroid/NORMALIZED_VS_RAW_MAPPING.csv
-    → logs/dependency_audit/comparison/NORMALIZED_VS_RAW_MAPPING.csv
-
-Audit/dependency_graph_raw.csv
-    → logs/dependency_audit/raw_graph/dependency_graph_raw.csv
-
-Audit/dependency_graph_raw_edges.csv
-    → logs/dependency_audit/raw_graph/dependency_graph_raw_edges.csv
+1. identify ledger entry
+2. read exact manuscript statement
+3. read manuscript proof / surrounding derivation
+4. write a short proof plan
+5. only then inspect mathlib
+6. design Lean statement
+7. implement
+8. compare Lean proof with manuscript proof plan
+9. build
+10. update provenance/status
 ```
 
-If `Audit/` becomes empty after these moves, remove the empty directory.
+Do not begin by searching mathlib for a theorem with a similar name.
+
+This ordering is intentional.
+
+The objective is to formalize the mathematics of the manuscript, not to reverse-engineer a manuscript interpretation from whatever declarations happen to exist in mathlib.
+
+---
+
+# 4. Use mathlib rather than redefining mathematics
+
+After the manuscript proof plan is understood, inspect the pinned version of mathlib.
+
+Use existing definitions and results whenever they faithfully represent the manuscript mathematics.
+
+In particular, continue to use mathlib's existing `Matroid` abstraction.
+
+Do not define a competing matroid structure corresponding literally to the manuscript's `(E, I)` presentation.
+
+The manuscript's finite independent-set definition is mathematical provenance, not a requirement to duplicate mathlib's foundational representation.
+
+A target may therefore be discharged by:
+
+```text
+MATHLIB_EXACT
+```
+
+when an existing theorem is exactly the required result, or by:
+
+```text
+MATHLIB_BRIDGE
+```
+
+when a short local theorem translates between the manuscript formulation and mathlib's interface.
+
+Use:
+
+```text
+LOCAL_PROOF
+```
+
+only when a suitable mathlib result is not available or when the required manuscript-facing result genuinely needs additional proof.
+
+---
+
+# 5. Proof fidelity versus library reuse
+
+Do not reproduce a long proof manually merely to imitate the manuscript when mathlib already proves exactly the same mathematical theorem.
+
+Conversely, do not hide a substantive manuscript argument behind a vaguely related powerful theorem without documenting the change of proof route.
+
+The desired principle is:
+
+> preserve the manuscript's mathematical decomposition while allowing mathlib to discharge standard subarguments.
+
+For every theorem-like target, the formalization record should make it possible to answer:
+
+- What does the manuscript claim?
+- How does the manuscript justify it?
+- What Lean/mathlib facts implement those steps?
+- Did the formal proof materially deviate from the manuscript route?
+
+---
+
+# 6. Formalization log
 
 Create:
 
 ```text
-logs/dependency_audit/README.md
+Matroid/FORMALIZATION_LOG.md
 ```
 
-explaining briefly that these files record the blind extraction, normalization, and independent normalized-vs-raw validation that preceded the canonical ledger.
+For each target attempted in this pass, record:
 
-Do not rewrite the historical artifacts during the move.
+```text
+Ledger ID:
+TeX label:
+Requirement:
+Manuscript proof status:
+Manuscript proof plan:
+Lean declaration:
+Formalization source:
+Mathlib declarations used:
+Deviation from manuscript proof:
+Build status:
+Notes:
+```
+
+`Manuscript proof plan` should be mathematical prose, not Lean tactics.
+
+Keep it concise but substantive enough to recover the intended argument.
+
+If the manuscript contains no proof, say so explicitly.
+
+Do not retroactively describe the Lean proof as though it appeared in the manuscript.
 
 ---
 
-# 3. Canonical final ledger
+# 7. Code provenance
 
-After archiving the historical files, create:
+Every project-facing definition or theorem introduced for a ledger entry should contain concise manuscript provenance in its docstring or immediately adjacent comment.
+
+For example:
 
 ```text
+Manuscript: `prop:closure-circuit` (N016).
+```
+
+For theorem-like declarations, also indicate the proof-source category when useful:
+
+```text
+Proof source: MANUSCRIPT_STATEMENT_ONLY.
+```
+
+Do not clutter every internal helper lemma with manuscript metadata.
+
+Provenance is required on the project-facing declarations corresponding to ledger nodes.
+
+---
+
+# 8. First formalization boundary
+
+This pass should implement the smallest coherent basis/rank/closure/circuit boundary identified in `ENTRY_NODES.md`.
+
+Target these ledger requirements:
+
+```text
+N001  Finite matroid
+N002  Basis
+N015  Circuit
+N003  Equal basis cardinalities
+N006  Rank
+N007  Closure
+N016  Circuit characterization of closure
+```
+
+The intended mathematical dependency shape is:
+
+```text
+N001
+ ├── N002
+ └── N015
+
+N002
+ └── N003
+      └── N006
+           └── N007
+
+N007 + N015
+ └── N016
+```
+
+Use `DEPENDENCY_EDGES.csv` as the authoritative internal dependency record if it contains additional direct edges relevant to these nodes.
+
+Do not expand the pass merely because adjacent facts are easy.
+
+---
+
+# 9. N001 does not require a new Matroid structure
+
+For N001, establish the project's connection to mathlib's existing `Matroid` abstraction.
+
+Do not recreate the independent-set axioms as a new structure unless direct inspection of mathlib proves that such a bridge is genuinely necessary.
+
+The goal is for all downstream work to use mathlib's `Matroid`.
+
+Record how the manuscript's finite independent-set presentation corresponds to the mathlib object.
+
+---
+
+# 10. Definitions versus theorems
+
+For manuscript definitions such as basis, rank, closure, or circuit:
+
+- first determine whether the concept already exists directly in mathlib;
+- prefer the existing mathlib object;
+- introduce manuscript-facing notation or wrapper definitions only when they materially improve statement fidelity or downstream usability.
+
+Do not create redundant aliases merely so every ledger row produces a new Lean constant.
+
+A ledger requirement may be marked complete by documenting an exact existing formal definition.
+
+---
+
+# 11. Statement first
+
+For every theorem-like target:
+
+1. formulate or identify the exact Lean statement;
+2. confirm that it expresses the ledger requirement;
+3. make the statement elaborate;
+4. only then complete the proof.
+
+Do not weaken hypotheses merely to make elaboration easier.
+
+Do not strengthen the conclusion unless the manuscript-facing theorem is still explicitly exposed.
+
+---
+
+# 12. First-boundary proof guidance
+
+## N003 — Equal basis cardinalities
+
+Manuscript location:
+
+```text
+def:matroid-basis
+```
+
+The manuscript states that the exchange axiom implies that all bases of a fixed subset have equal cardinality.
+
+Treat this as:
+
+```text
+MANUSCRIPT_SKETCH
+```
+
+The proof should be conceptually tied to basis exchange, even if mathlib already packages the result.
+
+Record the exact mathlib result used if the proof collapses to a library theorem.
+
+---
+
+## N016 — Circuit characterization of closure
+
+Manuscript label:
+
+```text
+prop:closure-circuit
+```
+
+The manuscript states:
+
+```text
+for e ∉ A,
+e ∈ cl(A)
+iff
+there exists a circuit C containing e with C \ {e} ⊆ A.
+```
+
+The manuscript does not provide a detailed proof.
+
+Treat this as:
+
+```text
+MANUSCRIPT_STATEMENT_ONLY
+```
+
+Preserve the exact manuscript hypotheses and conclusion in the project-facing statement.
+
+If mathlib already contains an equivalent theorem, identify the exact theorem and prove the manuscript-facing formulation by a transparent bridge if necessary.
+
+Do not substitute a related circuit/closure characterization with materially different side conditions.
+
+---
+
+# 13. N080 and N261 are not targets of this pass
+
+Do not formalize N080 in this pass.
+
+It belongs to an independent closure-axiom characterization branch and can be addressed after the basic manuscript-facing matroid vocabulary is stable.
+
+Do not formalize N261 in this pass.
+
+`ENTRY_NODES.md` explicitly records a scope question about whether N261 is properly a matroid requirement or an external matrix/TU lemma.
+
+Leave that question for the later regular-matroid branch.
+
+---
+
+# 14. Permitted files
+
+This pass may modify:
+
+```text
+Matroid/Internal/Basic.lean
+Matroid/Matroid.lean
 Matroid/LEDGER.md
+Matroid/FORMALIZATION_LOG.md
+Matroid/SOURCES.md
 ```
 
-This becomes the **only active matroid requirement ledger**.
+Modify `Matroid/Matroid.lean` only if an import change is genuinely required.
 
-It should be derived from the normalized ledger together with the adjudication recorded in the normalized-vs-raw comparison.
-
-Do not perform another manuscript-wide extraction.
-
-The node inventory has already been extensively audited.
-
-This pass should make only corrections justified by the completed comparison or by direct manuscript inspection required to adjudicate those corrections.
-
----
-
-# 4. Required adjudications
-
-Apply the following conclusions from the completed comparison.
-
-## N098
-
-Re-scope N098 from:
+Do not modify:
 
 ```text
-CORE_MATROID
-```
-
-to:
-
-```text
-APPLICATION_CONTEXT
-```
-
-The agreement-projection composition depends on query-partition semantics.
-
-The pure matroid flat-join content is already represented separately.
-
----
-
-## Triangle signature
-
-Add a new atomic ledger entry for the weighted triangle-signature interface used in the 3-sum calculation.
-
-It should record the manuscript's weighted class sums and the tuple:
-
-```text
-(a, p₁, p₂, p₃, c)
-```
-
-with exact provenance to the relevant TeX labels, including the displayed triangle-signature equations and the results that use them.
-
-Assign this the next unused normalized identifier:
-
-```text
-N266
-```
-
-unless direct inspection reveals that identifier is already occupied.
-
----
-
-## K4 signature
-
-Add a new atomic ledger entry for the weighted `M(K₄)` five-term signature used in the 3-sum theorem.
-
-It should record the five displayed weighted class sums with exact manuscript provenance.
-
-Assign:
-
-```text
-N267
-```
-
-unless direct inspection reveals that identifier is already occupied.
-
----
-
-## N206
-
-Retain N206.
-
-Clarify in its notes that the normalized ledger records the closure-union property of the shared-target construction, whereas the raw graph recorded the construction more coarsely.
-
-Do not treat this as a mathematical contradiction.
-
----
-
-## Normalized-only requirements
-
-Retain the normalized-only mathematical requirements identified by the comparison unless manuscript inspection shows that one is genuinely spurious.
-
-Their absence from the older raw graph is not evidence for deletion.
-
----
-
-## Recursive sensitivity
-
-Do not add `prop:recursive-r10-sensitivity` as an active Matroid-library requirement merely because it appeared as a raw-only node.
-
-Its stated conclusion concerns Boolean sensitivity.
-
-The matroid-side closure and pointed-R10 ingredients used by its proof are already represented separately.
-
-It may be mentioned in provenance notes if useful, but it should not become an active matroid dependency node unless manuscript inspection exposes a distinct pure matroid theorem that is currently missing.
-
----
-
-# 5. Stable identifiers
-
-Preserve the existing normalized identifiers `N001`, `N002`, ... wherever possible.
-
-Do not renumber the existing ledger merely to obtain a prettier sequence.
-
-The comparison artifacts already refer to these IDs.
-
-New adjudicated entries should receive new IDs after the existing range.
-
-The final ledger should preserve traceability back to blind `M###` identifiers where that information already exists.
-
----
-
-# 6. Scope of the dependency graph
-
-After `Matroid/LEDGER.md` has been finalized, construct the dependency relation **among the active matroid requirements in that ledger**.
-
-Do not reuse the old raw dependency graph as the final graph.
-
-The raw graph was manuscript-wide and used a different granularity.
-
-It may be consulted as historical evidence, but the new dependency graph must be derived from the final ledger and the manuscript.
-
-The active formalization graph should normally include entries whose scope is:
-
-```text
-CORE_MATROID
-MATROID_INTERFACE
-```
-
-Do not include `APPLICATION_CONTEXT` or `OUT_OF_SCOPE_CONTEXT` as formalization nodes merely because they remain in the ledger for provenance.
-
-If an application-context row contains a genuinely reusable matroid obligation, that obligation should already exist as a separate active ledger row.
-
-If scope remains unresolved for an entry, record that explicitly rather than silently inserting or deleting it from the graph.
-
----
-
-# 7. Meaning of a dependency edge
-
-For active ledger entries `A` and `B`, add an edge:
-
-```text
-A → B
-```
-
-only when `A` is genuinely required in order to define, state, or prove `B`.
-
-An edge is not merely conceptual similarity.
-
-Do not add an edge because two results concern the same mathematical topic.
-
-Do not add an edge merely because `A` appears earlier in the manuscript.
-
-Do not infer dependencies from chapter order.
-
-The direction is always:
-
-```text
-prerequisite → dependent
-```
-
----
-
-# 8. Edge types
-
-Use exactly these primary edge types unless a genuinely necessary distinction arises.
-
-## `DEFINITIONAL`
-
-Use when the target cannot be formulated in the project's mathematical vocabulary without the source definition, construction, or interface.
-
-Examples include a theorem stated in terms of closure depending definitionally on the closure object it uses.
-
-## `PROOF`
-
-Use when the target can be stated independently of the source, but the manuscript proof or intended mathematical derivation uses the source result.
-
-A theorem may have both definitional and proof prerequisites.
-
-Do not encode transitive conceptual relationships as direct proof edges.
-
----
-
-# 9. Prefer direct prerequisites
-
-The new graph should record **direct mathematical prerequisites**, not every transitive ancestor.
-
-Suppose:
-
-```text
-A → B
-B → C
-```
-
-and the proof of `C` only needs the result `B`.
-
-Do not also add:
-
-```text
-A → C
-```
-
-merely because `A` is transitively required through `B`.
-
-Add `A → C` only if `C` independently uses `A`.
-
-This keeps the graph operational and makes its frontier meaningful.
-
----
-
-# 10. Dependency evidence
-
-Every edge must be auditable.
-
-Create:
-
-```text
-Matroid/DEPENDENCY_EDGES.csv
-```
-
-with at least these columns:
-
-```text
-source_id
-source_name
-target_id
-target_name
-edge_type
-tex_evidence
-justification
-confidence
-```
-
-`tex_evidence` should contain exact TeX labels or a concise manuscript location.
-
-`justification` should explain why the source is a direct prerequisite of the target.
-
-Use confidence values such as:
-
-```text
-HIGH
-MEDIUM
-LOW
-```
-
-Do not use `LOW` confidence to conceal an unresolved mathematical question.
-
-If a dependency cannot be determined, document it explicitly in the entry-node report.
-
----
-
-# 11. External foundations are not internal edges
-
-The objective is to identify roots of the **matroid requirement graph**.
-
-A ledger node may depend on mathematics outside this graph, for example:
-
-- finite sets;
-- elementary logic;
-- graph theory;
-- linear algebra;
-- matrices;
-- fields;
-- arithmetic.
-
-Do not invent artificial ledger nodes for all such external foundations during this pass.
-
-Do not inspect mathlib to determine whether those foundations are already formalized.
-
-Instead, record important external prerequisites in the ledger notes or entry-node report when they affect interpretation.
-
-An internal entry node means:
-
-> no prerequisite among the other active matroid ledger requirements.
-
-It does **not** mean mathematically assumption-free.
-
----
-
-# 12. Strict entry nodes
-
-After constructing `Matroid/DEPENDENCY_EDGES.csv`, compute the indegree of every active matroid node.
-
-A **strict entry node** is an active formalization node with:
-
-```text
-internal indegree = 0
-```
-
-where only active matroid requirements count toward indegree.
-
-Identify all strict entry nodes.
-
-Do not choose them manually.
-
-They must follow from the final ledger and dependency edge table.
-
----
-
-# 13. First theorem frontier
-
-Strict roots may include mostly definitions or primitive constructions.
-
-To identify where theorem proving should begin, also compute a **first theorem frontier**.
-
-A theorem-like entry belongs to the first theorem frontier when all of its internal prerequisites are either:
-
-- strict entry definitions/constructions; or
-- absent because it has no internal matroid theorem prerequisite.
-
-This is not a ranking of importance.
-
-It identifies theorem-like statements that become available immediately after the foundational vocabulary is formalized.
-
-Keep strict entry nodes and the first theorem frontier separate.
-
----
-
-# 14. Entry-node report
-
-Create:
-
-```text
-Matroid/ENTRY_NODES.md
-```
-
-The report should contain:
-
-## Final graph summary
-
-Report:
-
-- number of active ledger nodes;
-- number of dependency edges;
-- number of `DEFINITIONAL` edges;
-- number of `PROOF` edges;
-- number of strict entry nodes;
-- number of first-frontier theorem-like nodes;
-- any entries excluded from the active graph because of scope.
-
-## Strict entry nodes
-
-For every strict entry node, give:
-
-- ledger ID;
-- name;
-- concise mathematical role;
-- manuscript provenance;
-- scope;
-- whether it is primarily a definition, construction, or theorem;
-- any obvious external non-matroid foundations it relies on.
-
-Do not discuss Lean implementation.
-
-## First theorem frontier
-
-List theorem-like nodes that can be approached after the strict foundational definitions/constructions.
-
-For each, record its direct internal prerequisites.
-
-Again, do not discuss Lean implementation.
-
-## Ambiguities or blockers
-
-Record:
-
-- unresolved statement-design questions;
-- uncertain edges;
-- scope ambiguities;
-- cases where the manuscript does not determine a unique dependency structure.
-
-Do not resolve such issues by consulting mathlib or writing code.
-
-## Suggested starting boundary
-
-Conclude with a purely mathematical description of the smallest coherent initial formalization boundary.
-
-This should mean something like:
-
-> formalize these definitions/constructions and these immediately exposed theorem nodes first.
-
-Do not provide Lean code.
-
-Do not select modules or filenames.
-
----
-
-# 15. Validation checks
-
-Before finishing, verify mechanically that:
-
-- every active `source_id` and `target_id` in `DEPENDENCY_EDGES.csv` exists in the final ledger;
-- no edge is a self-loop;
-- duplicate edges with the same source, target, and type do not exist;
-- all strict entry nodes actually have indegree zero;
-- every non-entry active node has at least one incoming internal edge, unless explicitly documented as a graph-construction anomaly;
-- application-context rows are not accidentally treated as formalization roots;
-- N098 has the corrected scope;
-- the triangle-signature and K4-signature entries are present;
-- the historical audit files have been moved under `logs/dependency_audit/`;
-- historical artifacts were not rewritten during archival.
-
-If cycles occur, do not simply break them arbitrarily.
-
-Inspect whether the cycle is caused by:
-
-- an overly broad ledger entry;
-- confusion between definition and theorem;
-- a transitive edge;
-- or a genuine mutually defined construction.
-
-Document and resolve the issue mathematically.
-
-The intended dependency graph should be suitable for bottom-up formalization.
-
----
-
-# 16. Prohibited work
-
-During this pass, do not:
-
-- edit `.lean` files;
-- create new `.lean` files;
-- inspect mathlib;
-- search for Lean theorem names;
-- prove any ledger statement;
-- write theorem skeletons;
-- use `sorry`, `axiom`, or `admit`;
-- redesign the future Lean module hierarchy;
-- begin formalization of entry nodes.
-
-The output of this pass is only the mathematical starting specification.
-
----
-
-# 17. Required active outputs
-
-When finished, the active dependency-analysis artifacts should be:
-
-```text
-Matroid/LEDGER.md
+Manuscript/main.tex
 Matroid/DEPENDENCY_EDGES.csv
 Matroid/ENTRY_NODES.md
-```
-
-The previous extraction, normalization, comparison, and raw-graph artifacts should live under:
-
-```text
 logs/dependency_audit/
 ```
 
-The next project phase will begin from `ENTRY_NODES.md`.
+The manuscript and dependency-analysis artifacts are frozen provenance.
 
-That later phase, not this one, will determine how the entry nodes should be expressed and discharged in Lean.
+---
+
+# 15. Ledger updates
+
+After a target is successfully formalized, update only that row of:
+
+```text
+Matroid/LEDGER.md
+```
+
+Set `Formalization source` appropriately:
+
+```text
+MATHLIB_EXACT
+MATHLIB_BRIDGE
+LOCAL_PROOF
+```
+
+Update `Status` only when justified.
+
+Use:
+
+```text
+LEAN_STATED
+```
+
+when the statement exists and elaborates but is not yet discharged.
+
+Use:
+
+```text
+MATHLIB_MATCH
+```
+
+when an exact library result has been identified and recorded.
+
+Use:
+
+```text
+BRIDGE_PROVED
+```
+
+when the manuscript-facing theorem is proved by a local bridge to mathlib.
+
+Use:
+
+```text
+PROVED_LOCAL
+```
+
+when a genuinely local proof is supplied.
+
+Use:
+
+```text
+COMPLETE
+```
+
+only when the manuscript-facing requirement has been fully discharged and provenance has been recorded.
+
+Do not mark a ledger row complete merely because a similar theorem exists.
+
+---
+
+# 16. No placeholders in completed work
+
+Do not use:
+
+```text
+sorry
+admit
+axiom
+```
+
+for completed declarations.
+
+If a target cannot yet be discharged, leave it at `LEAN_STATED`, document the blocker in `FORMALIZATION_LOG.md`, and keep the repository buildable without claiming completion.
+
+Prefer partial completion of the target set over introducing unproved assumptions.
+
+---
+
+# 17. Build discipline
+
+Run:
+
+```text
+lake build
+```
+
+after meaningful changes and before finishing.
+
+The final repository must build successfully.
+
+Do not consider successful elaboration of one scratch theorem sufficient if the library target fails.
+
+---
+
+# 18. Completion criteria
+
+This pass is complete when:
+
+1. N001, N002, N015, N003, N006, N007, and N016 have each been reconciled with Lean/mathlib;
+2. every project-facing declaration is traced to its ledger ID and manuscript label;
+3. theorem-like targets have a recorded manuscript proof status and proof plan;
+4. every material deviation from a manuscript proof route is documented;
+5. the corresponding ledger rows accurately record their formalization source and status;
+6. `Matroid/FORMALIZATION_LOG.md` records the work;
+7. no unrelated ledger nodes were formalized;
+8. `lake build` succeeds.
+
+Stop after this boundary.
+
+Do not continue automatically to the next dependency layer.
