@@ -15,4 +15,4 @@ rev = "v4.35.0-rc3"
 
 [[lean_lib]]
 name = "Matroid"
-roots = ["Matroid.Matroid"]
+roots = ["Matroid.Matroid", "Matroid.Internal.Basic", "Matroid.Internal.Frontier2"]

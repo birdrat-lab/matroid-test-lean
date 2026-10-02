@@ -68,7 +68,11 @@ theorem mem_closure_iff_eRk_insert_eq [M.Finite] (hA : A ⊆ M.E) (he : e ∈ M.
       hfin.closure_eq_closure_of_subset_of_eRk_ge_eRk (subset_insert e A) hr.le
     rw [hcl]
     exact M.mem_closure_of_mem (mem_insert e A)
-      (by intro x hx; rcases hx with rfl | hxA; exact he; exact hA hxA)
+      (by
+        intro x hx
+        rcases hx with rfl | hxA
+        · exact he
+        · exact hA hxA)
 
 /-- Manuscript: `prop:closure-circuit` (N016).
 Proof source: MANUSCRIPT_STATEMENT_ONLY. -/
