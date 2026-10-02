@@ -493,3 +493,79 @@ The frozen target set is recorded in `FRONTIER_PASS_2.md`. Plans below follow th
 - **Result:** BLOCKED_SCOPE
 - **Build status:** `lake build` passed for completed declarations; blocked entries leave no unproved active declaration.
 - **Notes:** The precise statement belongs to a TU matrix/linear-algebra layer rather than the reusable matroid API. The manuscript also needs preservation of reconstruction under row compression, beyond TU preservation. Scope adjudication is required; dependency graph unchanged.
+
+# Subject-module reorganization and blocker pass
+
+Phase A moved the five existing rank/closure/circuit bridges from `Internal/Basic.lean` to `RankClosure.lean` and split `Internal/Frontier2.lean` into mathematical subject modules. Declaration names, statements, and proof bodies were preserved. The umbrella import now exposes these modules; `lake build` passed before blocker work. The historical pass-2 frontier snapshot was moved intact to `logs/formalization/FRONTIER_PASS_2.md`.
+
+The manuscript definition `def:graphic-cographic` explicitly denotes the cographic matroid as the dual of the graphic matroid. The missing direct edge N061 → N062 was added to `DEPENDENCY_EDGES.csv` as `DEFINITIONAL`. Reinspection of the proof of `thm:regular-matroid-energy` confirms N261 is a TU matrix row-selection/compression step; its scope is now `OUT_OF_SCOPE_CONTEXT`, with the row retained for future matrix/TU work.
+
+## Primary blocker outcomes
+
+### N025
+
+- **Ledger ID:** N025
+- **TeX label:** `def:matroid-minors`
+- **Requirement:** For X⊆E\A, finite contraction rank is r_M(X∪A)−r_M(A).
+- **Manuscript proof status:** MANUSCRIPT_DEFINITION
+- **Manuscript proof plan:** Choose a basis I of A and extend it to a basis J of A∪X. The residual J\I is a basis of X after contracting I. Contracting A further deletes A\I, disjoint from X; cardinality gives the rank difference.
+- **Lean declaration:** Matroid.contract_rank_toNat_eq_sub
+- **Formalization source:** MATHLIB_BRIDGE
+- **Mathlib declarations used:** Matroid.exists_isBasis_subset_isBasis; Matroid.IsBasis.contract_sdiff_isBasis_sdiff; Matroid.IsBasis.contract_eq_contract_delete; Matroid.restrict_eRk_eq; Set.ncard_sdiff_add_ncard_of_subset
+- **Deviation from manuscript proof:** Mathlib defines contraction by dual deletion; the proof bridges its basis API to the manuscript natural-rank formula using `eRk.toNat`.
+- **Result:** COMPLETE
+- **Downstream effect:** Discharges a prerequisite for 25 descendants, including 14 direct children.
+- **Build status:** `lake build` passed.
+- **Notes:** No alternative contraction definition was introduced.
+
+### N043
+
+- **Ledger ID:** N043
+- **TeX label:** `def:vector-matroid`
+- **Requirement:** A finite indexed vector family yields a matroid on E with exactly its linearly independent indexed subfamilies as independent sets.
+- **Manuscript proof status:** MANUSCRIPT_DEFINITION
+- **Manuscript proof plan:** Ground type is the vector index type α with ground set E. Independence is `I⊆E` plus `LinearIndepOn K φ I`. Empty and heredity follow from linear independence. For augmentation, if every element of a larger independent J lay in the span of I, then finrank of span J would be at most |I|, contradicting |I|<|J|.
+- **Lean declaration:** Matroid.vectorMatroid; Matroid.vectorMatroid_indep_iff; Matroid.vectorMatroid_ground; Matroid.vectorMatroid_represents
+- **Formalization source:** LOCAL_PROOF
+- **Mathlib declarations used:** IndepMatroid.ofFinite; LinearIndepOn.insert; finrank_span_eq_card; Submodule.finrank_mono; finrank_range_le_card
+- **Deviation from manuscript proof:** The map `φ : α → V` is total on the ambient index type, but only E is ground; duplicate and zero vectors remain indexed and become dependent as required.
+- **Result:** COMPLETE
+- **Downstream effect:** Discharges a prerequisite for 70 descendants, including 10 direct children.
+- **Build status:** `lake build` passed.
+- **Notes:** The result is a matroid using mathlib’s foundational type, with no axioms or placeholders.
+
+### N061
+
+- **Ledger ID:** N061
+- **TeX label:** `def:graphic-cographic`
+- **Requirement:** For a finite graph G, the ground set is its edges and independent edge sets are exactly those with no graph cycle.
+- **Manuscript proof status:** MANUSCRIPT_DEFINITION
+- **Manuscript proof plan:** Use mathlib `Graph α β` for vertices α and edge labels β; it supports loops and parallel edges. For a finite edge set, define independence as acyclicity of the edge-selected subgraph and prove the forest augmentation axiom.
+- **Lean declaration:** No Lean graphic-matroid declaration
+- **Formalization source:** FORMALIZATION_SOURCE_UNRESOLVED
+- **Mathlib declarations used:** Graph; Graph.deleteEdges; Graph.IsBridge; SimpleGraph.IsAcyclic; IndepMatroid.ofFinite (inspected)
+- **Deviation from manuscript proof:** No statement was weakened to simple graphs.
+- **Result:** BLOCKED_MATHLIB_INFRASTRUCTURE
+- **Downstream effect:** Still holds 22 descendants after the N061→N062 edge correction, including N062.
+- **Build status:** `lake build` passed; no unproved declaration was left active.
+- **Notes:** The pinned multigraph Graph API has edge cuts and bonds but no walk/cycle/forest predicate or forest exchange theorem. The SimpleGraph acyclicity API loses loops and parallel edges; a faithful augmentation proof requires new multigraph cycle/forest infrastructure.
+
+### N062
+
+- **Ledger ID:** N062
+- **TeX label:** `def:graphic-cographic`
+- **Requirement:** The cographic matroid is M(G)* on the same edge ground, with minimal nonempty edge cuts as circuits.
+- **Manuscript proof status:** MANUSCRIPT_DEFINITION
+- **Manuscript proof plan:** After constructing N061, take its mathlib matroid dual. Prove that graphic cocircuits coincide with graph bonds, giving the manuscript cut-circuit characterization.
+- **Lean declaration:** No Lean cographic-matroid declaration
+- **Formalization source:** FORMALIZATION_SOURCE_UNRESOLVED
+- **Mathlib declarations used:** Matroid.dual; Matroid.IsCocircuit; Graph.IsBond (inspected)
+- **Deviation from manuscript proof:** No dual of an unverified candidate was published.
+- **Result:** BLOCKED_MATHLIB_INFRASTRUCTURE
+- **Downstream effect:** Still holds 13 descendants; N061 is now an explicit direct prerequisite.
+- **Build status:** `lake build` passed; no unproved declaration was left active.
+- **Notes:** The graphic matroid has not been constructed, and the bond/cocircuit correspondence is not present in mathlib. N062 was assessed after N061 as required.
+
+## Resulting active frontier
+
+The current frontier was recomputed mechanically from the updated ledger and direct-edge CSV after all four primary targets were assessed. It has 196 active requirements, 29 complete requirements, and 30 unresolved nodes whose direct active prerequisites are complete. Seven frontier nodes were newly exposed by N025/N043. N062 is now held behind the corrected N061 → N062 edge; N261 is excluded after re-scoping. The complete current list and remaining descendant counts are in `Matroid/FRONTIER.md`. No newly exposed target was formalized in this pass.

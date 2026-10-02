@@ -1,2 +1,9 @@
-import Matroid.Internal.Basic
-import Matroid.Internal.Frontier2
+import Matroid.RankClosure
+import Matroid.Cycles
+import Matroid.Colored
+import Matroid.Representation
+import Matroid.Uniform
+import Matroid.ThreeSum
+import Matroid.Pointed
+import Matroid.WeightedBases
+import Matroid.Minors

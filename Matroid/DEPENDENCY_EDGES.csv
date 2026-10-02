@@ -438,3 +438,4 @@ N007,Closure,N266,Weighted triangle signature,DEFINITIONAL,"eq:seymour-three-sum
 N158,Five 3-sum boundary classes,N266,Weighted triangle signature,PROOF,"eq:seymour-three-sum-phi, eq:seymour-three-sum-five",The five class sums weight independent sets by their triangle closure state. Direct prerequisite: Five 3-sum boundary classes.,HIGH
 N061,Graphic matroid,N267,Weighted K4 triangle signature,DEFINITIONAL,eq:k4-five-sums,The K4 spoke graph gives the displayed five weighted triangle class sums. Direct prerequisite: Graphic matroid.,HIGH
 N266,Weighted triangle signature,N267,Weighted K4 triangle signature,DEFINITIONAL,eq:k4-five-sums,The K4 spoke graph gives the displayed five weighted triangle class sums. Direct prerequisite: Weighted triangle signature.,HIGH
+N061,Graphic matroid,N062,Cographic matroid,DEFINITIONAL,def:graphic-cographic,The cographic matroid M*(G) is the dual of the graphic matroid M(G).,HIGH

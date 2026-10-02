@@ -4,7 +4,7 @@ import Mathlib.Combinatorics.Matroid.Closure
 import Mathlib.Combinatorics.Matroid.Rank.ENat
 
 /-!
-# The manuscript's first matroid boundary
+# Rank, closure, and circuit bridges
 
 Manuscript: `def:matroid` (N001), `def:matroid-basis` (N002), and
 `def:matroid-circuit` (N015).
