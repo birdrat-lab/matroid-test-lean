@@ -7,6 +7,8 @@ import Matroid.Colored
 import Matroid.Representation
 import Matroid.Regular
 import Matroid.TotallyUnimodular
+import Matroid.R10
+import Matroid.Sums
 import Matroid.Uniform
 import Matroid.ThreeSum
 import Matroid.Pointed

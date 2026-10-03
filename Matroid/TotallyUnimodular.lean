@@ -235,6 +235,40 @@ theorem IsTotallyUnimodular.basisStandardForm {r c K : Type*} [Field K]
   · exact hA.basisNormalize_nonbasis A hB
   · exact basisNormalize_vectorMatroid_eq B hB A E hE
 
+/-- Manuscript ledger N053, determinant part: a minor of an integer TU
+matrix is nonzero over any field exactly when it is nonzero over the
+integers. This includes characteristic two. -/
+theorem IsTotallyUnimodular.intCast_minor_ne_zero_iff
+    {m n K : Type*} [Field K] {A : Matrix m n ℤ}
+    (hA : A.IsTotallyUnimodular) (k : ℕ)
+    (f : Fin k → m) (g : Fin k → n) :
+    ((A.submatrix f g).det : K) ≠ 0 ↔ (A.submatrix f g).det ≠ 0 := by
+  obtain ⟨s, hs⟩ := (Matrix.isTotallyUnimodular_iff A).1 hA k f g
+  cases s with
+  | zero =>
+      have hz : (A.submatrix f g).det = 0 := by simpa using hs.symm
+      simp [hz]
+  | pos =>
+      have ho : (A.submatrix f g).det = 1 := by simpa using hs.symm
+      simp [ho]
+  | neg =>
+      have hn : (A.submatrix f g).det = -1 := by simpa using hs.symm
+      simp [hn]
+
+/-- Manuscript ledger N125, TU part of the Cauchy–Binet argument: every
+nonzero maximal minor contributes square `1` to the basis sum. -/
+theorem IsTotallyUnimodular.det_submatrix_sq_of_ne_zero
+    {m n K : Type*} [CommRing K] {A : Matrix m n K}
+    (hA : A.IsTotallyUnimodular) (k : ℕ)
+    (f : Fin k → m) (g : Fin k → n)
+    (hdet : (A.submatrix f g).det ≠ 0) :
+    (A.submatrix f g).det ^ 2 = 1 := by
+  obtain ⟨s, hs⟩ := (Matrix.isTotallyUnimodular_iff A).1 hA k f g
+  cases s with
+  | zero => exact (hdet (by simpa using hs.symm)).elim
+  | pos => rw [← hs]; norm_num
+  | neg => rw [← hs]; norm_num
+
 /-- Manuscript `thm:regular-quotient-form` (N057): the concrete kernel
 block `K = (-D; I)` is totally unimodular when `D` is. -/
 theorem IsTotallyUnimodular.kernelBlock {r c R : Type*} [CommRing R]

@@ -438,6 +438,12 @@ the dual of the graphic matroid on the same labeled edge ground set. -/
 noncomputable def cographic (hE : (Graph.edgeSet G).Finite) : Matroid β :=
   (graphic G hE)✶
 
+/-- Manuscript ledger N135: the cographic matroid is the dual of the
+graphic matroid, as used at `def:graphic-cographic`. -/
+theorem cographic_eq_dual_graphic (hE : (Graph.edgeSet G).Finite) :
+    cographic G hE = (graphic G hE)✶ :=
+  rfl
+
 /-- The abstract cographic construction retains the graph's edge labels. -/
 @[simp] theorem cographic_ground (hE : (Graph.edgeSet G).Finite) :
     (cographic G hE).E = G.edgeSet := by

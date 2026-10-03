@@ -417,7 +417,7 @@ The frozen target set is recorded in `FRONTIER_PASS_2.md`. Plans below follow th
 - **Deviation from manuscript proof:** The definition is the pure pointed-matroid part of the application-specific positive support.
 - **Result:** COMPLETE
 - **Build status:** `lake build` passed for completed declarations; blocked entries leave no unproved active declaration.
-- **Notes:** Finite M and A⊆E ensure candidate cardinalities are finite; hspan supplies a candidate.
+- **Notes:** Phase-A correspondence repair: the public argument now requires `A ⊆ M.E \ {τ}`, exactly matching the manuscript's available set and excluding the target. Finite M and this inclusion ensure candidate cardinalities are finite; hspan supplies a candidate.
 
 ## N122 — Weighted target basis sums
 
@@ -800,3 +800,103 @@ The depth audit at the start of this focused pass found no unresolved active nod
 - **Result:** COMPLETE. The formerly missing TU implication is kernel checked; column permutations and representation preservation were already checked.
 - **Build status:** `lake build` passed after this continuation.
 - **Notes:** No new direct matroid prerequisite or DAG edge was found. The previous `BLOCKED_PROOF` entry documents the intermediate state; this continuation supersedes it.
+
+# Depth-3 short bridges
+
+The Phase-A N105 correspondence repair changed `Matroid.positiveTargetSupport` to require `A ⊆ M.E \ {τ}`. No local caller needed adjustment; the full build passed. Structural depths 0–2 remain complete. The frozen unresolved depth-3 set is N005, N027, N048, N052, N053, N064, N070, N125, N135, N181, N256.
+
+## N005 — extension to a full basis
+
+- **Ledger ID / depth / use labels:** N005, depth 3; `prop:cocircuit-separates-closure`, `prop:support-linear-characterization`, `prop:r10-proper-minors`.
+- **Requirement / source:** Every independent set extends to a whole-matroid basis; EXTERNAL_UNCITED_STANDARD.
+- **Proof plan and Lean declaration:** Invoke exact mathlib `Matroid.Indep.exists_isBase_superset`; `Matroid.Indep.exists_isBase_superset_manuscript` exposes the manuscript statement in `RankClosure.lean`.
+- **Formalization source / result / build:** MATHLIB_EXACT; COMPLETE; `lake build` passed. No deviation or new prerequisite.
+
+## N027 — deletion composition
+
+- **Ledger ID / depth / use labels:** N027, depth 3; `thm:regular-matroid-energy`, `prop:seymour-two-sum-input-minors`, `prop:r10-proper-minors`, `prop:recursive-r10-closure`.
+- **Requirement / source:** Sequential deletion of disjoint sets equals deletion of their union; EXTERNAL_UNCITED_STANDARD.
+- **Proof plan and Lean declaration:** Exact mathlib `Matroid.delete_delete` proves the stronger unconditional identity; `Matroid.deletion_composition` records it in `Minors.lean`.
+- **Formalization source / result / build:** MATHLIB_EXACT; COMPLETE; `lake build` passed. The extra generality does not change the manuscript use; no new prerequisite.
+
+## N048 — represented restriction and deletion
+
+- **Ledger ID / depth / statement label:** N048, depth 3; `prop:represented-minors`.
+- **Requirement / source:** Restriction and deletion retain surviving indexed vectors; MANUSCRIPT_PROVED (the proof calls these cases immediate).
+- **Proof plan and Lean declarations:** Compare independence on each subset using `Matroid.vectorMatroid_indep_iff` and mathlib `Matroid.restrict_indep_iff`/`Matroid.delete_eq_restrict`. `Matroid.vectorMatroid_restrict_eq` and `Matroid.vectorMatroid_delete_eq` preserve labels even when vector values repeat.
+- **Formalization source / result / build:** MATHLIB_BRIDGE; COMPLETE; `lake build` passed. Represented contraction remains N049; no new prerequisite.
+
+## N135 — graphic-cographic duality
+
+- **Ledger ID / depth / use labels:** N135, depth 3; `def:graphic-cographic`, `prop:r10-proper-minors`, `prop:recursive-r10-closure`.
+- **Requirement / source:** The cographic matroid is the dual of the graphic matroid; EXTERNAL_UNCITED_STANDARD.
+- **Proof plan and Lean declaration:** `Graph.cographic` was already defined as the dual; `Graph.cographic_eq_dual_graphic` proves the exact equality by reflexivity.
+- **Formalization source / result / build:** LOCAL_PROOF; COMPLETE; `lake build` passed. No new prerequisite.
+
+## N181 — circuit persistence under deletion
+
+- **Ledger ID / depth / use labels:** N181, depth 3; `prop:r10-no-three-sum`, `prop:r10-proper-minors`.
+- **Requirement / source:** A circuit avoiding a deleted element remains a circuit; EXTERNAL_UNCITED_STANDARD.
+- **Proof plan and Lean declaration:** A circuit avoiding `e` is disjoint from `{e}`; mathlib `Matroid.delete_isCircuit_iff` supplies the criterion. `Matroid.IsCircuit.of_avoids_deleted_element` records the manuscript form.
+- **Formalization source / result / build:** MATHLIB_BRIDGE; COMPLETE; `lake build` passed. No new prerequisite.
+
+# Depth-3 substantial targets and DAG correction
+
+The initial depth-3 target set was frozen before proof work. Mathematical analysis of represented rank and field transfer added five direct edges to `DEPENDENCY_EDGES.csv`: N044→N053 (`def:regular-matroid`, unlabeled remark); N044→N070 (`def:r10` rank assertion); N053→N070 (`def:r10` regularity assertion); N044→N125 (`thm:regular-matroid-energy` and `prop:regular-triangle-identity` basis identification); N053→N052 (`def:regular-matroid` characterization, TU-to-regular direction). These are substantive dependencies rather than Lean helpers. Recomputed structural depths move N053/N125 to depth 5 and N052/N070 to depth 6. No depth-4 formalization was undertaken.
+
+## N052 — Tutte characterization
+
+- **Ledger ID / original depth / location:** N052, initially depth 3; unlabeled characterization after `def:regular-matroid`, used by `thm:regular-quotient-form`, `prop:regular-representations-are-weights`, and `thm:regular-matroid-energy`.
+- **Requirement / manuscript source:** `Regular M ↔ ∃` real TU coordinate representation; EXTERNAL_CITED to Tutte and Oxley.
+- **Mathematical plan:** The TU-to-regular direction is N053. The converse is Tutte's major regular-matroid characterization; it cannot be replaced by the forward direction.
+- **Lean declaration / source / result:** No full Lean declaration. Pinned mathlib has no regular-matroid/Tutte characterization. FORMALIZATION_SOURCE_UNRESOLVED; MISSING_PREREQUISITE (N053) plus the cited converse theorem requiring substantial new local development. No local proof of the converse was attempted. No mathematical deviation or placeholder.
+- **Build / graph:** The partial project builds. New direct edge N053→N052 raises N052 to depth 6.
+
+## N053 — TU representation over every field
+
+- **Ledger ID / original depth / location:** N053, initially depth 3; unlabeled remark after `def:regular-matroid`, used by `thm:regular-quotient-form` and `prop:regular-triangle-identity`.
+- **Requirement / manuscript source:** The indexed column matroid of a TU matrix is unchanged over any field; EXTERNAL_UNCITED_STANDARD.
+- **Mathematical plan:** Encode TU entries as integers, compare each square minor by `RingHom.map_det`, then use the represented-rank/minor criterion to transfer independent indexed sets. In characteristic two, `-1=1` remains nonzero.
+- **Lean declaration / source / result:** `Matrix.IsTotallyUnimodular.intCast_minor_ne_zero_iff` proves the nonzero-minor transfer for integer TU matrices, including characteristic two. The missing formal step is the general rectangular-matrix independence criterion via nonzero maximal minors, which belongs to N044; a real TU matrix also needs an integer sign-entry lift. FORMALIZATION_SOURCE_UNRESOLVED; MISSING_PREREQUISITE, not COMPLETE. Pinned mathlib has no directly usable general minor criterion for indexed column independence in the searched matrix API.
+- **Build / graph:** The partial result builds. New direct edge N044→N053 raises N053 to depth 5.
+
+## N064 — regular one-sum construction
+
+- **Ledger ID / depth / statement label:** N064, depth 3; `def:regular-matroid-sums`.
+- **Requirement / manuscript source:** For disjoint nonempty ground sets, the 1-sum is the ordinary direct sum and its cycles are exactly `C₁ △ C₂` for summand cycles; MANUSCRIPT_DEFINITION.
+- **Mathematical plan:** Use mathlib `Matroid.disjointSum`. Its independence criterion proves that each circuit of the sum belongs to exactly one side. Partition a finite pairwise-disjoint circuit family by side; conversely unite two such families. The two resulting cycle sets are disjoint because the ground sets are.
+- **Lean declarations / source / result:** `Matroid.oneSum`, `oneSum_ground`, `oneSum_indep_iff`, `oneSum_isCircuit_iff`, and `oneSum_isCircuitUnion_iff` in `Sums.lean`; local proof using mathlib `Matroid.disjointSum_indep_iff` and `Matroid.Dep.exists_isCircuit_subset`. LOCAL_PROOF; COMPLETE. The proof uses the manuscript's `IsCircuitUnion`, not merely an independence-only direct sum.
+- **Build / notes:** `lake build` passed. No new direct prerequisite. No 2- or 3-sum work was done.
+
+## N070 — exact R10 object
+
+- **Ledger ID / original depth / labels:** N070, initially depth 3; `def:r10`, `fig:r10-k33`.
+- **Requirement / manuscript source:** The exact rank-five, ten-element regular vector matroid of the displayed matrix; MANUSCRIPT_DEFINITION.
+- **Mathematical plan:** Store the integer matrix with row type `Fin 5` and column type `Fin 10`; cast to reals for the vector matroid. The index `i : Fin 10` is manuscript column `i` from left to right. The first five columns form the identity, giving the rank lower bound; represented rank gives the upper bound. TU of the displayed integer matrix plus N053 would prove regularity.
+- **Lean declarations / source / result:** `Matroid.r10IntegerMatrix`, `r10Matrix`, `r10`, `r10_ground`, `r10_ground_card`, `r10IntegerMatrix_left`, `r10Matrix_left` in `R10.lean`. The exact matrix, labels, ten-element ground, and identity block are checked. Rank-five and regularity remain unproved; no atlas/certificate data was introduced. LOCAL_PROOF for the partial declarations; MISSING_PREREQUISITE for the full target.
+- **Build / graph:** `lake build` passed. New direct edges N044→N070 and N053→N070 raise N070 to depth 6; a finite TU certificate for this matrix remains to be supplied when its prerequisites are ready.
+
+## N125 — TU weighted basis determinant
+
+- **Ledger ID / original depth / use labels:** N125, initially depth 3; `thm:regular-matroid-energy`, `prop:regular-triangle-identity`, `app:r10-atlas-response`.
+- **Requirement / manuscript source:** For a full-row-rank TU real matrix `C` and positive weights `w`, `det(C diag(w) Cᵀ)` is the weighted sum over bases; EXTERNAL_CITED (Cauchy–Binet and the cited determinant representation).
+- **Exact needed identity:** For finite row type of size `r` and finite column set, `det(C diag(w) Cᵀ) = ∑_{S, |S|=r} (det C[:,S])² · ∏_{e∈S} w_e`. TU changes each squared maximal minor to `0` or `1`; represented rank identifies the nonzero terms with bases. Positive weights are part of the manuscript setting, though the polynomial identity itself needs only commutative-ring weights.
+- **Lean declaration / source / result:** `Matrix.IsTotallyUnimodular.det_submatrix_sq_of_ne_zero` proves the TU squared-minor component. Pinned mathlib has no directly named rectangular weighted Cauchy–Binet theorem in the searched matrix determinant API. The full identity is not yet proved; FORMALIZATION_SOURCE_UNRESOLVED and MISSING_PREREQUISITE (N044), plus determinant infrastructure.
+- **Build / graph:** The partial lemma builds. New direct edge N044→N125 raises N125 to depth 5. No energy-ratio theorem was placed in Matroid.
+
+## N256 — binary cycle symmetric difference
+
+- **Ledger ID / depth / location:** N256, depth 3; prose after `def:matroid-cycle`, used by `def:regular-matroid-sums` and `lem:seymour-three-sum-five`.
+- **Requirement / manuscript source:** Cycles, defined as finite disjoint unions of circuits, are closed under symmetric difference for a regular matroid; EXTERNAL_CITED.
+- **Mathematical plan:** The manuscript's `def:matroid` assumes a finite ground set, so the eventual Lean closure theorem must include `M.Finite`. Instantiate regularity at `ZMod 2`. For an indexed binary representation, prove `IsCircuitUnion X` iff the sum of representing columns over `X` is zero. Each circuit has a minimal relation whose coefficients are all nonzero, hence all `1` over `ZMod 2`; disjoint unions sum to zero. Conversely, peel off a circuit from any nonempty zero-sum set and induct on finite cardinality. In characteristic two, the indicator of `X △ Y` is the sum of the indicators of `X` and `Y`; hence its column sum is zero, giving closure.
+- **Lean declaration / source / result:** `Matroid.Regular.representableF2` and `Matroid.IsCircuitUnion.subset_ground` are checked. Pinned mathlib has no binary matroid/cycle-space API or ready circuit-union/kernel equivalence in the searched matroid files. The equivalence above remains a local proof obligation, so the requested closure is not proved. FORMALIZATION_SOURCE_UNRESOLVED; BLOCKED_PROOF. No conditional axiom or weakened circuit-only result was substituted.
+- **Build / notes:** Partial declarations build. No new direct prerequisite or DAG edge was found; this is the current depth-3 blocker.
+
+## N256 continuation — closed
+
+- **Ledger ID / structural depth / location:** N256, depth 3; unlabeled prose immediately after `def:matroid-cycle`. The manuscript's finite-ground-set convention is stated in `def:matroid`.
+- **Requirement / mathematical provenance:** Cycles of a regular matroid are closed under symmetric difference; EXTERNAL_CITED (`Seymour1980`, `Oxley2011`). A cycle remains the manuscript's finite disjoint union of circuits, including the empty union.
+- **Mathematical proof:** In an indexed `ZMod 2` representation, linear independence is equivalent to every nonempty finite indexed subfamily having nonzero column sum. Minimal dependence then forces each circuit's full column sum to be zero. Conversely, a nonempty zero-sum set contains a circuit; removing it leaves another zero-sum set, so finite induction partitions the set into disjoint circuits. The sum over `X △ Y` is the sum over `X` plus the sum over `Y`, since the common columns occur twice and `2 = 0`. Regularity supplies the binary representation.
+- **Lean declarations / source:** `Matroid.isCircuitUnion_iff_binary_sum_eq_zero` exposes the cycle-space characterization; `Matroid.Regular.isCircuitUnion_symmDiff` proves the manuscript conclusion under `[M.Finite]`. LOCAL_PROOF; COMPLETE. The supporting finite-index independence, circuit-removal, and symmetric-difference lemmas are private to `Cycles.lean`.
+- **Mathlib support / deviation:** Uses `Fintype.linearIndependent_iff`, `Matroid.Dep.exists_isCircuit_subset`, `Matroid.IsCircuit.eq_of_not_indep_subset`, and finite-set sum identities. The Lean statement preserves the manuscript's indexed elements and finite matroid convention. No alternate cycle definition or conditional axiom was introduced.
+- **Build / graph:** `lake build` passed with the closure theorem. No new substantive prerequisite, ledger ID, or dependency edge was needed. The earlier N256 blocker entry above records the prior state.

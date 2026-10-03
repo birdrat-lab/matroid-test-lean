@@ -1,96 +1,50 @@
-# Complete the Remaining Topological Depth-2 Matroid Formalization
+# Clean the Certified Boundary and Begin Topological Depth 3
 
-The active Matroid formalization is now complete through structural topological depth 1.
+The active Matroid formalization is complete through structural topological depth 2.
 
-The current depth audit is:
+The current mechanically computed state is:
 
 ```text
-depth 0: complete
-depth 1: complete
-depth 2: 19 active nodes, 7 complete, 12 unresolved
+depth 0:  1 active,  1 complete
+depth 1:  9 active,  9 complete
+depth 2: 19 active, 19 complete
+depth 3: 12 active,  1 complete, 11 unresolved
 ```
 
-This task attacks the **12 remaining unresolved active depth-2 requirements**.
-
-The governing invariant is:
-
-> **Never perform new formalization work at a greater topological depth while a valid active requirement remains unresolved at a smaller depth.**
-
-For this pass:
+The minimum unresolved structural depth is therefore:
 
 ```text
-verify depths 0 and 1 remain clear
+3
+```
+
+This task has two phases:
+
+```text
+Phase A
+repair the one statement-interface issue found by the depth-≤2
+manuscript/Lean correspondence audit
         ↓
-freeze the 12 unresolved depth-2 targets
+verify depths 0–2 remain complete
         ↓
-attack every target
+Phase B
+freeze the unresolved depth-3 layer
         ↓
-repair missing direct prerequisites if genuinely discovered
+attack every unresolved depth-3 target
         ↓
-update Lean / ledger / log / graph
+repair the DAG if formalization reveals a genuine missing prerequisite
         ↓
 recompute structural depths
-        ↓
-report whether depth 2 is clear
         ↓
 STOP
 ```
 
-Do not begin depth 3.
+Do not begin depth 4.
 
 ---
 
-# 1. Canonical sources
+# 1. Governing breadth-first invariant
 
-The mathematical source of truth is:
-
-```text
-Manuscript/main.tex
-```
-
-The canonical requirement inventory is:
-
-```text
-Matroid/LEDGER.md
-```
-
-The direct dependency DAG is:
-
-```text
-Matroid/DEPENDENCY_EDGES.csv
-```
-
-The mechanically computed depth table is:
-
-```text
-Matroid/DEPTHS.csv
-```
-
-The current formalization boundary is:
-
-```text
-Matroid/FRONTIER.md
-```
-
-The formalization/provenance record is:
-
-```text
-Matroid/FORMALIZATION_LOG.md
-```
-
-The manuscript determines the mathematics.
-
-The ledger determines the accepted formalization obligations.
-
-The DAG determines direct internal prerequisites.
-
-Mathlib determines how much proof infrastructure must be supplied locally.
-
----
-
-# 2. Verify the breadth-first invariant before beginning
-
-Recompute structural topological depth mechanically.
+The repository is formalized in increasing structural topological depth.
 
 For an active node `v`:
 
@@ -110,50 +64,256 @@ over direct active prerequisite edges:
 u → v.
 ```
 
-Before doing any depth-2 proof work, verify:
+The governing rule is:
 
-```text
-no unresolved active node has depth 0 or depth 1.
-```
+> **Do not perform new work at depth `d + 1` while a valid active requirement remains unresolved at depth `d`.**
 
-The expected state is:
+Historical results proved ahead of the current boundary remain valid and should not be undone.
 
-```text
-depth 0: clear
-depth 1: clear
-minimum unresolved depth: 2
-```
-
-If this is false, stop and investigate the ledger/DAG discrepancy.
-
-Do not silently proceed deeper.
+Downstream leverage is only a tie-breaker among nodes at the same depth.
 
 ---
 
-# 3. Freeze the depth-2 target set
+# 2. Canonical sources
 
-The expected unresolved active depth-2 targets are exactly:
+Use:
 
 ```text
-N024  Deletion
-N036  Single-element extension
-N046  Represented circuits
-N047  Projective equivalence
-N051  Regularity
-N056  TU pivot and standard form
-N057  TU identity augmentation
-N062  Cographic matroid
-N111  Nonzero column rescaling
-N112  Ambient linear isomorphism
-N130  Corank-one uniform target circuit
-N258  Incidence representation of a graphic matroid
+Manuscript/main.tex
 ```
 
-Recompute this set mechanically from `DEPTHS.csv`.
+as the mathematical source of truth.
 
-Treat the list above as a sanity check, not as authority over the DAG.
+Use:
 
-Record the verified target snapshot in:
+```text
+Matroid/LEDGER.md
+```
+
+as the canonical requirement inventory.
+
+Use:
+
+```text
+Matroid/DEPENDENCY_EDGES.csv
+```
+
+as the direct internal prerequisite graph.
+
+Use:
+
+```text
+Matroid/DEPTHS.csv
+```
+
+as a mechanically generated view of structural depth.
+
+Use:
+
+```text
+Matroid/FORMALIZATION_LOG.md
+```
+
+for proof/provenance history.
+
+Use:
+
+```text
+Matroid/FRONTIER.md
+```
+
+for the current formalization boundary.
+
+The manuscript determines what a requirement means.
+
+Mathlib may simplify the proof but must not redefine the requirement.
+
+---
+
+# 3. Phase A — repair N105 before advancing
+
+The correspondence audit through depth 2 found one actual interface issue.
+
+Ledger requirement N105 is:
+
+```text
+Positive target support
+```
+
+with manuscript provenance:
+
+```text
+def:positive-support
+```
+
+The manuscript applies the definition to a pointed matroid `(M, τ)` and an availability set satisfying:
+
+```text
+A ⊆ E(M) \ {τ}.
+```
+
+The current Lean definition instead accepts only:
+
+```lean
+A ⊆ M.E
+```
+
+and therefore formally permits:
+
+```text
+τ ∈ A.
+```
+
+That is broader than the manuscript definition and can change the interpretation of positive support.
+
+Repair N105 before beginning new depth-3 work.
+
+The resulting public interface must explicitly encode target exclusion, either directly as:
+
+```lean
+hA : A ⊆ M.E \ {τ}
+```
+
+or equivalently through separate hypotheses:
+
+```lean
+hA : A ⊆ M.E
+hτA : τ ∉ A
+```
+
+Prefer the formulation that works most naturally with the surrounding pointed-matroid API while remaining transparently equivalent to the manuscript statement.
+
+Update any affected local proofs or uses.
+
+Update:
+
+```text
+Matroid/LEDGER.md
+Matroid/FORMALIZATION_LOG.md
+```
+
+to record the corrected correspondence.
+
+Run:
+
+```text
+lake build
+```
+
+after this repair.
+
+N105 remains `COMPLETE` only if the corrected manuscript-facing formulation builds.
+
+---
+
+# 4. Do not unnecessarily reopen N051 or N056
+
+The same correspondence audit identified two lesser implementation caveats that are **not** current statement failures.
+
+## N051 — Regularity
+
+The Lean definition uses universe-polymorphic quantification over fields.
+
+This is ordinary Lean universe bookkeeping rather than a mathematical discrepancy.
+
+Record the universe limitation clearly in the formalization log if it is not already recorded.
+
+Do not weaken the mathematical definition.
+
+Do not reopen N051 merely to eliminate universe parameters.
+
+If a depth-3 theorem exposes an actual `ULift` or universe-transport issue, solve that issue locally and document it.
+
+## N056 — TU standard form
+
+The existing Lean development proves the manuscript standard-form step compositionally:
+
+```text
+reindex basis columns
++
+normalize the basis block to I
++
+prove the resulting nonbasis block remains TU
++
+prove the indexed column matroid is preserved
+```
+
+This is mathematically sufficient for the manuscript.
+
+Do not rewrite N056 merely to obtain one monolithic theorem.
+
+An end-to-end wrapper may be added if a depth-3 proof benefits from one, but only as a convenience theorem over the already verified content.
+
+---
+
+# 5. Revalidate the certified boundary
+
+After the N105 repair, mechanically regenerate:
+
+```text
+Matroid/DEPTHS.csv
+```
+
+and verify:
+
+```text
+all active nodes of depths 0, 1, and 2 are COMPLETE.
+```
+
+If any depth ≤ 2 node becomes unresolved:
+
+```text
+STOP
+```
+
+and repair the shallow boundary before beginning depth 3.
+
+The expected minimum unresolved depth remains:
+
+```text
+3.
+```
+
+---
+
+# 6. Freeze the unresolved depth-3 layer
+
+The expected active depth-3 nodes are:
+
+```text
+N005  Extension to a full basis
+N006  Rank                         COMPLETE
+N027  Deletion composition
+N048  Represented restriction and deletion
+N052  Tutte characterization
+N053  TU representation over every field
+N064  Regular one-sum construction
+N070  R10
+N125  TU weighted basis determinant
+N135  Graphic-cographic duality
+N181  Circuit persistence under deletion
+N256  Binary cycle symmetric difference
+```
+
+Therefore the expected unresolved target set is exactly:
+
+```text
+N005
+N027
+N048
+N052
+N053
+N064
+N070
+N125
+N135
+N181
+N256
+```
+
+Recompute this mechanically.
+
+Record the verified set in:
 
 ```text
 Matroid/FRONTIER.md
@@ -162,29 +322,29 @@ Matroid/FRONTIER.md
 under:
 
 ```text
-## Active depth-2 target snapshot
+## Active depth-3 target snapshot
 ```
 
-Once verified, attack every unresolved node in the snapshot.
-
-Do not add ordinary newly exposed depth-3 nodes to this pass.
+The DAG, not this expected list, is authoritative.
 
 ---
 
-# 4. Universal formalization workflow
+# 7. Universal workflow for every depth-3 target
 
-For every target, work in this order:
+For each target use:
 
 ```text
-ledger requirement
+ledger entry
         ↓
-exact manuscript statement / context
+exact manuscript location
         ↓
-manuscript proof or derivation, if any
+statement / cited fact actually required by the manuscript
         ↓
-mathematical proof / construction plan
+manuscript proof or surrounding mathematical argument
         ↓
-inspect pinned mathlib
+write a mathematical proof/construction plan
+        ↓
+only then inspect pinned mathlib
         ↓
 design manuscript-facing Lean statement
         ↓
@@ -192,121 +352,66 @@ implement
         ↓
 lake build
         ↓
-update ledger and formalization log
+update ledger + formalization log
 ```
 
-Do **not** begin from mathlib search and then reinterpret the manuscript around what the library happens to contain.
+Do not begin by finding a nearby mathlib theorem and changing the requirement to fit it.
 
-The Lean API should formalize the manuscript requirement.
-
-Mathlib may compress the proof.
+For cited standard facts, formalize only the strength actually required by the manuscript unless a clean general theorem is natural.
 
 ---
 
-# 5. Proof-source classification
+# 8. N005 — Extension to a full basis
 
-For every target, use the existing manuscript-source categories:
+Canonical requirement:
 
-```text
-MANUSCRIPT_DEFINITION
-MANUSCRIPT_PROOF
-MANUSCRIPT_SKETCH
-MANUSCRIPT_STATEMENT_ONLY
-EXTERNAL_CITED
-EXTERNAL_UNCITED_STANDARD
-```
+> An independent set extends to a basis of the whole matroid.
 
-Do not attribute a proof to the manuscript when the manuscript merely states or cites the result.
+This is an external uncited standard fact.
 
-For project-local formalization source, use:
+N004 already formalizes extension to a basis inside a prescribed subset.
+
+First inspect whether the existing mathlib basis API gives N005 directly.
+
+Prefer:
 
 ```text
 MATHLIB_EXACT
-MATHLIB_BRIDGE
-LOCAL_PROOF
 ```
 
-as appropriate.
+or a very small:
+
+```text
+MATHLIB_BRIDGE.
+```
+
+Do not build a new maximality argument if mathlib already packages this result.
+
+Expected mathematical home:
+
+```text
+Matroid/RankClosure.lean
+```
+
+or another existing basis-oriented module.
 
 ---
 
-# 6. Source organization
-
-Lean files must continue to be organized by mathematics, not by formalization chronology or depth.
-
-Do not create:
-
-```text
-Depth2.lean
-Frontier6.lean
-Pass6.lean
-```
-
-Use or create mathematically named modules.
-
-The expected homes for this pass are approximately:
-
-```text
-Matroid/Minors.lean
-    N024
-
-Matroid/Extensions.lean
-    N036
-
-Matroid/Representation.lean
-    N046
-    N047
-    N111
-    N112
-
-Matroid/Regular.lean
-    N051
-
-Matroid/TotallyUnimodular.lean
-    N056
-    N057
-
-Matroid/Graphic.lean
-    N062
-    N258
-
-Matroid/Uniform.lean
-    N130
-```
-
-This organization is advisory rather than rigid.
-
-Do not create a new file for one trivial declaration if an existing mathematical module is clearly appropriate.
-
-If new modules are created, import them transitively through:
-
-```text
-Matroid/Matroid.lean
-```
-
----
-
-# 7. N024 — Deletion
+# 9. N027 — Deletion composition
 
 Canonical requirement:
 
-```text
-M \ A is M restricted to E(M) \ A.
-```
+> For disjoint `A,B`, deleting `A` and then `B` agrees with deleting `A ∪ B`.
 
-Manuscript provenance:
+This is a standard minor-algebra fact.
 
-```text
-def:matroid-minors
-```
+The manuscript uses it in later minor manipulations.
 
-This is a manuscript definition.
+Use the existing mathlib restriction/deletion API if possible.
 
-Prefer an exact mathlib definition or a transparent bridge.
+Be careful about whether the library theorem requires explicit disjointness or whether deletion composition is valid without it after set simplification.
 
-Do not introduce a competing deletion operation.
-
-The project-facing result should make the manuscript identity explicit if mathlib uses a differently named primitive.
+The project-facing statement should imply the manuscript formulation directly.
 
 Expected home:
 
@@ -316,76 +421,27 @@ Matroid/Minors.lean
 
 ---
 
-# 8. N036 — Single-element extension
-
-Canonical requirement:
-
-```text
-A matroid on E ∪ {τ} restricting to the given matroid on E.
-```
+# 10. N048 — Represented restriction and deletion
 
 Manuscript provenance:
 
 ```text
-def:single-element-extension
+prop:represented-minors
 ```
 
-This is a definition, not Crapo's classification theorem.
+The manuscript states:
 
-Formalize only the notion required here.
+> If `φ : E → V` represents `M`, restriction and deletion are represented by retaining the corresponding indexed vectors.
 
-The definition must preserve both pieces of manuscript data:
+The manuscript proof says these two cases are immediate.
 
-```text
-ground set = E ∪ {τ}
-restriction to E = N
-```
+Preserve the indexed representation semantics already established in N042/N043.
 
-Do not prematurely formalize modular-cut classification N037.
+Do not collapse equal vector values.
 
-If mathlib has no exact predicate, a small project definition is appropriate.
+The Lean theorem should express that restricting the vector-matroid ground set to the surviving indices agrees with the corresponding matroid restriction/deletion.
 
-Expected home:
-
-```text
-Matroid/Extensions.lean
-```
-
----
-
-# 9. N046 — Represented circuits
-
-Canonical requirement:
-
-> Circuits of a vector matroid are exactly minimally linearly dependent indexed subfamilies.
-
-The manuscript states this immediately after `def:vector-matroid`.
-
-Important:
-
-> preserve the **indexed** formulation.
-
-Distinct ground elements may represent equal vectors.
-
-A loop may be represented by the zero vector.
-
-Do not replace indexed dependence by dependence of the set of vector values.
-
-Build directly on the completed vector-matroid construction N043.
-
-The desired result should connect:
-
-```text
-Matroid.IsCircuit
-```
-
-to minimal failure of:
-
-```text
-LinearIndepOn
-```
-
-for the represented indexed family.
+This target does **not** include represented contraction; that is separately tracked as N049.
 
 Expected home:
 
@@ -393,70 +449,59 @@ Expected home:
 Matroid/Representation.lean
 ```
 
----
-
-# 10. N047 — Projective equivalence
-
-Manuscript provenance:
+or:
 
 ```text
-def:projective-equivalence
+Matroid/Minors.lean
 ```
 
-The manuscript defines projective equivalence of two representations of the same matroid over the same field by:
+depending on current import structure.
 
-```text
-an isomorphism between their column spans
-+
-one nonzero scalar for each nonloop ground element.
-```
-
-The definition must respect the manuscript's treatment of loops:
-
-```text
-loop columns remain zero;
-no nonzero scalar datum is required for loops.
-```
-
-Do not replace the span-restricted isomorphism by an unnecessarily stronger isomorphism between arbitrary ambient spaces.
-
-If a convenient equivalent formulation is used internally, expose a manuscript-faithful public definition or equivalence theorem.
-
-Expected home:
-
-```text
-Matroid/Representation.lean
-```
+Avoid import cycles.
 
 ---
 
-# 11. N051 — Regularity
-
-Manuscript provenance:
-
-```text
-def:regular-matroid
-```
+# 11. N052 — Tutte characterization
 
 Canonical requirement:
 
+> A matroid is regular iff it admits a real totally unimodular coordinate representation.
+
+The manuscript explicitly cites Tutte and Oxley for this characterization.
+
+This is a substantial theorem.
+
+Do not silently replace it by only one implication.
+
+The required equivalence has two directions:
+
 ```text
-A matroid is regular iff it is representable over every field.
+TU real representation
+    ⇒ regular
+
+regular
+    ⇒ existence of a TU real representation.
 ```
 
-This target is only the definition of regularity.
+N053 corresponds closely to the first direction and may provide reusable infrastructure.
 
-Do not pull Tutte's characterization or unique representability into N051.
+However, N052 and N053 are both currently depth 3. Work within the same depth is allowed.
 
-First inspect pinned mathlib for an existing regular-matroid predicate.
+It is acceptable to prove N053 first and use it in N052.
 
-If exact, use it.
+The converse direction may require a substantial external characterization theorem not already present in mathlib.
 
-Otherwise define the narrow manuscript notion in terms of the existing representation API.
+Search pinned mathlib carefully **after** fixing the manuscript statement and proof plan.
 
-Pay particular attention to Lean universe polymorphism when quantifying over fields.
+If mathlib lacks the converse and a complete local proof would require formalizing a major portion of Tutte's theorem, report that precisely rather than claiming an incomplete equivalence.
 
-Do not solve universe problems by weakening the mathematical statement to a fixed collection of fields.
+Do not weaken N052 to:
+
+```text
+TU representable → regular.
+```
+
+That is N053-level content, not Tutte's characterization.
 
 Expected home:
 
@@ -464,41 +509,49 @@ Expected home:
 Matroid/Regular.lean
 ```
 
+and/or:
+
+```text
+Matroid/TotallyUnimodular.lean
+```
+
 ---
 
-# 12. N056 — TU pivot and standard form
+# 12. N053 — TU representation over every field
+
+The manuscript explains this fact immediately after the definition of regularity.
 
 Canonical requirement:
 
-> Pivoting a totally unimodular representation on a basis and permuting columns can put it into standard form `[I D]` without losing total unimodularity.
+> The independent column sets of a totally unimodular matrix are unchanged when its entries are interpreted over another field; therefore its column matroid is regular.
 
-This is an external uncited standard fact used explicitly in manuscript proofs.
-
-The principal manuscript occurrence is in:
+The manuscript's argument is:
 
 ```text
-thm:regular-quotient-form
+a k-column set is independent
+        ↕
+some k×k minor is nonzero
+        ↓
+TU means every such determinant is 0, +1, or -1
+        ↓
+nonzero minors remain nonzero over any field
+        ↓
+the same indexed column sets are independent.
 ```
 
-where a TU representation is transformed to:
+Formalize this argument faithfully.
+
+Take special care in characteristic `2`, where `-1 = 1` but remains nonzero.
+
+Do not rely on real-specific linear algebra after the statement has moved to an arbitrary field.
+
+This theorem should connect naturally to the existing:
 
 ```text
-A = ( I_r  D ).
+Matroid.Regular
 ```
 
-Do not prove a much broader matrix-normal-form theorem unless it is genuinely simpler.
-
-The target should be strong enough to justify exactly the standard-form step used by the manuscript.
-
-Separate the mathematical obligations if useful:
-
-```text
-row/column permutations preserve TU
-pivot/basis normalization preserves TU
-resulting representation has identity basis block
-```
-
-Use existing mathlib determinant/matrix/TU infrastructure wherever possible.
+definition.
 
 Expected home:
 
@@ -506,269 +559,175 @@ Expected home:
 Matroid/TotallyUnimodular.lean
 ```
 
----
-
-# 13. N057 — TU identity augmentation
-
-This target is currently:
-
-```text
-STATEMENT_DESIGN
-```
-
-Do not begin by inventing a general theorem from the phrase "identity augmentation."
-
-Read the exact matrices used in `thm:regular-quotient-form`.
-
-The manuscript starts from:
-
-```text
-A = ( I_r  D )
-```
-
-and constructs:
-
-```text
-K =
-( -D       )
-( I_{n-r}  )
-```
-
-and then:
-
-```text
-Â = ( I_n  K ).
-```
-
-The manuscript says:
-
-> Appending identity rows or columns preserves total unimodularity, so both `K` and `Â` are totally unimodular.
-
-The formalization target should justify these concrete steps.
-
-Preferred strategy:
-
-1. formulate the narrow TU lemmas actually required for `K`;
-2. formulate the narrow TU lemma required for `Â`;
-3. only generalize if the general statement is clearly correct and easier to use.
-
-Do not mark N057 complete merely because "adding some identity matrix sometimes preserves TU."
-
-The resulting formal theorem must actually imply the two manuscript claims.
-
-Once its exact Lean statement is settled, change the ledger status out of:
-
-```text
-STATEMENT_DESIGN
-```
-
-and record the adopted formulation.
-
-Expected home:
-
-```text
-Matroid/TotallyUnimodular.lean
-```
+or `Regular.lean` with supporting TU lemmas elsewhere.
 
 ---
 
-# 14. N062 — Cographic matroid
+# 13. N064 — Regular one-sum construction
 
 Manuscript provenance:
 
 ```text
-def:graphic-cographic
+def:regular-matroid-sums
 ```
 
-N061 is now complete.
+For disjoint nonempty ground sets, the manuscript's `1`-sum is the ordinary direct sum.
 
-The manuscript requires:
-
-> the cographic matroid `M*(G)` has the same edge ground set and its circuits are the minimal nonempty edge cuts.
-
-Do not merely define:
+Its cycles are:
 
 ```text
-cographic G := (graphic G)*
+C₁ △ C₂
 ```
 
-and stop.
+where `Cᵢ` is a cycle of `Mᵢ`.
 
-That supplies the abstract dual but does not yet verify the manuscript's circuit characterization.
+Because the ground sets are disjoint, this is simply their disjoint union.
 
-The target has two obligations:
+Prefer mathlib's existing direct-sum construction if available.
+
+The formalization should expose the manuscript's cycle characterization rather than merely define an unrelated direct-sum object.
+
+Do not formalize the `2`-sum or `3`-sum in N064.
+
+Preserve the disjoint-ground-set condition.
+
+Expected home may be a new mathematically named module such as:
 
 ```text
-1. define/identify the cographic matroid as the dual of the completed graphic matroid;
-2. prove that its circuits are exactly the minimal nonempty edge cuts/bonds.
+Matroid/Sums.lean
 ```
 
-Reuse the graph-cut infrastructure already developed in:
+if this is the first substantive sum construction.
+
+---
+
+# 14. N070 — `R10`
+
+Manuscript provenance:
 
 ```text
-Matroid/Graphic.lean
+def:r10
+fig:r10-k33
 ```
 
-Do not rebuild the graphic matroid.
+The manuscript defines `R10` as the vector matroid on:
 
-Prefer connecting the existing cut construction to matroid cocircuits/dual circuits.
+```text
+E10 = {0,1,...,9}
+```
+
+represented over the reals by the explicit `5 × 10` matrix:
+
+```text
+[ 1 0 0 0 0 | -1  1  0  0  1 ]
+[ 0 1 0 0 0 |  1 -1  1  0  0 ]
+[ 0 0 1 0 0 |  0  1 -1  1  0 ]
+[ 0 0 0 1 0 |  0  0  1 -1  1 ]
+[ 0 0 0 0 1 |  1  0  0  1 -1 ]
+```
+
+with columns indexed left-to-right by `0,...,9`.
+
+Formalize **this exact represented matroid**.
+
+Do not substitute an isomorphic but differently indexed representation unless accompanied by a precise equivalence back to the manuscript indexing.
+
+The definition should make later finite `R10` calculations convenient.
+
+Also establish the elementary metadata asserted directly in `def:r10` where needed:
+
+```text
+10-element ground set
+rank 5
+regularity
+```
+
+Do not begin formalizing the later `R10` atlas or finite certificate data in this target.
 
 Expected home:
 
 ```text
-Matroid/Graphic.lean
+Matroid/R10.lean
 ```
+
+This is a sufficiently important mathematical object to justify its own module.
 
 ---
 
-# 15. N111 — Nonzero column rescaling
+# 15. N125 — TU weighted basis determinant
 
 Canonical requirement:
 
-> Independently rescaling represented columns by nonzero scalars preserves the vector matroid.
+> For a full-row-rank TU representation with positive column weights,
+> `det(C W Cᵀ)` equals the weighted basis-generating sum of the represented column matroid.
 
-This is a matroid statement only.
+The manuscript explicitly invokes Cauchy–Binet and total unimodularity.
 
-Do not formalize the later energy-scaling claims here.
-
-For an indexed representation `φ`, a scalar function `c` satisfying:
-
-```text
-∀ e, c e ≠ 0
-```
-
-should give a represented family:
+The mathematical route should remain recognizable:
 
 ```text
-e ↦ c e • φ e
+Cauchy–Binet
+    ↓
+sum over maximal column subsets
+    ↓
+each squared maximal minor is 0 or 1 by TU
+    ↓
+surviving terms are exactly bases
+    ↓
+each surviving term carries the product of its column weights.
 ```
 
-with exactly the same independent indexed subsets.
+Formalize the determinant identity needed by the manuscript.
 
-Preserve loops correctly:
+Do not include the reconstruction-energy ratio itself; that is later application-level mathematics.
+
+Be explicit about:
 
 ```text
-c e • 0 = 0.
+finite row and column indices
+full row rank
+diagonal weight matrix
+positive/nonzero weights as actually required
+the represented column matroid
 ```
 
-Prove equality of the vector matroids or an equivalent representation-preservation theorem.
+If Cauchy–Binet infrastructure is absent or awkward in pinned mathlib, isolate the missing determinant lemma cleanly.
 
 Expected home:
 
 ```text
-Matroid/Representation.lean
+Matroid/TotallyUnimodular.lean
 ```
+
+or a focused mathematical module such as:
+
+```text
+Matroid/WeightedDeterminants.lean
+```
+
+if substantial.
 
 ---
 
-# 16. N112 — Ambient linear isomorphism
+# 16. N135 — Graphic-cographic duality
 
 Canonical requirement:
 
-> An invertible ambient linear map preserves the represented vector matroid.
+> The cographic matroid of `G` is the dual of its graphic matroid.
 
-Again, this is the matroid statement, not the later energy-invariance proposition.
+N061 and N062 are already complete.
 
-Given an appropriate linear equivalence `T`, prove that:
+The current cographic construction was intentionally built through duality, so N135 should likely be a small exact theorem or definitional equality.
 
-```text
-φ
-```
+Do not reprove the bond/cocircuit theory already established for N062.
 
-and:
+Expose the manuscript relation directly:
 
 ```text
-T ∘ φ
+cographic G = (graphic G)✶
 ```
 
-have identical indexed independence structure.
-
-Prefer a result stated using Lean's standard linear-equivalence abstraction.
-
-Do not unnecessarily require the represented vectors to span the whole ambient space.
-
-Expected home:
-
-```text
-Matroid/Representation.lean
-```
-
----
-
-# 17. N130 — Corank-one uniform target circuit
-
-Canonical requirement:
-
-> In `U_{n,n+1}`, the full ground set is the unique target circuit.
-
-This is an external uncited standard consequence of the already completed uniform-matroid construction N129.
-
-State the theorem carefully enough to preserve the intended distinguished target element.
-
-The core mathematical content is:
-
-```text
-every proper subset is independent
-the whole ground set is dependent
-therefore the whole ground set is the unique circuit
-```
-
-Then expose the pointed/target formulation required downstream.
-
-Do not mix in the Grover application itself.
-
-Expected home:
-
-```text
-Matroid/Uniform.lean
-```
-
----
-
-# 18. N258 — Incidence representation of the graphic matroid
-
-Canonical requirement:
-
-> A graph's edge-incidence vector configuration has exactly its cycle dependencies and therefore represents its graphic matroid.
-
-This is an externally cited standard fact used in the introduction/discussion.
-
-N043 and N061 are both complete, so the formal target should connect those two completed constructions.
-
-The desirable end result is a theorem of the form:
-
-```text
-vectorMatroid (incidenceRepresentation G) = graphic G
-```
-
-or an equivalent `Represents` statement.
-
-The manuscript is concerned with real span programs, so do not overgeneralize the coefficient field unless doing so is natural and already supported.
-
-The representation must correctly handle:
-
-```text
-ordinary edges
-parallel labeled edges
-loops
-```
-
-For a signed incidence representation:
-
-```text
-nonloop edge u—v ↦ basis(u) - basis(v)
-loop ↦ 0
-```
-
-up to an arbitrary choice of orientation.
-
-The represented matroid must be independent of those orientation choices.
-
-Prefer existing incidence-matrix / finitely-supported-function infrastructure if available.
-
-Do not replace the manuscript's labeled multigraph model by `SimpleGraph`.
-
-This target may require substantial proof engineering. If a reusable graph-linear-algebra prerequisite is discovered, treat it according to the missing-prerequisite rule below.
+using the project's actual names for duality.
 
 Expected home:
 
@@ -776,21 +735,116 @@ Expected home:
 Matroid/Graphic.lean
 ```
 
-or a mathematically justified companion module such as:
+---
+
+# 17. N181 — Circuit persistence under deletion
+
+Canonical requirement:
+
+> A circuit avoiding a deleted element remains a circuit after deletion.
+
+This is the implicit step used in:
 
 ```text
-Matroid/GraphicRepresentation.lean
+prop:r10-no-three-sum
 ```
 
-if the development becomes substantial.
+The manuscript argument is:
+
+```text
+C circuit of R10
+e ∉ C
+    ⇒
+C remains a circuit of R10 \ e.
+```
+
+Formalize the standard deletion-circuit restriction fact.
+
+Prefer an exact mathlib theorem or a short bridge from the restriction API.
+
+Do not involve `R10` in the generic theorem.
+
+Expected home:
+
+```text
+Matroid/Minors.lean
+```
 
 ---
 
-# 19. Missing-prerequisite rule
+# 18. N256 — Binary cycle symmetric difference
 
-Formalization may reveal that the audited DAG omitted a substantive mathematical prerequisite.
+The manuscript states after `def:matroid-cycle`:
 
-Distinguish:
+> A regular matroid is representable over `𝔽₂`, so the symmetric difference of two cycles is again a cycle.
+
+Formalize precisely that fact.
+
+Do not merely prove symmetric-difference closure for circuits; cycles are disjoint unions of circuits.
+
+The manuscript route should guide the proof:
+
+```text
+regular
+    ↓
+representation over F₂
+    ↓
+cycles correspond to the binary cycle space
+    ↓
+addition over F₂ corresponds to symmetric difference
+    ↓
+cycle closure under △.
+```
+
+If mathlib already has binary matroid/cycle-space infrastructure, use it.
+
+If it does not, first determine the minimum local result needed to prove symmetric-difference closure.
+
+Do not build a broad theory of binary matroids unless required.
+
+Expected home:
+
+```text
+Matroid/Cycles.lean
+```
+
+with supporting representation lemmas where appropriate.
+
+---
+
+# 19. Same-depth dependencies are allowed
+
+The structural DAG only records direct prerequisites known before formalization.
+
+During this pass, one depth-3 theorem may naturally become useful in another depth-3 proof.
+
+For example:
+
+```text
+N053 → N052
+```
+
+may emerge as a useful direct proof dependency.
+
+If that dependency is mathematically substantive and should have been in the DAG:
+
+1. add the direct edge;
+2. record manuscript/log evidence;
+3. recompute depths.
+
+This may raise the dependent theorem's structural depth.
+
+That is acceptable.
+
+Do **not** preserve an incorrect depth assignment merely to finish the nominal depth-3 batch.
+
+The graph is allowed to improve through formalization.
+
+---
+
+# 20. Missing-prerequisite rule
+
+If a target exposes a missing theorem, distinguish:
 
 ```text
 routine Lean helper
@@ -802,45 +856,62 @@ from:
 genuine reusable mathematical requirement.
 ```
 
-Routine helpers do not become ledger nodes.
+Routine helpers remain implementation details.
 
-If a genuine prerequisite is missing:
+A substantive missing prerequisite should receive:
 
-1. identify its manuscript evidence or explain why it is logically required to formalize an existing manuscript requirement;
-2. add a canonical ledger row;
-3. add only the direct dependency edge;
-4. recompute topological depths;
-5. work on the newly discovered prerequisite before resuming any dependent target if its depth is ≤ 2.
+```text
+a ledger entry
+a direct dependency edge
+manuscript/provenance evidence
+a recomputed depth
+```
 
-Do not preserve an incorrect graph merely to claim that depth 2 closed.
-
-If a new prerequisite lands at depth 0 or 1, the breadth-first invariant immediately makes it the highest priority.
+If this produces a new unresolved node of depth ≤ 3, the breadth-first invariant requires addressing it before moving deeper.
 
 ---
 
-# 20. Same-depth blockers do not stop independent work
+# 21. Same-depth blockers do not halt independent work
 
-All 12 current targets are at the same structural depth.
+If one depth-3 target blocks after serious effort, continue with the other unresolved depth-3 targets.
 
-If one target blocks after a serious attempt, continue attempting the other independent depth-2 targets.
+A blocker prevents advancement to depth 4.
 
-A blocker at depth 2 prevents advancement to depth 3, but does not prevent work on other depth-2 nodes.
+It does not prevent work on independent nodes at depth 3.
 
-Use precise blocker categories:
+Use precise blocker statuses such as:
 
 ```text
-BLOCKED_STATEMENT
 BLOCKED_PROOF
 BLOCKED_MATHLIB_INFRASTRUCTURE
+BLOCKED_STATEMENT
 BLOCKED_SCOPE
 MISSING_PREREQUISITE
 ```
 
-A blocker report must identify the exact unresolved mathematical step.
+A blocker report must identify the exact mathematical obstruction.
+
+For large cited results such as N052, explicitly distinguish:
+
+```text
+missing theorem in mathlib
+```
+
+from:
+
+```text
+local proof attempted and failed
+```
+
+from:
+
+```text
+formalization would require importing a major external theorem not currently developed.
+```
 
 ---
 
-# 21. Do not force completion
+# 22. No placeholders
 
 Do not use:
 
@@ -850,26 +921,102 @@ admit
 axiom
 ```
 
-to close any target.
+to mark any target complete.
 
-If a target remains unresolved:
+Do not encode a cited theorem as an axiom merely because the manuscript cites it.
 
-- keep the repository buildable;
-- document the exact obstruction;
-- leave its ledger status accurate;
-- continue with independent depth-2 targets.
+A cited theorem must either:
+
+```text
+already exist in trusted imported Lean mathematics
+```
+
+or:
+
+```text
+be formally proved here.
+```
+
+Otherwise leave the requirement unresolved and document the blocker.
 
 ---
 
-# 22. Formalization log
+# 23. Formalization-source categories
 
-For every target, append or update an entry in:
+Continue using:
 
 ```text
-Matroid/FORMALIZATION_LOG.md
+MATHLIB_EXACT
+MATHLIB_BRIDGE
+LOCAL_PROOF
 ```
 
-using:
+For substantial cited theorems unavailable in mathlib, do not misuse `EXTERNAL_CITED` as a Lean completion status.
+
+`EXTERNAL_CITED` describes manuscript provenance.
+
+It does not constitute a formal proof.
+
+---
+
+# 24. Lean source organization
+
+Keep organizing source code by mathematics.
+
+Appropriate existing or anticipated modules include:
+
+```text
+Matroid/RankClosure.lean
+Matroid/Minors.lean
+Matroid/Representation.lean
+Matroid/Regular.lean
+Matroid/TotallyUnimodular.lean
+Matroid/Cycles.lean
+Matroid/Graphic.lean
+Matroid/Sums.lean
+Matroid/R10.lean
+```
+
+Do not create:
+
+```text
+Depth3.lean
+Frontier3.lean
+Pass7.lean
+```
+
+Chronology belongs in the log.
+
+If a new module is created, import it transitively from:
+
+```text
+Matroid/Matroid.lean
+```
+
+---
+
+# 25. Manuscript provenance in Lean
+
+Every project-facing declaration should retain concise provenance such as:
+
+```lean
+/-- Manuscript: `prop:represented-minors` (N048). -/
+```
+
+For unlabeled prose facts:
+
+```lean
+/-- Manuscript ledger N053; standard TU/regularity fact stated after
+`def:regular-matroid`. -/
+```
+
+Do not annotate routine internal helper lemmas unless it materially improves traceability.
+
+---
+
+# 26. Formalization log
+
+For each target record:
 
 ```text
 Ledger ID:
@@ -887,67 +1034,17 @@ Build status:
 Notes:
 ```
 
-For N057, explicitly record the final statement design.
+For N052, record the two directions separately if they use substantially different machinery.
 
-For N062 and N258, explicitly record how the formal graph model matches the manuscript's finite labeled graph conventions.
+For N070, record the exact relationship between Lean column indices and manuscript indices `0,...,9`.
 
----
+For N125, record the exact Cauchy–Binet identity used.
 
-# 23. Provenance comments in Lean
-
-Project-facing declarations should carry concise manuscript provenance.
-
-For example:
-
-```lean
-/-- Manuscript: `def:matroid-minors` (N024). ... -/
-```
-
-or, for unlabeled standard facts:
-
-```lean
-/-- Manuscript ledger N111; standard represented-matroid fact used in
-`prop:representation-scaling`. -/
-```
-
-Do not add provenance noise to routine private helper lemmas.
+For N256, record precisely how symmetric difference is identified with binary addition.
 
 ---
 
-# 24. Dependency graph discipline
-
-Modify:
-
-```text
-Matroid/DEPENDENCY_EDGES.csv
-```
-
-only when formalization demonstrates a genuine error or omitted direct prerequisite.
-
-Edges must point:
-
-```text
-prerequisite → dependent
-```
-
-and must be direct, not transitive.
-
-Record:
-
-```text
-edge_type
-tex_evidence
-justification
-confidence
-```
-
-for every added edge.
-
-Document graph changes in the formalization log.
-
----
-
-# 25. Build discipline
+# 27. Build discipline
 
 Run:
 
@@ -955,19 +1052,9 @@ Run:
 lake build
 ```
 
-after meaningful groups of changes.
+after the N105 repair.
 
-In particular, build after:
-
-```text
-minor/extension targets
-representation targets
-TU/regular targets
-graphic/cographic targets
-uniform target
-```
-
-as applicable.
+Then build after meaningful groups of depth-3 work.
 
 Run a final:
 
@@ -975,75 +1062,67 @@ Run a final:
 lake build
 ```
 
-before reporting completion.
+before updating any target to `COMPLETE`.
 
-No target is `COMPLETE` unless the final project builds.
+No target is complete merely because an isolated file elaborates.
 
----
-
-# 26. End-of-pass depth audit
-
-After all 12 targets have been attempted, regenerate:
-
-```text
-Matroid/DEPTHS.csv
-```
-
-from the final ledger and DAG.
-
-Update:
-
-```text
-Matroid/FRONTIER.md
-```
-
-with:
-
-```text
-depth-2 targets completed
-depth-2 targets unresolved
-new prerequisites discovered
-minimum unresolved structural depth
-active/complete/unresolved counts by depth
-```
-
-If all valid active depth-2 requirements are complete, state explicitly:
-
-```text
-The active Matroid formalization is complete through topological depth 2.
-```
-
-Then identify the unresolved depth-3 layer.
-
-Do not formalize it.
+The full project must build.
 
 ---
 
-# 27. Stop condition
+# 28. End-of-pass depth audit
 
-This pass ends after every current depth-2 target has been seriously attempted and the final depth audit has been performed.
+After all unresolved depth-3 targets have been attempted:
 
-Best-case result:
+1. regenerate `Matroid/DEPTHS.csv`;
+2. update `Matroid/FRONTIER.md`;
+3. report all graph corrections;
+4. report all new substantive prerequisites;
+5. list complete and unresolved depth-3 nodes;
+6. identify the new minimum unresolved structural depth.
+
+If every valid active node of depth ≤ 3 is complete, state:
+
+```text
+The active Matroid formalization is complete through topological depth 3.
+```
+
+Then list the resulting depth-4 frontier.
+
+Do not attack it.
+
+If depth 3 remains incomplete, state the exact remaining blockers.
+
+---
+
+# 29. Stop condition
+
+This task ends after:
+
+```text
+N105 correspondence repair
+        +
+verification that depths 0–2 remain clear
+        +
+serious attempt on every unresolved depth-3 target
+        +
+final lake build
+        +
+depth/DAG recomputation
+```
+
+The best-case outcome is:
 
 ```text
 depth 0: clear
 depth 1: clear
 depth 2: clear
-minimum unresolved depth: 3
+depth 3: clear
+minimum unresolved depth: 4
 ```
 
-If one or more depth-2 targets remain unresolved:
+If depth 3 does not fully close, remain at depth 3.
 
-```text
-depth 0: clear
-depth 1: clear
-depth 2: incomplete
-```
+Do not begin depth 4.
 
-with exact blockers recorded.
-
-Either way:
-
-> **Do not begin depth 3 in this task.**
-
-The goal is to close the current structural layer, not to maximize the total number of formalized downstream nodes.
+The objective is to extend the certified breadth-first formalization boundary by exactly one structural layer while preserving manuscript-to-Lean statement fidelity.

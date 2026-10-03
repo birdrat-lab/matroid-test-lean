@@ -23,6 +23,13 @@ namespace Matroid
 
 variable {α : Type*} {M : Matroid α} {I J X A C : Set α} {e : α}
 
+/-- Manuscript ledger N005; used in `prop:cocircuit-separates-closure`,
+`prop:support-linear-characterization`, and `prop:r10-proper-minors`.
+An independent set extends to a basis of the whole matroid. -/
+theorem Indep.exists_isBase_superset_manuscript (hI : M.Indep I) :
+    ∃ B, M.IsBase B ∧ I ⊆ B :=
+  hI.exists_isBase_superset
+
 /-- Manuscript: `def:matroid-basis` (N003), prose immediately following the
 definition. Proof source: MANUSCRIPT_SKETCH. Exchange forbids two maximal
 independent subsets of the same set from having different finite sizes. -/

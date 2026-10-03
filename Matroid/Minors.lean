@@ -14,6 +14,22 @@ complement within the ground set. -/
 theorem deletion_eq_restriction {α : Type*} (M : Matroid α) (A : Set α) :
     M ＼ A = M ↾ (M.E \ A) := M.delete_eq_restrict A
 
+/-- Manuscript ledger N027: successive deletions combine into deletion of
+the union, including the disjoint case used in the manuscript. -/
+theorem deletion_composition {α : Type*} (M : Matroid α)
+    (A B : Set α) : M ＼ A ＼ B = M ＼ (A ∪ B) :=
+  M.delete_delete A B
+
+/-- Manuscript ledger N181; the proof of `prop:r10-no-three-sum` deletes an
+element outside a circuit. -/
+theorem IsCircuit.of_avoids_deleted_element {α : Type*} {M : Matroid α}
+    {C : Set α} {e : α} (hC : M.IsCircuit C) (he : e ∉ C) :
+    (M ＼ {e}).IsCircuit C := by
+  apply (M.delete_isCircuit_iff).2
+  refine ⟨hC, Set.disjoint_left.mpr ?_⟩
+  intro x hxC hxe
+  exact he (by simpa using hxe ▸ hxC)
+
 /-- Manuscript: `def:matroid-minors` (N025). The natural-valued finite rank
 of a contraction is the rank gain from adjoining the contracted set. -/
 theorem contract_rank_toNat_eq_sub {α : Type*} {M : Matroid α} [M.Finite]

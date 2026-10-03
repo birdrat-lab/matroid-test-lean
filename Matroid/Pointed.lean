@@ -52,10 +52,11 @@ theorem minimal_spanning_iff_circuit {α : Type*} {M : Matroid α}
         exact hτS (hxτ ▸ hxS)⟩
     exact hTS.not_subset hST
 
-/-- Manuscript: `def:positive-support` (N105), matroid-side content. The
-spanning hypothesis makes the set of candidate cardinalities nonempty. -/
+/-- Manuscript: `def:positive-support` (N105), matroid-side content. Available
+elements exclude the target, and the spanning hypothesis makes the set of
+candidate cardinalities nonempty. -/
 noncomputable def positiveTargetSupport {α : Type*} (M : Matroid α)
-    [M.Finite] (τ : α) (A : Set α) (_hA : A ⊆ M.E)
+    [M.Finite] (τ : α) (A : Set α) (_hA : A ⊆ M.E \ {τ})
     (_hspan : τ ∈ M.closure A) : ℕ :=
   sInf {n : ℕ | ∃ S : Set α, S ⊆ A ∧ τ ∈ M.closure S ∧ S.ncard = n}
 

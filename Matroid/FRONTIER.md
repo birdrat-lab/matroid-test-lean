@@ -127,3 +127,59 @@ N056 is now `COMPLETE`. `Matrix.IsTotallyUnimodular.basisStandardForm` packages 
 - **Total:** 196 active, 43 complete, 153 unresolved.
 
 The N056/N258 audit above records the prior state. No depth-3 formalization was performed in this continuation.
+
+## Active depth-3 target snapshot
+
+After correcting N105 to require `A ⊆ M.E \ {τ}`, `lake build` passes. Structural depths recomputed from the direct-edge DAG agree with `DEPTHS.csv`: depths 0, 1, and 2 are entirely `COMPLETE`; depth 3 has 12 active nodes, of which N006 is already complete.
+
+The frozen unresolved depth-3 set is N005, N027, N048, N052, N053, N064, N070, N125, N135, N181, and N256. No depth-4 target is included in this pass.
+
+## End-of-pass depth-3 audit
+
+The N105 interface now requires `A ⊆ M.E \ {τ}` and the full build passed after that repair. All active nodes at depths 0–2 remain `COMPLETE`. The initial depth-3 target snapshot above is retained as a historical record.
+
+During the depth-3 attempt, manuscript and proof analysis exposed five missing direct edges: N044→N053, N044→N070, N053→N070, N044→N125, and N053→N052. The edge evidence and rationale are in `DEPENDENCY_EDGES.csv` and `FORMALIZATION_LOG.md`. N044 is the existing represented-rank requirement; no new ledger ID was needed. Recomputing the DAG moves N053 and N125 to depth 5 and N052 and N070 to depth 6. Their partial implementations and precise remaining obligations are recorded in the log. No depth-4 target was attacked.
+
+The current active depth-3 layer is N005, N006, N027, N048, N064, N135, N181, and N256. The first seven are `COMPLETE`; N256 remains `BLOCKED_PROOF`. Its `F₂` representability step is checked, but the finite binary cycle-space theorem needed to identify disjoint circuit unions with zero column sums has not been proved. The requested symmetric-difference closure therefore remains open. The minimum unresolved structural depth is **3**.
+
+| Depth | Active | Complete | Unresolved |
+| ---: | ---: | ---: | ---: |
+| 0 | 1 | 1 | 0 |
+| 1 | 9 | 9 | 0 |
+| 2 | 19 | 19 | 0 |
+| 3 | 8 | 7 | 1 |
+| 4 | 6 | 2 | 4 |
+| 5 | 24 | 10 | 14 |
+| 6 | 24 | 1 | 23 |
+| 7 | 33 | 0 | 33 |
+| 8 | 30 | 0 | 30 |
+| 9 | 28 | 0 | 28 |
+| 10 | 10 | 0 | 10 |
+| 11 | 3 | 0 | 3 |
+| 12 | 1 | 0 | 1 |
+
+**Total:** 196 active, 49 complete, 147 unresolved. This audit is based on the recomputed `DEPTHS.csv`; depth 3 is not yet clear.
+
+## N256 continuation audit
+
+`Matroid.isCircuitUnion_iff_binary_sum_eq_zero` proves the finite binary cycle-space characterization, and `Matroid.Regular.isCircuitUnion_symmDiff` closes N256 for the manuscript's finite regular matroids. The full project builds. No direct dependency edge or ledger ID changed in this continuation. `DEPTHS.csv` was regenerated from the canonical ledger and direct-edge DAG.
+
+**The active Matroid formalization is complete through topological depth 3.** All eight active depth-3 nodes (N005, N006, N027, N048, N064, N135, N181, N256) are `COMPLETE`. The minimum unresolved structural depth is **4**. The unresolved depth-4 frontier is N044 (represented rank), N067 (one-sum preserves regularity), N136 (direct-sum bases), and N176 (planar graphic-cographic correspondence). This continuation did not attack any depth-4 node.
+
+| Depth | Active | Complete | Unresolved |
+| ---: | ---: | ---: | ---: |
+| 0 | 1 | 1 | 0 |
+| 1 | 9 | 9 | 0 |
+| 2 | 19 | 19 | 0 |
+| 3 | 8 | 8 | 0 |
+| 4 | 6 | 2 | 4 |
+| 5 | 24 | 10 | 14 |
+| 6 | 24 | 1 | 23 |
+| 7 | 33 | 0 | 33 |
+| 8 | 30 | 0 | 30 |
+| 9 | 28 | 0 | 28 |
+| 10 | 10 | 0 | 10 |
+| 11 | 3 | 0 | 3 |
+| 12 | 1 | 0 | 1 |
+
+**Total:** 196 active, 50 complete, 146 unresolved.

@@ -7,6 +7,7 @@ import Mathlib.Combinatorics.Matroid.IndepAxioms
 import Mathlib.Combinatorics.Matroid.Circuit
 import Mathlib.Combinatorics.Matroid.Loop
 import Mathlib.LinearAlgebra.LinearIndependent.Basic
+import Mathlib.Combinatorics.Matroid.Minor.Delete
 
 /-! # Representation -/
 
@@ -112,6 +113,29 @@ theorem vectorMatroid_represents {α K V : Type*} [Field K] [AddCommGroup V]
   intro I hI
   change I ⊆ E at hI
   simp [vectorMatroid_indep_iff, hI]
+
+/-- Manuscript: `prop:represented-minors` (N048). Restriction retains the
+surviving indexed vectors, including labels with equal or zero columns. -/
+theorem vectorMatroid_restrict_eq {α K V : Type*} [Field K] [AddCommGroup V]
+    [Module K V] (E : Set α) (hE : E.Finite) (φ : α → V)
+    (R : Set α) (hR : R ⊆ E) :
+    (vectorMatroid (K := K) E hE φ) ↾ R =
+      vectorMatroid (K := K) R (hE.subset hR) φ := by
+  apply Matroid.ext_indep (by simp)
+  intro I hI
+  change I ⊆ R at hI
+  rw [restrict_indep_iff, vectorMatroid_indep_iff,
+    vectorMatroid_indep_iff]
+  simp [hI, hI.trans hR]
+
+/-- Manuscript: `prop:represented-minors` (N048). Deletion retains exactly
+the columns whose element labels survive. -/
+theorem vectorMatroid_delete_eq {α K V : Type*} [Field K] [AddCommGroup V]
+    [Module K V] (E : Set α) (hE : E.Finite) (φ : α → V) (D : Set α) :
+    (vectorMatroid (K := K) E hE φ) ＼ D =
+      vectorMatroid (K := K) (E \ D) (hE.subset Set.sdiff_subset) φ := by
+  rw [Matroid.delete_eq_restrict]
+  exact vectorMatroid_restrict_eq E hE φ (E \ D) Set.sdiff_subset
 
 /-- Manuscript: prose after `def:vector-matroid` (N046). Minimal dependence
 is tested on element indices, including distinct equal or zero columns. -/
