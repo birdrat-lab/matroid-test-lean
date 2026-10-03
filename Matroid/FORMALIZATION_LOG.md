@@ -605,3 +605,19 @@ The initial mechanical depth table had one complete depth-0 requirement and two 
 - **Result:** COMPLETE; the construction and equality of closure operators are kernel checked.
 - **Build status:** `lake build` passed.
 - **Notes:** This proves both required obligations: matroid construction and exact recovery of the supplied closure. It adds no new foundational matroid type.
+
+# N061 closure pass
+
+- **Ledger ID:** N061
+- **Structural depth:** 1
+- **TeX label:** `def:graphic-cographic`
+- **Requirement:** A finite graph has a matroid with ground set its edges, and an edge set is independent exactly when it contains no graph cycle.
+- **Manuscript proof status:** MANUSCRIPT_DEFINITION
+- **Manuscript construction plan:** A set contains a cycle exactly when some selected edge closes a finite walk through the other selected edges. This characterization covers loops (the remaining walk is empty) and parallel edges (the remaining walk has one edge). An edge does not close such a walk exactly when a graph cut isolates it from the other selected edges. Use the edge cuts to construct the matroid.
+- **Lean declaration:** `Matroid.graphic`, `Matroid.graphic_ground`, `Matroid.graphic_indep_iff`; graph-side `Graph.ReachableOn`, `Graph.HasEdgeCycle`, `Graph.IsForestIn`, and loop/parallel-cycle lemmas.
+- **Formalization source:** LOCAL_PROOF
+- **Mathlib declarations used:** `Graph.edgeCut_symmDiff`, `Graph.IsLink.mem_edgeCut_iff`, `Relation.ReflTransGen`, `Matroid.ofFiniteClosure`, `Matroid.mapEmbedding`.
+- **Deviation from manuscript route:** The manuscript gives the cycle-free independence definition without an axiom proof. Lean proves exchange via symmetric differences of cuts and finite closure exchange. Mathlib's multigraph API has no cycle predicate, so the formal forest predicate uses the equivalent edge-closes-a-walk criterion; a walk can be shortened to a simple path, and removing one edge from a usual cycle yields such a walk.
+- **Result:** COMPLETE. The mapped matroid has ground set exactly `G.edgeSet`; `graphic_indep_iff` gives independence exactly for subsets with no edge-closing walk. Formal loop and parallel-edge lemmas check the cases a simple-graph model would miss.
+- **Build status:** `lake build` passed (1602 jobs).
+- **Notes:** The construction assumes a finite edge set, which follows from the manuscript's finite-graph hypothesis; vertex finiteness is unnecessary. The direct mathematical prerequisites remain as recorded; the proof-route cut and walk lemmas do not require a new ledger node or dependency edge. At the user's direction, no depth-2 target was attempted after N061 completed.

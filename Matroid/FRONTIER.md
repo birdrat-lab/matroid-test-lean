@@ -1,29 +1,36 @@
 # Current Matroid structural-depth frontier
 
-Computed mechanically from `Matroid/LEDGER.md` and `Matroid/DEPENDENCY_EDGES.csv` after the depth-1 pass. Only `CORE_MATROID` and `MATROID_INTERFACE` rows are active. Depth is the length of the longest directed prerequisite chain ending at each node; nodes with no active prerequisite have depth 0. `Matroid/DEPTHS.csv` records every active node and its direct prerequisites.
+Computed mechanically from `Matroid/LEDGER.md` and `Matroid/DEPENDENCY_EDGES.csv`. Active scopes are `CORE_MATROID` and `MATROID_INTERFACE`; depth is the longest direct-prerequisite chain. `Matroid/DEPTHS.csv` contains the row-level calculation.
 
-At the start of this pass, the minimum unresolved depth was **1**, containing N061 and N080. N080 is now complete. The final minimum unresolved depth remains **1**, containing **N061 Graphic matroid**. The depth-2 set was not started.
+## Completed depth-1 result
 
-## Minimum unresolved depth
+N061 is `COMPLETE`. `Matroid.graphic` has ground set exactly `G.edgeSet`, and `Matroid.graphic_indep_iff` characterizes its independent sets as subsets with no edge closing a finite walk through the other selected edges. The formal graph-cycle criterion includes loops and parallel-edge cycles. The proof derives the graph cut criterion from reachability and constructs the matroid through closure exchange. Provenance: `def:graphic-cographic`.
 
-| ID | Name | Status | Direct prerequisites | Manuscript label |
+Depth 0 and depth 1 are now clear. The minimum unresolved active structural depth is **2**. The user requested work only on N061, so the following layer was recomputed for visibility and **no depth-2 target was attempted**.
+
+## Minimum unresolved depth: 2
+
+| ID | Name | Direct active prerequisites | Status | Manuscript provenance |
 | --- | --- | --- | --- | --- |
-| N061 | Graphic matroid | `STATEMENT_DESIGN`; `BLOCKED_MATHLIB_INFRASTRUCTURE` | N001 (`COMPLETE`) | `def:graphic-cographic` |
-
-## Focused depth-1 blocker
-
-`Graph.edgeCutMatroid` now constructs a matroid on the subtype of actual labeled graph edges. Its independence theorem says each selected edge admits a graph cut containing that edge and no other selected edge. The cut family is closed under symmetric difference, which gives Steinitz exchange for the corresponding closure operator.
-
-**Unfinished N061 statement:** `def:graphic-cographic` specifies independent sets by absence of graph cycles. The pinned mathlib multigraph `Graph` API has edge cuts and bonds but no walk/cycle predicate or cycle-free/bridge equivalence. A Lean proof that the cut-isolation criterion is equivalent to a cycle-free edge set is still required before N061 can be marked `COMPLETE`. This comparison is part of the construction proof, not a separate manuscript dependency; no new ledger node or edge was added.
-
-`Matroid.ofFiniteClosure` and `Matroid.ofFiniteClosure_closure` complete N080. They construct a finite matroid from a Steinitz-exchange closure and prove that its closure equals the supplied operator on every set.
+| N024 | Deletion | N023 | `IDENTIFIED` | `def:matroid-minors` |
+| N036 | Single-element extension | N023 | `IDENTIFIED` | `def:single-element-extension` |
+| N046 | Represented circuits | N015, N043 | `IDENTIFIED` | — |
+| N047 | Projective equivalence | N042 | `IDENTIFIED` | `def:projective-equivalence` |
+| N051 | Regularity | N042 | `IDENTIFIED` | `def:regular-matroid` |
+| N056 | TU pivot and standard form | N042 | `IDENTIFIED` | — |
+| N057 | TU identity augmentation | N042 | `STATEMENT_DESIGN` | — |
+| N062 | Cographic matroid | N001, N061 | `IDENTIFIED` | `def:graphic-cographic` |
+| N111 | Nonzero column rescaling | N043 | `IDENTIFIED` | — |
+| N112 | Ambient linear isomorphism | N043 | `IDENTIFIED` | — |
+| N130 | Corank-one uniform target circuit | N015, N129 | `IDENTIFIED` | — |
+| N258 | Incidence representation of a graphic matroid | N043, N061 | `IDENTIFIED` | — |
 
 ## Active-node counts by structural depth
 
 | Depth | Active | Complete | Unresolved |
 | ---: | ---: | ---: | ---: |
 | 0 | 1 | 1 | 0 |
-| 1 | 9 | 8 | 1 |
+| 1 | 9 | 9 | 0 |
 | 2 | 19 | 7 | 12 |
 | 3 | 12 | 1 | 11 |
 | 4 | 19 | 2 | 17 |
@@ -36,6 +43,4 @@ At the start of this pass, the minimum unresolved depth was **1**, containing N0
 | 11 | 3 | 0 | 3 |
 | 12 | 1 | 0 | 1 |
 
-## Held depth-2 layer
-
-Twelve active depth-2 requirements remain unresolved: `N024`, `N036`, `N046`, `N047`, `N051`, `N056`, `N057`, `N062`, `N111`, `N112`, `N130`, `N258`. This list is informational; no depth-2 target snapshot was frozen or attacked because depth 1 is unresolved.
+No dependency edge changed in the N061 proof pass.
