@@ -4,6 +4,9 @@ import Mathlib.LinearAlgebra.LinearIndependent.Lemmas
 import Mathlib.LinearAlgebra.Dimension.Constructions
 import Mathlib.LinearAlgebra.FiniteDimensional.Defs
 import Mathlib.Combinatorics.Matroid.IndepAxioms
+import Mathlib.Combinatorics.Matroid.Circuit
+import Mathlib.Combinatorics.Matroid.Loop
+import Mathlib.LinearAlgebra.LinearIndependent.Basic
 
 /-! # Representation -/
 
@@ -109,5 +112,82 @@ theorem vectorMatroid_represents {α K V : Type*} [Field K] [AddCommGroup V]
   intro I hI
   change I ⊆ E at hI
   simp [vectorMatroid_indep_iff, hI]
+
+/-- Manuscript: prose after `def:vector-matroid` (N046). Minimal dependence
+is tested on element indices, including distinct equal or zero columns. -/
+theorem vectorMatroid_isCircuit_iff {α K V : Type*} [Field K] [AddCommGroup V]
+    [Module K V] (E : Set α) (hE : E.Finite) (φ : α → V) (C : Set α)
+    (hC : C ⊆ E) :
+    (vectorMatroid (K := K) E hE φ).IsCircuit C ↔
+      Minimal (fun I : Set α =>
+        ¬ LinearIndependent K (fun i : I => φ i.1)) C := by
+  rw [Matroid.isCircuit_iff_minimal_not_indep (by simpa using hC)]
+  simp only [minimal_iff_forall_ssubset]
+  constructor
+  · rintro ⟨hdep, hproper⟩
+    refine ⟨?_, ?_⟩
+    · simpa [vectorMatroid_indep_iff, hC] using hdep
+    · intro I hIC
+      have hIE : I ⊆ E := hIC.subset.trans hC
+      simpa [vectorMatroid_indep_iff, hIE] using hproper hIC
+  · rintro ⟨hdep, hproper⟩
+    refine ⟨?_, ?_⟩
+    · simpa [vectorMatroid_indep_iff, hC] using hdep
+    · intro I hIC
+      have hIE : I ⊆ E := hIC.subset.trans hC
+      simpa [vectorMatroid_indep_iff, hIE] using hproper hIC
+
+/-- Manuscript: `def:projective-equivalence` (N047). The linear isomorphism
+acts only on column spans. Scalars are required to be nonzero only for
+nonloop elements; representing loop columns are zero. -/
+def ProjectivelyEquivalent {α K V W : Type*} [Field K]
+    [AddCommGroup V] [Module K V] [AddCommGroup W] [Module K W]
+    (M : Matroid α) (φ : α → V) (ψ : α → W) : Prop :=
+  Represents (K := K) M φ ∧ Represents (K := K) M ψ ∧
+    ∃ T : Submodule.span K (φ '' M.E) ≃ₗ[K] Submodule.span K (ψ '' M.E),
+      ∃ c : α → K,
+        (∀ e ∈ M.E, ¬ M.IsLoop e → c e ≠ 0) ∧
+        ∀ e (he : e ∈ M.E), ¬ M.IsLoop e →
+          ψ e = c e • (T ⟨φ e, Submodule.subset_span ⟨e, he, rfl⟩⟩).1
+
+/-- Manuscript `def:projective-equivalence` (N047): a represented loop has
+zero column, so no scalar datum is needed for it. -/
+theorem Represents.loop_column_eq_zero {α K V : Type*} [Field K]
+    [AddCommGroup V] [Module K V] {M : Matroid α} {φ : α → V}
+    (hφ : Represents (K := K) M φ) {e : α} (he : M.IsLoop e) :
+    φ e = 0 := by
+  have hground : e ∈ M.E := he.mem_ground
+  have hnot := (M.singleton_not_indep hground).2 he
+  by_contra hne
+  apply hnot
+  exact (hφ {e} (Set.singleton_subset_iff.mpr hground)).2
+    ((linearIndepOn_singleton_iff K).2 hne)
+
+/-- Manuscript ledger N111; used in `prop:representation-scaling`. Independent
+nonzero column scalings preserve the indexed vector matroid. -/
+theorem vectorMatroid_smul_eq {α K V : Type*} [Field K] [AddCommGroup V]
+    [Module K V] (E : Set α) (hE : E.Finite) (φ : α → V)
+    (c : α → K) (hc : ∀ e ∈ E, c e ≠ 0) :
+    vectorMatroid (K := K) E hE (fun e => c e • φ e) =
+      vectorMatroid (K := K) E hE φ := by
+  refine Matroid.ext_indep (by simp) (fun I hI => ?_)
+  change I ⊆ E at hI
+  simp only [vectorMatroid_indep_iff, hI, true_and]
+  let u : I → Kˣ := fun i => Units.mk0 (c i.1) (hc i.1 (hI i.2))
+  simpa only [u, Pi.smul_def', Units.smul_def, Units.val_mk0] using
+    (LinearIndependent.units_smul_iff (fun i : I => φ i.1) u)
+
+/-- Manuscript ledger N112; used in `prop:representation-coordinate-invariance`.
+An ambient linear equivalence preserves indexed vector-matroid independence. -/
+theorem vectorMatroid_map_linearEquiv_eq {α K V W : Type*} [Field K]
+    [AddCommGroup V] [Module K V] [AddCommGroup W] [Module K W]
+    (E : Set α) (hE : E.Finite) (φ : α → V) (T : V ≃ₗ[K] W) :
+    vectorMatroid (K := K) E hE (T ∘ φ) =
+      vectorMatroid (K := K) E hE φ := by
+  refine Matroid.ext_indep (by simp) (fun I hI => ?_)
+  change I ⊆ E at hI
+  simp only [vectorMatroid_indep_iff, hI, true_and]
+  exact T.toLinearMap.linearIndependent_iff
+    (LinearMap.ker_eq_bot.mpr T.injective)
 
 end Matroid

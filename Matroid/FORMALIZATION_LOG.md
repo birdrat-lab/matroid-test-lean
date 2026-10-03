@@ -621,3 +621,182 @@ The initial mechanical depth table had one complete depth-0 requirement and two 
 - **Result:** COMPLETE. The mapped matroid has ground set exactly `G.edgeSet`; `graphic_indep_iff` gives independence exactly for subsets with no edge-closing walk. Formal loop and parallel-edge lemmas check the cases a simple-graph model would miss.
 - **Build status:** `lake build` passed (1602 jobs).
 - **Notes:** The construction assumes a finite edge set, which follows from the manuscript's finite-graph hypothesis; vertex finiteness is unnecessary. The direct mathematical prerequisites remain as recorded; the proof-route cut and walk lemmas do not require a new ledger node or dependency edge. At the user's direction, no depth-2 target was attempted after N061 completed.
+
+# Remaining structural depth-2 pass
+
+The target snapshot is frozen in `FRONTIER.md`. Before searching mathlib, the statements and proof contexts were checked in the frozen manuscript: `def:matroid-minors`, `def:single-element-extension`, the prose after `def:vector-matroid`, `def:projective-equivalence`, `def:regular-matroid`, the proof of `thm:regular-quotient-form`, `def:graphic-cographic`, `prop:representation-scaling`, `prop:representation-coordinate-invariance`, `prop:grover-source-value`, `prop:grover-program-value`, `lem:r10-targeted-query-matroid`, `sec:introduction`, `sec:discussion`, and `prop:r10-regular-route-b`. The target's manuscript-source classification is the mathematical-provenance field below; no manuscript proof is attributed to an unlabeled standard fact. No direct dependency edge changed.
+
+## N024 — deletion
+
+- **Ledger ID:** N024; **Structural depth:** 2; **TeX label / manuscript location:** `def:matroid-minors`.
+- **Requirement:** Deletion by `A` equals restriction to `E(M) \ A`.
+- **Manuscript source status:** MANUSCRIPT_DEFINITION.
+- **Mathematical proof or construction plan:** Identify the manuscript operation with mathlib's deletion on the same ground set.
+- **Lean declaration:** `Matroid.deletion_eq_restriction`.
+- **Formalization source:** MATHLIB_BRIDGE. **Mathlib declarations used:** `Matroid.delete_eq_restrict`.
+- **Deviation from manuscript route:** None. **Result:** COMPLETE. **Build status:** `lake build` passed.
+- **Notes:** No competing deletion operation was introduced.
+
+## N036 — single-element extension
+
+- **Ledger ID:** N036; **Structural depth:** 2; **TeX label / manuscript location:** `def:single-element-extension`.
+- **Requirement:** A fresh target `τ` extends `N` exactly when the larger matroid has ground `insert τ N.E` and restricts to `N` on `N.E`.
+- **Manuscript source status:** MANUSCRIPT_DEFINITION.
+- **Mathematical proof or construction plan:** Package the three defining conditions as a predicate; neither existence nor Crapo classification is part of this definition.
+- **Lean declaration:** `Matroid.IsSingleElementExtension`.
+- **Formalization source:** LOCAL_PROOF (local definition). **Mathlib declarations used:** `Matroid.restrict`.
+- **Deviation from manuscript route:** None. **Result:** COMPLETE. **Build status:** `lake build` passed.
+- **Notes:** Loop and coloop extensions satisfy the same predicate when their restriction and ground conditions hold.
+
+## N046 — represented circuits
+
+- **Ledger ID:** N046; **Structural depth:** 2; **TeX label / manuscript location:** unlabeled prose immediately after `def:vector-matroid`; material uses in `prop:represented-minors`, `prop:span-program-matroid-shadow`, `prop:matroid-program-to-linear-span-program`, `prop:support-linear-characterization`, `thm:quotient-normal-form-correct`.
+- **Requirement:** Circuits are minimal failures of linear independence of the *indexed* columns.
+- **Manuscript source status:** EXTERNAL_UNCITED_STANDARD.
+- **Mathematical proof or construction plan:** Combine the completed vector-matroid independence theorem with minimal dependence on subsets of the ground set.
+- **Lean declaration:** `Matroid.vectorMatroid_isCircuit_iff`.
+- **Formalization source:** MATHLIB_BRIDGE. **Mathlib declarations used:** `Matroid.isCircuit_iff_minimal_not_indep`, `Minimal`; local `vectorMatroid_indep_iff`.
+- **Deviation from manuscript route:** None; the Lean statement keeps a subtype-indexed family, so equal columns and zero columns at distinct labels remain distinct. **Result:** COMPLETE. **Build status:** `lake build` passed.
+- **Notes:** The explicit `C ⊆ E` hypothesis excludes off-ground sets.
+
+## N047 — projective equivalence
+
+- **Ledger ID:** N047; **Structural depth:** 2; **TeX label / manuscript location:** `def:projective-equivalence`.
+- **Requirement:** Two representations of the same matroid over one field differ by a linear equivalence between their column spans and nonzero scalars on nonloop columns.
+- **Manuscript source status:** MANUSCRIPT_DEFINITION.
+- **Mathematical proof or construction plan:** Use submodule spans as the two linear-equivalence domains; require `ψ e = c e • T(φ e)` for nonloops; derive zero loop columns from representation.
+- **Lean declaration:** `Matroid.ProjectivelyEquivalent`, `Matroid.Represents.loop_column_eq_zero`.
+- **Formalization source:** LOCAL_PROOF. **Mathlib declarations used:** `Submodule.span`, `LinearEquiv`, `Matroid.singleton_not_indep`, `linearIndepOn_singleton_iff`.
+- **Deviation from manuscript route:** Scalars are represented by a total function but nonzero and compatibility conditions apply only on ground-set nonloops. This avoids requiring arbitrary ambient spaces to be isomorphic. **Result:** COMPLETE. **Build status:** `lake build` passed.
+- **Notes:** The zero-column lemma formally checks the manuscript's loop convention.
+
+## N051 — regularity
+
+- **Ledger ID:** N051; **Structural depth:** 2; **TeX label / manuscript location:** `def:regular-matroid`.
+- **Requirement:** Representability over every field.
+- **Manuscript source status:** MANUSCRIPT_DEFINITION.
+- **Mathematical proof or construction plan:** Quantify over arbitrary field types using the existing `RepresentableOver` predicate.
+- **Lean declaration:** `Matroid.Regular.{u,v,w}`.
+- **Formalization source:** LOCAL_PROOF (local definition). **Mathlib declarations used:** `Field`; local `Matroid.RepresentableOver`.
+- **Deviation from manuscript route:** Lean's universe parameters express the type universes for fields and representation spaces; no finite or fixed list of fields is substituted. **Result:** COMPLETE. **Build status:** `lake build` passed.
+- **Notes:** This does not assert Tutte's TU characterization.
+
+## N056 — TU pivot and standard form
+
+- **Ledger ID:** N056; **Structural depth:** 2; **TeX label / manuscript location:** proof of `thm:regular-quotient-form`; further uses `thm:regular-support-bound`, `thm:regular-matroid-energy`.
+- **Requirement:** A TU matrix representing a matroid can be permuted and normalized on a basis to `[I D]` while retaining TU.
+- **Manuscript source status:** EXTERNAL_UNCITED_STANDARD.
+- **Mathematical proof or construction plan:** Relabel basis columns, use their determinant `±1` to invert the basis block, then show every normalized minor is `0,±1` by a pivot-minor determinant identity.
+- **Lean declaration:** `Matrix.isTotallyUnimodular_reindex_iff` supplies the permutation portion; no completed normalization theorem.
+- **Formalization source:** FORMALIZATION_SOURCE_UNRESOLVED. **Mathlib declarations used:** `Matrix.reindex_isTotallyUnimodular`, `Matrix.IsTotallyUnimodular.submatrix`; the pinned TU file has no pivot-preservation theorem.
+- **Deviation from manuscript route:** None asserted for the unfinished portion. **Result:** BLOCKED_PROOF. **Build status:** `lake build` passed with the verified permutation bridge only.
+- **Notes:** Exact obstruction: prove the determinant identity for arbitrary minors after multiplying by the inverse unimodular basis block, including row and column indexing; a mere row permutation/submatrix fact does not imply it. This is matrix proof infrastructure within N056, not a newly discovered matroid prerequisite.
+
+## N057 — TU identity augmentation
+
+- **Ledger ID:** N057; **Structural depth:** 2; **TeX label / manuscript location:** displayed matrices `A=(I_r\;D)`, `K=(-D;I_{n-r})`, and `Â=(I_n\;K)` in the proof of `thm:regular-quotient-form`.
+- **Requirement:** The concrete `K` and `Â` are TU whenever `D` is TU.
+- **Manuscript source status:** EXTERNAL_UNCITED_STANDARD.
+- **Mathematical proof or construction plan:** Prove sign reversal preserves TU, append an identity row block to `-D`, then append an identity column block to `K`.
+- **Lean declaration:** `Matrix.IsTotallyUnimodular.neg`, `.kernelBlock`, `.augmentedKernelBlock`.
+- **Formalization source:** MATHLIB_BRIDGE. **Mathlib declarations used:** `Matrix.fromRows_one_isTotallyUnimodular_iff`, `Matrix.one_fromCols_isTotallyUnimodular_iff`, `Matrix.det_neg`, `SignType.coe_mul`, `SignType.coe_pow`.
+- **Deviation from manuscript route:** The adopted Lean statement uses `Matrix.fromRows` and `Matrix.fromCols` with `Sum` row indices for exactly the displayed block matrices. **Result:** COMPLETE. **Build status:** `lake build` passed.
+- **Notes:** The proof establishes both manuscript TU claims; it does not assert the unrelated kernel-basis or regularity claims.
+
+## N062 — cographic matroid
+
+- **Ledger ID:** N062; **Structural depth:** 2; **TeX label / manuscript location:** `def:graphic-cographic`.
+- **Requirement:** `M*(G)` is dual to the graphic matroid on the same labeled edges, and its circuits are precisely graph bonds.
+- **Manuscript source status:** MANUSCRIPT_DEFINITION.
+- **Mathematical proof or construction plan:** Characterize spanning in the cut-closure matroid by meeting every nonempty cut. Minimal nonspanning complements are minimal nonempty cuts. Transport circuits through the edge-label embedding and matroid duality.
+- **Lean declaration:** `Matroid.cographic`, `cographic_ground`, `cographic_isCircuit_iff_isBond`; `Graph.edgeCutMatroid_spanning_iff`, `edgeCutMatroid_isCocircuit_iff`.
+- **Formalization source:** LOCAL_PROOF. **Mathlib declarations used:** `Matroid.isCocircuit_iff_minimal_compl_nonspanning`, `Matroid.map_dual`, `Matroid.mapEmbedding_indep_iff`, `Graph.IsBond`.
+- **Deviation from manuscript route:** The proof uses the N061 cut-closure construction rather than a separate graphic bond theorem. **Result:** COMPLETE. **Build status:** `lake build` passed.
+- **Notes:** The formal graph is mathlib's `Graph α β`, with actual labeled edges as `G.edgeSet`; the construction and theorem retain loops and parallel edge labels. The bond theorem is on ambient edge labels, not only the edge subtype.
+
+## N111 — nonzero column rescaling
+
+- **Ledger ID:** N111; **Structural depth:** 2; **TeX label / manuscript location:** unlabeled matroid-side step at `prop:representation-scaling`, `prop:representation-coordinate-invariance`, `prop:regular-representations-are-weights`.
+- **Requirement:** Independently scaling indexed columns by nonzero field elements preserves the vector matroid.
+- **Manuscript source status:** EXTERNAL_UNCITED_STANDARD.
+- **Mathematical proof or construction plan:** Convert nonzero scalars on the ground set to units and use invariance of indexed linear independence.
+- **Lean declaration:** `Matroid.vectorMatroid_smul_eq`.
+- **Formalization source:** MATHLIB_BRIDGE. **Mathlib declarations used:** `LinearIndependent.units_smul_iff`, `Matroid.ext_indep`.
+- **Deviation from manuscript route:** None. **Result:** COMPLETE. **Build status:** `lake build` passed.
+- **Notes:** The scalar hypothesis is only needed on actual ground elements. Loop columns remain zero under scaling.
+
+## N112 — ambient linear isomorphism
+
+- **Ledger ID:** N112; **Structural depth:** 2; **TeX label / manuscript location:** unlabeled matroid-side step at `prop:representation-scaling`, `prop:representation-coordinate-invariance`, `prop:regular-representations-are-weights`.
+- **Requirement:** Applying a linear equivalence to every indexed column preserves the vector matroid.
+- **Manuscript source status:** EXTERNAL_UNCITED_STANDARD.
+- **Mathematical proof or construction plan:** Use injectivity of a linear equivalence to preserve and reflect linear independence on each indexed subset.
+- **Lean declaration:** `Matroid.vectorMatroid_map_linearEquiv_eq`.
+- **Formalization source:** MATHLIB_BRIDGE. **Mathlib declarations used:** `LinearMap.linearIndependent_iff`, `LinearMap.ker_eq_bot`, `Matroid.ext_indep`.
+- **Deviation from manuscript route:** None; vectors need not span the ambient space. **Result:** COMPLETE. **Build status:** `lake build` passed.
+- **Notes:** This is only the matroid statement; it makes no witness-energy claim.
+
+## N130 — corank-one uniform target circuit
+
+- **Ledger ID:** N130; **Structural depth:** 2; **TeX label / manuscript location:** unlabeled step at `prop:grover-source-value`, `prop:grover-program-value`, `lem:r10-targeted-query-matroid`.
+- **Requirement:** In `U_{r,r+1}`, the full ground set is the unique circuit containing a distinguished target.
+- **Manuscript source status:** EXTERNAL_UNCITED_STANDARD.
+- **Mathematical proof or construction plan:** Every proper subset has cardinality at most `r` and is independent; the full set has cardinality `r+1` and is dependent. Any circuit must therefore equal the ground set.
+- **Lean declaration:** `Matroid.uniformOn_isCircuit_iff_eq_ground`, `uniformOn_unique_target_circuit`.
+- **Formalization source:** LOCAL_PROOF. **Mathlib declarations used:** `Matroid.isCircuit_iff_forall_ssubset`, `Set.ncard_lt_ncard`; local `uniformOn_indep_iff`.
+- **Deviation from manuscript route:** None. **Result:** COMPLETE. **Build status:** `lake build` passed.
+- **Notes:** The target theorem explicitly requires `τ ∈ E`.
+
+## N258 — incidence representation of a graphic matroid
+
+- **Ledger ID:** N258; **Structural depth:** 2; **TeX label / manuscript location:** cited incidence construction in `sec:introduction`; graphic program discussion in `sec:discussion`; use in `prop:r10-regular-route-b`.
+- **Requirement:** Signed real incidence columns represent the graphic matroid, including loops and parallel labeled edges.
+- **Manuscript source status:** EXTERNAL_CITED.
+- **Mathematical proof or construction plan:** Choose ordered endpoints only for actual edges; use `δ_u−δ_v` as each edge column. A cycle supplies an alternating signed linear relation. Conversely, a nonzero finite linear relation among forest edges should vanish by a cut-isolation or leaf-elimination argument, yielding the N061 forest criterion.
+- **Lean declaration:** `Graph.IsEdgeOrientation`, `exists_edgeOrientation`, `incidenceColumn`, `incidenceColumn_loop` (partial construction); no equality of vector and graphic matroids yet.
+- **Formalization source:** FORMALIZATION_SOURCE_UNRESOLVED. **Mathlib declarations used:** `Graph.edge_mem_iff_exists_isLink`, `Graph.eq_or_eq_of_isLink_of_isLink`, `Finsupp.single`; pinned mathlib has `SimpleGraph.IncMatrix` but no corresponding labeled-multigraph signed-incidence independence theorem.
+- **Deviation from manuscript route:** The partial code keeps distinct edge labels and uses real finitely supported vertex vectors. Off-ground labels receive zero, while the eventual representation statement must restrict to `G.edgeSet`. **Result:** BLOCKED_PROOF. **Build status:** `lake build` passed with the partial construction.
+- **Notes:** Exact obstruction: prove, for every indexed `I ⊆ G.edgeSet`, `LinearIndependent ℝ (fun i : I => G.incidenceColumn ends i)` iff `G.IsForestIn I`; the forward cycle-relation and reverse cut-isolation arguments both remain to be formalized. The orientation is defined on the subtype of actual edges, so no nonempty ambient vertex type is assumed when the graph has no edges. This is the statement of N258 itself, not a newly discovered direct prerequisite.
+
+# Dedicated N056 and N258 attack
+
+The depth audit at the start of this focused pass found no unresolved active node at depth 0 or 1; N056 and N258 were the only unresolved depth-2 nodes. The exact manuscript source for N056 remains the standard-form step in the proof of `thm:regular-quotient-form` (also used by `thm:regular-support-bound` and `thm:regular-matroid-energy`). N258 remains the externally cited incidence construction in `sec:introduction`, with the graphic identification in `sec:discussion` and use at `prop:r10-regular-route-b`. No direct DAG edge changed and no depth-3 proof work was undertaken.
+
+## N056 — focused result
+
+- **Ledger ID:** N056. **Structural depth:** 2. **TeX label / manuscript location:** proof of `thm:regular-quotient-form`.
+- **Requirement:** Basis pivoting and column permutation yield a totally unimodular standard form `[I D]` representing the same column matroid.
+- **Manuscript source status:** EXTERNAL_UNCITED_STANDARD; the manuscript invokes the step without its proof.
+- **Mathematical proof or construction plan:** Relabel basis columns, invert their nonsingular square block `B`, and write `B⁻¹A = [I, B⁻¹C]`. To finish, prove every minor of `B⁻¹C` is, up to the unit `det B`, a minor of the original TU matrix. This is the generalized pivot-minor determinant identity.
+- **Lean declaration:** `Matrix.basisNormalize_eq_fromCols` proves the standard-form identity, `Matrix.basisNormalize_vectorMatroid_eq` proves the inverse basis-block row operation preserves the indexed column matroid, and `Matrix.basisNormalize_isTotallyUnimodular_iff` proves that TU of the normalized matrix is equivalent to TU of its nonbasis block. The earlier `Matrix.isTotallyUnimodular_reindex_iff` handles permutations.
+- **Formalization source:** FORMALIZATION_SOURCE_UNRESOLVED for the full target. **Mathlib declarations used:** `Matrix.nonsing_inv_mul`, `Matrix.mul_fromCols`, `Matrix.one_fromCols_isTotallyUnimodular_iff`, `Matrix.reindex_isTotallyUnimodular`; local `Matroid.vectorMatroid_map_linearEquiv_eq` supplies representation preservation.
+- **Deviation from manuscript route:** None. The checked reduction isolates, but does not assume, the TU claim.
+- **Result:** BLOCKED_PROOF. The exact remaining step is `A.IsTotallyUnimodular → (B⁻¹ * C).IsTotallyUnimodular` when `B` is a nonsingular basis-column block of `A`. Pinned mathlib has Schur-complement and determinant-of-inverse infrastructure but no generalized pivot-minor identity or TU pivot theorem; a proof would require formal indexing of arbitrary complementary row and column subsets and the determinant sign.
+- **Build status:** `lake build` passed with the checked partial results.
+- **Notes:** This determinant lemma is matrix proof infrastructure internal to N056. It is not an omitted independent matroid prerequisite and no new canonical ledger node or DAG edge was added.
+
+## N258 — focused result
+
+- **Ledger ID:** N258. **Structural depth:** 2. **TeX label / manuscript location:** `sec:introduction`, `sec:discussion`, `prop:r10-regular-route-b`.
+- **Requirement:** Real signed incidence columns have exactly the graph-cycle dependencies and represent the graphic matroid on finite labeled edges; the matroid is independent of edge orientations.
+- **Manuscript source status:** EXTERNAL_CITED; the manuscript gives the incidence construction and identifies its graphic dependence but does not prove the linear-algebra theorem.
+- **Mathematical proof or construction plan:** A selected edge closes a walk through the other edges exactly when its endpoint difference belongs to their column span. Signed columns are endpoint differences up to sign, and differences telescope along a walk. In the other direction, a forest edge admits an isolating graph cut; summing vertex coordinates on one side is a linear functional vanishing on the other selected columns and nonzero on that edge.
+- **Lean declaration:** `Graph.not_linearIndepOn_incidence_of_cycle`, `Graph.linearIndepOn_incidence_of_forest`, `Graph.incidence_vectorMatroid_eq_graphic`, `Graph.incidence_represents_graphic`, `Graph.incidence_vectorMatroid_orientation_independent`.
+- **Formalization source:** LOCAL_PROOF. **Mathlib declarations used:** `Finsupp.lsum`, `linearIndepOn_iff_notMem_span`, `Submodule.span_le`, `linearIndependent_equiv'`, `Matroid.ext_indep`; local `Graph.edgeCutMatroid_indep_iff_noEdgeCycle` and `Matroid.graphic_indep_iff`.
+- **Deviation from manuscript route:** The proof uses the already established equivalent edge-closes-a-walk criterion for graph cycles and mathlib's labeled `Graph α β`. It does not restrict to `SimpleGraph`.
+- **Result:** COMPLETE. The vector matroid of the incidence columns equals `Matroid.graphic G hE`, and a direct `Represents` theorem and orientation-independence theorem are kernel checked.
+- **Build status:** `lake build` passed.
+- **Notes:** Orientations are functions on the subtype of actual edge labels; this permits empty graphs even when ambient types contain unused labels. Parallel edges keep distinct labels, and the previously proved loop lemma gives their zero-column boundary case.
+
+# N056 continuation — TU basis normalization closed
+
+- **Ledger ID:** N056. **Structural depth:** 2. **TeX label / manuscript location:** proof of `thm:regular-quotient-form`; the same basis-pivot step is used in `thm:regular-support-bound` and `thm:regular-matroid-energy`.
+- **Requirement:** A TU representation with chosen basis columns can be permuted and normalized to `[I D]`, retaining both total unimodularity and its indexed column matroid.
+- **Manuscript source status:** EXTERNAL_UNCITED_STANDARD; the manuscript invokes the step without a proof.
+- **Mathematical proof or construction plan:** For an arbitrary minor of `D = B⁻¹C`, select its columns `C_g` and rows `f`. Append to `[B C_g]` unit rows selecting `f`; the resulting block matrix `[B C_g; F 0]` is TU. Its Schur complement gives `det B · det(-D[f,g])`, hence this determinant is a sign because `det B` is a nonzero sign. Negation transfers the result to every minor of `D`.
+- **Lean declaration:** `Matrix.IsTotallyUnimodular.basisNormalize_nonbasis` proves `D` TU; `Matrix.IsTotallyUnimodular.basisNormalize` proves the full normalized matrix TU; `Matrix.IsTotallyUnimodular.basisStandardForm` packages the `[I D]` identity, `D` TU, and preservation of the indexed vector matroid from linearly independent basis columns. `Matrix.IsTotallyUnimodular.basisNormalize_entry` records the Cramer-rule one-entry case.
+- **Formalization source:** LOCAL_PROOF. **Mathlib declarations used:** `Matrix.IsTotallyUnimodular.fromRows_unitlike`, `Matrix.det_fromBlocks₁₁`, `Matrix.one_submatrix_mul`, `Matrix.invOf_eq_nonsing_inv`, `Matrix.linearIndependent_cols_iff_isUnit`, `Matrix.isUnit_iff_isUnit_det`, `Matrix.one_fromCols_isTotallyUnimodular_iff`; local `Matroid.vectorMatroid_map_linearEquiv_eq` supplies representation preservation.
+- **Deviation from manuscript route:** The manuscript leaves basis pivoting implicit. The proof uses a TU unit-row augmentation and Schur complement to establish all normalized minors without choosing complementary index sets.
+- **Result:** COMPLETE. The formerly missing TU implication is kernel checked; column permutations and representation preservation were already checked.
+- **Build status:** `lake build` passed after this continuation.
+- **Notes:** No new direct matroid prerequisite or DAG edge was found. The previous `BLOCKED_PROOF` entry documents the intermediate state; this continuation supersedes it.

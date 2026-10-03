@@ -1,6 +1,8 @@
 import Matroid.ClosureConstruction
 import Mathlib.Combinatorics.Graph.Connected.EdgeCut
 import Mathlib.Combinatorics.Matroid.Map
+import Mathlib.Combinatorics.Matroid.Dual
+import Mathlib.Combinatorics.Matroid.Circuit
 
 /-! # Matroids from graph edge cuts
 
@@ -108,6 +110,84 @@ instance edgeCutMatroid_finite (hE : (Graph.edgeSet G).Finite) :
     (edgeCutMatroid G hE).Finite := by
   unfold edgeCutMatroid
   infer_instance
+
+/-- A set spans the cut-closure matroid exactly when it meets every
+nonempty graph edge cut. This is the graph side of N062. -/
+theorem edgeCutMatroid_spanning_iff (hE : (Graph.edgeSet G).Finite)
+    (A : Set {e : β // e ∈ Graph.edgeSet G}) :
+    (edgeCutMatroid G hE).Spanning A ↔
+      ∀ C, IsLiftedEdgeCut G C → Disjoint A C → C = ∅ := by
+  letI : Finite {e : β // e ∈ Graph.edgeSet G} := hE.to_subtype
+  have hcl : (edgeCutMatroid G hE).closure A =
+      {e | ∀ C, IsLiftedEdgeCut G C → Disjoint A C → e ∉ C} := by
+    unfold edgeCutMatroid
+    exact Matroid.ofFiniteClosure_closure _ _ A
+  rw [Matroid.spanning_iff_closure_eq (by simp), edgeCutMatroid_ground, hcl]
+  constructor
+  · intro h C hC hAC
+    ext e
+    constructor
+    · intro heC
+      have hecl : e ∈ ({e | ∀ D, IsLiftedEdgeCut G D → Disjoint A D → e ∉ D} :
+          Set {e : β // e ∈ Graph.edgeSet G}) := by rw [h]; trivial
+      exact (hecl C hC hAC heC).elim
+    · simp
+  · intro h
+    apply Set.eq_univ_of_forall
+    intro e
+    intro C hC hAC heC
+    rw [h C hC hAC] at heC
+    exact heC.elim
+
+/-- The cocircuits of the cut-closure matroid are exactly inclusion-minimal
+nonempty lifted edge cuts. This is the intrinsic cut/bond bridge for N062. -/
+theorem edgeCutMatroid_isCocircuit_iff (hE : (Graph.edgeSet G).Finite)
+    (X : Set {e : β // e ∈ Graph.edgeSet G}) :
+    (edgeCutMatroid G hE).IsCocircuit X ↔
+      Minimal (fun C => IsLiftedEdgeCut G C ∧ C.Nonempty) X := by
+  let M := edgeCutMatroid G hE
+  have hnonspan (Y : Set {e : β // e ∈ Graph.edgeSet G}) :
+      ¬ M.Spanning (M.E \ Y) ↔
+        ∃ C, IsLiftedEdgeCut G C ∧ C.Nonempty ∧ C ⊆ Y := by
+    have hground : M.E = univ := G.edgeCutMatroid_ground hE
+    rw [hground, G.edgeCutMatroid_spanning_iff hE]
+    constructor
+    · intro hn
+      by_contra hnone
+      apply hn
+      intro C hC hdisj
+      by_contra hne
+      apply hnone
+      refine ⟨C, hC, Set.nonempty_iff_ne_empty.mpr hne, ?_⟩
+      intro e heC
+      by_contra heY
+      exact (Set.disjoint_left.mp hdisj) ⟨trivial, heY⟩ heC
+    · rintro ⟨C, hC, hne, hCY⟩ hspan
+      have hzero := hspan C hC (Set.disjoint_left.mpr (by
+        intro e hecomp heC
+        exact hecomp.2 (hCY heC)))
+      obtain ⟨e, he⟩ := hne
+      rw [hzero] at he
+      exact he.elim
+  rw [Matroid.isCocircuit_iff_minimal_compl_nonspanning]
+  change Minimal (fun Y : Set {e : β // e ∈ Graph.edgeSet G} =>
+    ¬ M.Spanning (M.E \ Y)) X ↔ _
+  simp_rw [hnonspan]
+  constructor
+  · intro hmin
+    obtain ⟨C, hC, hne, hCX⟩ := hmin.prop
+    have hCXeq : C = X := (hmin.eq_of_superset ⟨C, hC, hne, Subset.rfl⟩ hCX).symm
+    subst X
+    refine ⟨⟨hC, hne⟩, ?_⟩
+    intro Y hY hYC
+    exact (hmin.eq_of_superset ⟨Y, hY.1, hY.2, Subset.rfl⟩ hYC).subset
+  · intro hmin
+    refine ⟨⟨X, hmin.prop.1, hmin.prop.2, Subset.rfl⟩, ?_⟩
+    intro Y hY hYX
+    obtain ⟨C, hC, hne, hCY⟩ := hY
+    have hCX : C ⊆ X := hCY.trans hYX
+    have hCXeq : X = C := hmin.eq_of_superset ⟨hC, hne⟩ hCX
+    exact hCXeq.subset.trans hCY
 
 end Graph
 
@@ -275,6 +355,48 @@ namespace Matroid
 
 variable {α β : Type*} (G : Graph α β)
 
+private theorem isCircuit_mapEmbedding_iff {γ δ : Type*} (M : Matroid γ)
+    (f : γ ↪ δ) (C : Set δ) (hC : C ⊆ f '' M.E) :
+    (M.mapEmbedding f).IsCircuit C ↔ M.IsCircuit (f ⁻¹' C) := by
+  have hCrange : C ⊆ Set.range f :=
+    hC.trans (Set.image_subset_range _ _)
+  have himage : f '' (f ⁻¹' C) = C :=
+    (Set.image_preimage_eq_iff).2 hCrange
+  have hpreE : f ⁻¹' C ⊆ M.E := by
+    intro e he
+    obtain ⟨x, hx, hxe⟩ := hC he
+    exact (f.injective hxe).symm ▸ hx
+  have hground : C ⊆ (M.mapEmbedding f).E := by simpa using hC
+  rw [Matroid.isCircuit_iff_forall_ssubset,
+    Matroid.isCircuit_iff_forall_ssubset]
+  constructor
+  · rintro ⟨hdep, hproper⟩
+    refine ⟨?_, ?_⟩
+    · rw [Matroid.dep_iff] at hdep ⊢
+      exact ⟨fun hI => hdep.1 ((Matroid.mapEmbedding_indep_iff).2 ⟨hI, hCrange⟩), hpreE⟩
+    · intro I hI
+      have hIE : I ⊆ M.E := hI.subset.trans hpreE
+      have hmap : f '' I ⊂ C := by
+        rw [← himage]
+        exact (f.injective.injOn.image_ssubset_image_iff
+          (Set.subset_univ _) (Set.subset_univ _)).2 hI
+      have hmapind := hproper hmap
+      simpa [Set.preimage_image_eq _ f.injective] using
+        (Matroid.mapEmbedding_indep_iff.mp hmapind).1
+  · rintro ⟨hdep, hproper⟩
+    refine ⟨?_, ?_⟩
+    · rw [Matroid.dep_iff] at hdep ⊢
+      exact ⟨fun hI => hdep.1 (Matroid.mapEmbedding_indep_iff.mp hI).1, hground⟩
+    · intro D hD
+      have hDrange : D ⊆ Set.range f := hD.subset.trans hCrange
+      have himageD : f '' (f ⁻¹' D) = D :=
+        (Set.image_preimage_eq_iff).2 hDrange
+      have hpre : f ⁻¹' D ⊂ f ⁻¹' C := by
+        apply (f.injective.injOn.image_ssubset_image_iff
+          (Set.subset_univ _) (Set.subset_univ _)).1
+        simpa [himageD, himage] using hD
+      exact (Matroid.mapEmbedding_indep_iff).2 ⟨hproper hpre, hDrange⟩
+
 /-- Manuscript `def:graphic-cographic` (N061): the graphic matroid on the
 actual labeled edge set of a finite graph. -/
 noncomputable def graphic (hE : (Graph.edgeSet G).Finite) :
@@ -310,5 +432,122 @@ theorem graphic_indep_iff (hE : (Graph.edgeSet G).Finite)
     refine ⟨hforest, ?_⟩
     intro e heA
     exact ⟨⟨e, hA heA⟩, rfl⟩
+
+/-- Manuscript: `def:graphic-cographic` (N062). The cographic matroid is
+the dual of the graphic matroid on the same labeled edge ground set. -/
+noncomputable def cographic (hE : (Graph.edgeSet G).Finite) : Matroid β :=
+  (graphic G hE)✶
+
+/-- The abstract cographic construction retains the graph's edge labels. -/
+@[simp] theorem cographic_ground (hE : (Graph.edgeSet G).Finite) :
+    (cographic G hE).E = G.edgeSet := by
+  simp [cographic]
+
+private theorem liftedEdgeCut_iff_isEdgeCut (C : Set β)
+    (hC : C ⊆ G.edgeSet) :
+    G.IsLiftedEdgeCut (G.edgeEmbedding ⁻¹' C) ↔ G.IsEdgeCut C := by
+  have hCrange : C ⊆ Set.range G.edgeEmbedding := by
+    intro e he
+    exact ⟨⟨e, hC he⟩, rfl⟩
+  constructor
+  · rintro ⟨S, hS⟩
+    refine ⟨S, ?_⟩
+    have himage : G.edgeEmbedding '' (G.edgeEmbedding ⁻¹' C) = C :=
+      (Set.image_preimage_eq_iff).2 hCrange
+    rw [hS] at himage
+    have hcutimage : G.edgeCut S =
+        G.edgeEmbedding '' {e : G.EdgeIndex | (e : β) ∈ G.edgeCut S} := by
+      ext e
+      constructor
+      · intro he
+        exact ⟨⟨e, G.edgeCut_subset_edgeSet he⟩, he, rfl⟩
+      · rintro ⟨x, hx, rfl⟩
+        exact hx
+    exact hcutimage.trans himage
+  · rintro ⟨S, hS⟩
+    refine ⟨S, ?_⟩
+    rw [← hS]
+    rfl
+
+private theorem liftedEdgeCut_nonempty_iff (C : Set β)
+    (hC : C ⊆ G.edgeSet) :
+    (G.edgeEmbedding ⁻¹' C).Nonempty ↔ C.Nonempty := by
+  constructor
+  · rintro ⟨e, he⟩
+    exact ⟨e.1, he⟩
+  · rintro ⟨e, he⟩
+    exact ⟨⟨e, hC he⟩, he⟩
+
+/-- Manuscript `def:graphic-cographic` (N062): on the finite labeled edge
+set, cographic circuits are exactly the minimal nonempty edge cuts. -/
+theorem cographic_isCircuit_iff_isBond (hE : (Graph.edgeSet G).Finite)
+    (C : Set β) : (cographic G hE).IsCircuit C ↔ G.IsBond C := by
+  have hdual : (graphic G hE)✶ =
+      ((G.edgeCutMatroid hE)✶).mapEmbedding G.edgeEmbedding := by
+    simp [graphic, Matroid.mapEmbedding]
+  have hBondE (hB : G.IsBond C) : C ⊆ G.edgeSet :=
+    hB.isEdgeCut.subset_edgeSet
+  have hCircE (hB : (cographic G hE).IsCircuit C) : C ⊆ G.edgeSet := by
+    simpa using hB.subset_ground
+  constructor
+  · intro hB
+    have hCE := hCircE hB
+    have hCimage : C ⊆ G.edgeEmbedding '' (G.edgeCutMatroid hE)✶.E := by
+      simpa [Graph.edgeEmbedding] using hCE
+    have hsub : ((G.edgeCutMatroid hE)✶).IsCircuit (G.edgeEmbedding ⁻¹' C) :=
+      (isCircuit_mapEmbedding_iff _ _ _ hCimage).1 (by simpa [cographic, hdual] using hB)
+    have hmin := (G.edgeCutMatroid_isCocircuit_iff hE _).1 hsub
+    have hcut : G.IsEdgeCut C :=
+      (liftedEdgeCut_iff_isEdgeCut G C hCE).1 hmin.prop.1
+    have hne : C.Nonempty := (liftedEdgeCut_nonempty_iff G C hCE).1 hmin.prop.2
+    refine ⟨⟨hcut, hne⟩, ?_⟩
+    intro D hD hDC
+    have hDE : D ⊆ G.edgeSet := hDC.trans hCE
+    have hpreD : G.edgeEmbedding ⁻¹' D ⊆ G.edgeEmbedding ⁻¹' C :=
+      Set.preimage_mono hDC
+    have hpreCsub := (hmin.eq_of_superset
+      ⟨(liftedEdgeCut_iff_isEdgeCut G D hDE).2 hD.1,
+        (liftedEdgeCut_nonempty_iff G D hDE).2 hD.2⟩ hpreD).subset
+    have hCrange : C ⊆ Set.range G.edgeEmbedding := by
+      intro e he; exact ⟨⟨e, hCE he⟩, rfl⟩
+    have hDrange : D ⊆ Set.range G.edgeEmbedding := by
+      intro e he; exact ⟨⟨e, hDE he⟩, rfl⟩
+    have himageC : G.edgeEmbedding '' (G.edgeEmbedding ⁻¹' C) = C :=
+      (Set.image_preimage_eq_iff).2 hCrange
+    have himageD : G.edgeEmbedding '' (G.edgeEmbedding ⁻¹' D) = D :=
+      (Set.image_preimage_eq_iff).2 hDrange
+    have himageSub : G.edgeEmbedding '' (G.edgeEmbedding ⁻¹' C) ⊆
+        G.edgeEmbedding '' (G.edgeEmbedding ⁻¹' D) := Set.image_mono hpreCsub
+    simpa only [himageC, himageD] using himageSub
+  · intro hB
+    have hCE := hBondE hB
+    have hCimage : C ⊆ G.edgeEmbedding '' (G.edgeCutMatroid hE)✶.E := by
+      simpa [Graph.edgeEmbedding] using hCE
+    have hmin : Minimal
+        (fun D => G.IsLiftedEdgeCut D ∧ D.Nonempty)
+        (G.edgeEmbedding ⁻¹' C) := by
+      refine ⟨⟨(liftedEdgeCut_iff_isEdgeCut G C hCE).2 hB.prop.1,
+        (liftedEdgeCut_nonempty_iff G C hCE).2 hB.prop.2⟩, ?_⟩
+      intro D hD hDC
+      have hDimage : G.edgeEmbedding '' D ⊆ C := by
+        have himageC : G.edgeEmbedding '' (G.edgeEmbedding ⁻¹' C) = C :=
+          (Set.image_preimage_eq_iff).2 (by
+            intro e he; exact ⟨⟨e, hCE he⟩, rfl⟩)
+        rw [← himageC]
+        exact Set.image_mono hDC
+      have hDed : G.edgeEmbedding '' D ⊆ G.edgeSet := by
+        rintro e ⟨x, -, rfl⟩
+        exact x.property
+      have hcutD : G.IsEdgeCut (G.edgeEmbedding '' D) := by
+        apply (liftedEdgeCut_iff_isEdgeCut G _ hDed).1
+        simpa [Set.preimage_image_eq _ G.edgeEmbedding.injective] using hD.1
+      have hneD : (G.edgeEmbedding '' D).Nonempty := hD.2.image _
+      have hCsub := hB.eq_of_superset ⟨hcutD, hneD⟩ hDimage
+      have hCpre : G.edgeEmbedding ⁻¹' C ⊆ D := by
+        rw [hCsub, Set.preimage_image_eq _ G.edgeEmbedding.injective]
+      exact hCpre
+    have hsub := (G.edgeCutMatroid_isCocircuit_iff hE _).2 hmin
+    have hmap := (isCircuit_mapEmbedding_iff _ _ _ hCimage).2 hsub
+    simpa [cographic, hdual] using hmap
 
 end Matroid

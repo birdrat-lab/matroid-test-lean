@@ -15,4 +15,4 @@ rev = "v4.35.0-rc3"
 
 [[lean_lib]]
 name = "Matroid"
-roots = ["Matroid.Matroid", "Matroid.RankClosure", "Matroid.ClosureConstruction", "Matroid.Graphic", "Matroid.Cycles", "Matroid.Colored", "Matroid.Representation", "Matroid.Uniform", "Matroid.ThreeSum", "Matroid.Pointed", "Matroid.WeightedBases", "Matroid.Minors"]
+roots = ["Matroid.Matroid", "Matroid.RankClosure", "Matroid.ClosureConstruction", "Matroid.Graphic", "Matroid.GraphicRepresentation", "Matroid.Cycles", "Matroid.Colored", "Matroid.Representation", "Matroid.Regular", "Matroid.TotallyUnimodular", "Matroid.Uniform", "Matroid.ThreeSum", "Matroid.Pointed", "Matroid.WeightedBases", "Matroid.Minors", "Matroid.Extensions"]

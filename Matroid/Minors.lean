@@ -1,5 +1,6 @@
 import Matroid.RankClosure
 import Mathlib.Combinatorics.Matroid.Minor.Contract
+import Mathlib.Combinatorics.Matroid.Minor.Delete
 import Mathlib.Combinatorics.Matroid.Rank.ENat
 
 /-! # Minor rank -/
@@ -7,6 +8,11 @@ import Mathlib.Combinatorics.Matroid.Rank.ENat
 open Set
 
 namespace Matroid
+
+/-- Manuscript: `def:matroid-minors` (N024). Deletion is restriction to the
+complement within the ground set. -/
+theorem deletion_eq_restriction {α : Type*} (M : Matroid α) (A : Set α) :
+    M ＼ A = M ↾ (M.E \ A) := M.delete_eq_restrict A
 
 /-- Manuscript: `def:matroid-minors` (N025). The natural-valued finite rank
 of a contraction is the rank gain from adjoining the contracted set. -/

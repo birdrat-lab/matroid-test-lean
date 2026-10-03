@@ -1,11 +1,15 @@
 import Matroid.RankClosure
 import Matroid.ClosureConstruction
 import Matroid.Graphic
+import Matroid.GraphicRepresentation
 import Matroid.Cycles
 import Matroid.Colored
 import Matroid.Representation
+import Matroid.Regular
+import Matroid.TotallyUnimodular
 import Matroid.Uniform
 import Matroid.ThreeSum
 import Matroid.Pointed
 import Matroid.WeightedBases
 import Matroid.Minors
+import Matroid.Extensions
