@@ -1,3 +1,4 @@
+import Matroid.RankClosure
 import Mathlib.Combinatorics.Matroid.Basic
 import Mathlib.LinearAlgebra.LinearIndependent.Defs
 import Mathlib.LinearAlgebra.LinearIndependent.Lemmas
@@ -136,6 +137,74 @@ theorem vectorMatroid_delete_eq {α K V : Type*} [Field K] [AddCommGroup V]
       vectorMatroid (K := K) (E \ D) (hE.subset Set.sdiff_subset) φ := by
   rw [Matroid.delete_eq_restrict]
   exact vectorMatroid_restrict_eq E hE φ (E \ D) Set.sdiff_subset
+
+/-- Manuscript: `prop:represented-minors` (N048). An arbitrary representation
+of a finite matroid identifies it with the indexed vector matroid on its ground
+set; equal or zero vector values do not identify element labels. -/
+theorem Represents.eq_vectorMatroid {α K V : Type*} [Field K] [AddCommGroup V]
+    [Module K V] {M : Matroid α} [M.Finite] {φ : α → V}
+    (hφ : M.Represents (K := K) φ) :
+    M = vectorMatroid (K := K) M.E M.ground_finite φ := by
+  apply Matroid.ext_indep (by simp)
+  intro I hI
+  rw [vectorMatroid_indep_iff]
+  simpa [hI] using hφ I hI
+
+/-- Manuscript: `prop:represented-minors` (N048). Retaining the vectors
+indexed by a restricted ground set represents that restriction. -/
+theorem Represents.restrict {α K V : Type*} [Field K] [AddCommGroup V]
+    [Module K V] {M : Matroid α} [M.Finite] {φ : α → V}
+    (hφ : M.Represents (K := K) φ) (R : Set α) (hR : R ⊆ M.E) :
+    (M ↾ R).Represents (K := K) φ := by
+  rw [hφ.eq_vectorMatroid,
+    vectorMatroid_restrict_eq M.E M.ground_finite φ R hR]
+  exact vectorMatroid_represents R (M.ground_finite.subset hR) φ
+
+/-- Manuscript: `prop:represented-minors` (N048). Deletion retains the
+surviving indexed vectors; labels with equal values remain distinct. -/
+theorem Represents.delete {α K V : Type*} [Field K] [AddCommGroup V]
+    [Module K V] {M : Matroid α} [M.Finite] {φ : α → V}
+    (hφ : M.Represents (K := K) φ) (D : Set α) :
+    (M ＼ D).Represents (K := K) φ := by
+  rw [hφ.eq_vectorMatroid, vectorMatroid_delete_eq]
+  exact vectorMatroid_represents (M.E \ D)
+    (M.ground_finite.subset Set.sdiff_subset) φ
+
+/-- Manuscript prose after `def:vector-matroid` (N044). The finite rank of
+a represented set equals the dimension of the span of its indexed vectors. -/
+theorem Represents.eRk_eq_finrank_span {α K V : Type*} [Field K]
+    [AddCommGroup V] [Module K V] {M : Matroid α} [M.Finite]
+    {φ : α → V} (hφ : M.Represents (K := K) φ)
+    (A : Set α) (hA : A ⊆ M.E) :
+    M.eRk A = (Module.finrank K (Submodule.span K (φ '' A)) : ℕ∞) := by
+  obtain ⟨B, hB⟩ := M.exists_isBasis A
+  have hBli : LinearIndepOn K φ B :=
+    (hφ B hB.left_subset_ground).1 hB.indep
+  have hspan : Submodule.span K (φ '' B) = Submodule.span K (φ '' A) := by
+    apply le_antisymm
+    · exact Submodule.span_mono (Set.image_mono hB.subset)
+    · apply Submodule.span_le.mpr
+      rintro v ⟨e, heA, rfl⟩
+      by_contra hn
+      have hIE : insert e B ⊆ M.E :=
+        Set.insert_subset (hA heA) hB.left_subset_ground
+      have hI : M.Indep (insert e B) :=
+        (hφ (insert e B) hIE).2 (hBli.insert hn)
+      have heB : e ∈ B := hB.mem_of_insert_indep heA hI
+      exact hn (Submodule.subset_span ⟨e, heB, rfl⟩)
+  have hBfin : B.Finite := M.ground_finite.subset hB.left_subset_ground
+  letI : Fintype B := hBfin.fintype
+  have hrange : Set.range (fun b : B => φ b.1) = φ '' B := by
+    ext v
+    simp
+  have hBcard : B.ncard = Module.finrank K (Submodule.span K (φ '' B)) := by
+    rw [← Set.fintypeCard_eq_ncard]
+    have h := (finrank_span_eq_card hBli).symm
+    rwa [hrange] at h
+  calc
+    M.eRk A = (B.ncard : ℕ∞) := M.isBasis_eRk_eq_ncard hB
+    _ = (Module.finrank K (Submodule.span K (φ '' A)) : ℕ∞) := by
+      rw [← hspan, ← hBcard]
 
 /-- Manuscript: prose after `def:vector-matroid` (N046). Minimal dependence
 is tested on element indices, including distinct equal or zero columns. -/

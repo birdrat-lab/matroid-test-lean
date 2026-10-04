@@ -23,8 +23,8 @@ namespace Matroid
 
 variable {α : Type*} {M : Matroid α} {I J X A C : Set α} {e : α}
 
-/-- Manuscript ledger N005; used in `prop:cocircuit-separates-closure`,
-`prop:support-linear-characterization`, and `prop:r10-proper-minors`.
+/-- Manuscript ledger N005; used in `prop:cocircuit-separates-closure`
+and `prop:support-linear-characterization`.
 An independent set extends to a basis of the whole matroid. -/
 theorem Indep.exists_isBase_superset_manuscript (hI : M.Indep I) :
     ∃ B, M.IsBase B ∧ I ⊆ B :=

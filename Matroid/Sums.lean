@@ -1,4 +1,5 @@
 import Matroid.Cycles
+import Matroid.Regular
 import Mathlib.Combinatorics.Matroid.Sum
 
 /-! # Disjoint-ground-set matroid sums -/
@@ -26,6 +27,145 @@ theorem oneSum_indep_iff {α : Type*} (M N : Matroid α)
     (oneSum M N hdisj hM hN).Indep I ↔
       M.Indep (I ∩ M.E) ∧ N.Indep (I ∩ N.E) ∧ I ⊆ M.E ∪ N.E := by
   simp [oneSum]
+
+/-- Manuscript `prop:seymour-one-sum` (N136): a one-sum basis is exactly
+the union of a basis from each disjoint summand. -/
+theorem oneSum_isBase_iff_exists {α : Type*} (M N : Matroid α)
+    (hdisj : Disjoint M.E N.E) (hM : M.E.Nonempty) (hN : N.E.Nonempty)
+    (B : Set α) :
+    (oneSum M N hdisj hM hN).IsBase B ↔
+      ∃ BM BN : Set α, M.IsBase BM ∧ N.IsBase BN ∧ B = BM ∪ BN := by
+  constructor
+  · intro hB
+    obtain ⟨BM, BN, hBM, hBN, _, hBunion⟩ :=
+      Matroid.IsBase.eq_union_image_of_disjointSum (show
+        (M.disjointSum N hdisj).IsBase B from hB)
+    exact ⟨BM, BN, hBM, hBN, hBunion⟩
+  · rintro ⟨BM, BN, hBM, hBN, rfl⟩
+    change (M.disjointSum N hdisj).IsBase (BM ∪ BN)
+    apply Matroid.disjointSum_isBase_iff.mpr
+    have hleft : (BM ∪ BN) ∩ M.E = BM := by
+      ext e
+      constructor
+      · rintro ⟨he, heM⟩
+        rcases he with heBM | heBN
+        · exact heBM
+        · exact False.elim (Set.disjoint_left.mp hdisj heM (hBN.subset_ground heBN))
+      · intro heBM
+        exact ⟨Or.inl heBM, hBM.subset_ground heBM⟩
+    have hright : (BM ∪ BN) ∩ N.E = BN := by
+      ext e
+      constructor
+      · rintro ⟨he, heN⟩
+        rcases he with heBM | heBN
+        · exact False.elim (Set.disjoint_left.mp hdisj (hBM.subset_ground heBM) heN)
+        · exact heBN
+      · intro heBN
+        exact ⟨Or.inr heBN, hBN.subset_ground heBN⟩
+    rw [hleft, hright]
+    exact ⟨hBM, hBN, Set.union_subset
+      (hBM.subset_ground.trans Set.subset_union_left)
+      (hBN.subset_ground.trans Set.subset_union_right)⟩
+
+/-- A representation of each summand gives a representation of their
+one-sum in two independent coordinate spaces. -/
+theorem Represents.oneSum {α K V W : Type*} [Field K]
+    [AddCommGroup V] [Module K V] [AddCommGroup W] [Module K W]
+    {M N : Matroid α} [DecidablePred (· ∈ M.E)]
+    {φM : α → V} {φN : α → W}
+    (hφM : M.Represents (K := K) φM)
+    (hφN : N.Represents (K := K) φN)
+    (hdisj : Disjoint M.E N.E) (hM : M.E.Nonempty) (hN : N.E.Nonempty) :
+    (oneSum M N hdisj hM hN).Represents (K := K)
+      (fun e => if e ∈ M.E then (φM e, 0) else (0, φN e)) := by
+  classical
+  let ψ : α → V × W := fun e => if e ∈ M.E then (φM e, 0) else (0, φN e)
+  intro I hI
+  have hcover : I ⊆ M.E ∪ N.E := by
+    simpa only [oneSum_ground] using hI
+  let IL : Set α := I ∩ M.E
+  let IR : Set α := I ∩ N.E
+  have hLground : IL ⊆ M.E := Set.inter_subset_right
+  have hRground : IR ⊆ N.E := Set.inter_subset_right
+  have hLI : LinearIndependent K (fun i : IL => φM i.1) ↔ M.Indep IL :=
+    (hφM IL hLground).symm
+  have hRI : LinearIndependent K (fun i : IR => φN i.1) ↔ N.Indep IR :=
+    (hφN IR hRground).symm
+  have hψ : LinearIndependent K (fun i : I => ψ i.1) ↔
+      LinearIndependent K (fun i : IL => φM i.1) ∧
+        LinearIndependent K (fun i : IR => φN i.1) := by
+    let f : IL ⊕ IR → I := Sum.elim
+      (fun i => ⟨i.1, i.2.1⟩) (fun i => ⟨i.1, i.2.1⟩)
+    have hf : Function.Bijective f := by
+      constructor
+      · intro x y hxy
+        cases x with
+        | inl x =>
+          cases y with
+          | inl y =>
+            simp only [f, Sum.elim_inl, Subtype.mk.injEq] at hxy
+            exact congrArg Sum.inl (Subtype.ext hxy)
+          | inr y =>
+            exfalso
+            have heq : x.1 = y.1 := by
+              simpa only [f, Sum.elim_inl, Sum.elim_inr, Subtype.mk.injEq] using hxy
+            exact Set.disjoint_left.mp hdisj x.2.2 (heq ▸ y.2.2)
+        | inr x =>
+          cases y with
+          | inl y =>
+            exfalso
+            have heq : y.1 = x.1 := by
+              simpa only [f, Sum.elim_inl, Sum.elim_inr, Subtype.mk.injEq] using hxy.symm
+            exact Set.disjoint_left.mp hdisj y.2.2 (heq ▸ x.2.2)
+          | inr y =>
+            simp only [f, Sum.elim_inr, Subtype.mk.injEq] at hxy
+            exact congrArg Sum.inr (Subtype.ext hxy)
+      · intro i
+        rcases hcover i.2 with hm | hn
+        · exact ⟨Sum.inl ⟨i.1, i.2, hm⟩, rfl⟩
+        · exact ⟨Sum.inr ⟨i.1, i.2, hn⟩, rfl⟩
+    let e : IL ⊕ IR ≃ I := Equiv.ofBijective f hf
+    have hcoord : (fun i : I => ψ i.1) ∘ e =
+        Sum.elim
+          (fun i : IL => (LinearMap.inl K V W) (φM i.1))
+          (fun i : IR => (LinearMap.inr K V W) (φN i.1)) := by
+      funext i
+      cases i with
+      | inl i => simp [e, f, ψ, i.2.2]
+      | inr i =>
+        have hnot : i.1 ∉ M.E := fun hm =>
+          Set.disjoint_left.mp hdisj hm i.2.2
+        simp [e, f, ψ, hnot]
+    rw [← linearIndependent_equiv' e hcoord]
+    constructor
+    · intro hψI
+      have hsum := (linearIndependent_sum.mp hψI)
+      constructor
+      · exact (LinearIndependent.of_comp (LinearMap.inl K V W) hsum.1)
+      · exact (LinearIndependent.of_comp (LinearMap.inr K V W) hsum.2.1)
+    · rintro ⟨hl, hr⟩
+      exact linearIndependent_inl_union_inr' hl hr
+  rw [oneSum_indep_iff, hψ]
+  simp only [hcover, and_true, hLI, hRI, IL, IR]
+
+/-- Manuscript prose after `def:regular-matroid-sums` (N067): the one-sum
+of two regular matroids is regular. The construction works over every field
+and retains the universe of the representation spaces. -/
+theorem oneSum_regular.{u,v,w} {α : Type u} {M N : Matroid α}
+    (hdisj : Disjoint M.E N.E) (hM : M.E.Nonempty) (hN : N.E.Nonempty)
+    (hRegM : Regular.{u, v, w} M) (hRegN : Regular.{u, v, w} N) :
+    Regular.{u, v, w} (oneSum M N hdisj hM hN) := by
+  classical
+  intro K _
+  obtain ⟨V, gV, mV, φM, hφM⟩ := hRegM K
+  obtain ⟨W, gW, mW, φN, hφN⟩ := hRegN K
+  letI : AddCommGroup V := gV
+  letI : Module K V := mV
+  letI : AddCommGroup W := gW
+  letI : Module K W := mW
+  exact ⟨V × W, inferInstance, inferInstance,
+    (fun e => if e ∈ M.E then (φM e, 0) else (0, φN e)),
+    hφM.oneSum hφN hdisj hM hN⟩
 
 /-- A circuit of the left summand is a circuit of the one-sum. This is one
 direction of the cycle characterization in manuscript N064. -/

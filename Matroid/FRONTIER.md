@@ -183,3 +183,55 @@ The current active depth-3 layer is N005, N006, N027, N048, N064, N135, N181, an
 | 12 | 1 | 0 | 1 |
 
 **Total:** 196 active, 50 complete, 146 unresolved.
+
+## Depth-3 correspondence cleanup audit
+
+N048 now has manuscript-facing `Matroid.Represents.restrict` and `Matroid.Represents.delete` bridges for an arbitrary representation of a finite matroid, via `Matroid.Represents.eq_vectorMatroid`. N005's stale `prop:r10-proper-minors` use location was removed from the canonical ledger after checking the manuscript proof. `lake build` passes.
+
+The ledger, unchanged direct-edge DAG, and `DEPTHS.csv` agree: depths 0–3 remain entirely `COMPLETE` (1, 9, 19, and 8 active nodes respectively). The minimum unresolved structural depth remains **4**. No depth-4 target was attacked in this cleanup.
+
+## Active depth-4 target snapshot
+
+Preflight `lake build` passed. `DEPTHS.csv` records all active nodes at depths 0–3 as `COMPLETE` (1, 9, 19, and 8 respectively). The N048 arbitrary-`Represents` restriction/deletion bridge and corrected N005 provenance are present. The frozen unresolved depth-4 working set is N044, N067, N136, and N176; N007 and N025 are already complete. No depth-5 node belongs to this pass.
+
+## Depth-4 attempt and prerequisite audit
+
+The four frozen targets were attempted. N044, N067, and N136 are `COMPLETE`, each with a manuscript-facing Lean theorem and a successful `lake build`. N176 has a checked conditional bridge: a cycle-bond dual pair of finite labeled multigraphs gives both graphic-cographic matroid equalities. The plane-embedding-to-dual cycle-bond theorem itself remains open. It is now N268, split from N176/M120, with a direct N268→N176 proof edge evidenced by `prop:r10-proper-minors`. The pinned library lacks a compatible plane embedding and dual graph construction. `DEPTHS.csv` was regenerated from the ledger and direct edges; existing node depths did not change. N268 has depth 0 because the geometric graph theorem has no matroid prerequisite. No depth-5 work was performed.
+
+| Depth | Active | Complete | Unresolved |
+| ---: | ---: | ---: | ---: |
+| 0 | 2 | 1 | 1 (N268) |
+| 1 | 9 | 9 | 0 |
+| 2 | 19 | 19 | 0 |
+| 3 | 8 | 8 | 0 |
+| 4 | 6 | 5 | 1 (N176) |
+| 5 | 24 | 10 | 14 |
+| 6 | 24 | 1 | 23 |
+| 7 | 33 | 0 | 33 |
+| 8 | 30 | 0 | 30 |
+| 9 | 28 | 0 | 28 |
+| 10 | 10 | 0 | 10 |
+| 11 | 3 | 0 | 3 |
+| 12 | 1 | 0 | 1 |
+
+**Current active total:** 197 nodes, 53 complete, 144 unresolved. The minimum unresolved structural depth is **0** (N268); at the original depth-4 layer, N176 remains open. Depth 5 is outside this pass.
+
+### N176 continuation
+
+`Matroid/PlanarDuality.lean` now has an independent geometric `Graph.IsPlanar` predicate: actual edge labels have crossing-free continuous paths in `ℝ × ℝ`, including loops and parallel edges. Faces are connected components of the drawing complement. Edge deletion preserves this planarity; for finite graphs the drawn support is closed and the face region open. A graph on the complementary faces can be formed from proposed edge-face incidences with the same edge labels. The checked `CycleBondDuality.of_cycles_iff_bonds` reduces the needed geometric theorem to one cycle-to-bond equivalence; matroid duality supplies the reverse direction. The proposition `PlaneEmbedding.HasCycleBondFaceDual` states the still-unproved N268 step. Pinned mathlib has no Jordan-curve or compatible planar-dual theorem to establish the edge-side assignment and that equivalence. `lake build` passed; N268 remains blocked at depth 0 and N176 remains missing that prerequisite at depth 4. No depth-5 work was undertaken.
+
+The next N176 continuation strengthened the geometric side of that interface: the chosen faces must now approach interior points of their edges. For finite drawings, checked lemmas identify faces with complement path components and prove each face region open. The missing N268 theorem is precisely existence of actual incident faces plus primal-cycle/dual-bond equivalence from plane separation. Its depth and blocked status, and N176's depth-4 status, remain unchanged; no depth-5 work was done.
+
+The N268 continuation reduced the proposed face graph's cuts to boundaries of partitions of actual complementary faces. Checked Lean theorems identify its bonds with minimal nonempty face boundaries and prove that, for a finite drawing, `HasCycleBondFaceDual` is equivalent to the existence of incident face assignments for which primal minimal cycles are exactly those boundaries. This exposes the remaining local arc-side and embedded-cycle separation theorem without graph-cut bookkeeping. Pinned mathlib supplies neither a compatible Jordan curve theorem nor the needed local side theorem, so N268 remains `BLOCKED_MATHLIB_INFRASTRUCTURE` at depth 0 and N176 remains `MISSING_PREREQUISITE` at depth 4. No depth-5 work was undertaken.
+
+The next N268 attack proved a local isolation theorem for finite vertex and edge sets. At every edge interior point, every open interval of path parameters containing that point has an open plane neighborhood in which all drawn points lie on the corresponding subarc. The proof also establishes unique edge/parameter preimages at interior points, including loops. This removes interference from other edges, vertices, and remote parts of the same edge before a local separation argument. The missing theorem must still produce incident complementary faces and prove that their minimal boundaries are exactly the primal cycles. N268 and N176 retain their blocked statuses; no depth-5 node was attempted.
+
+The following N268 pass checked a conditional existence theorem for one incident face per edge. Face regions cover the complement; if individual edge paths have dense complement, the finite drawing has dense complement; if there are finitely many faces, every plane point lies in the closure of one face region. These hypotheses have not been proved from `PlaneEmbedding`. Establishing empty interior of arbitrary embedded edge paths, finiteness of faces, their two local sides, and cycle separation remains necessary for N268. N268 is still blocked at depth 0 and N176 still awaits it at depth 4; no depth-5 work was attempted.
+
+The next N268 pass proved an exact finite combinatorial decomposition of the remaining cycle–boundary theorem. For a fixed assignment of incident faces, primal cycles are exactly minimal nonempty face boundaries if and only if every primal cycle is some face boundary and every nonempty face boundary contains a primal cycle. `hasCycleBondFaceDual_iff_geometric_conditions` combines this with the existing checked duality bridge. The open work is now the geometric incident-face assignment and those two separation claims. An attempted local proof that embedded arcs have empty interior needs punctured-disk connectivity and an arc cut-point argument; no direct theorem for arbitrary continuous embedded arcs was found in pinned mathlib. N268 remains blocked and N176 remains dependent on it; depth 5 was not attacked.
+
+The next N268 continuation proved that every finite plane drawing has a unique unbounded complementary face. The drawing's support is compact; mathlib's path-connected sphere theorem and a checked radial path proof make the exterior of a sufficiently large disk path connected. The result supplies a face from the actual geometry without any finiteness assumption on the face set. The unresolved work is still local edge-side incidence and the two cycle/face-boundary separation claims. N268 remains `BLOCKED_MATHLIB_INFRASTRUCTURE` and N176 remains `MISSING_PREREQUISITE`; depth 5 was not attacked.
+
+The latest N268 continuation constructed the map from complementary faces of a plane drawing to those after edge deletion. The deleted drawing has smaller support, so each old face lies in one new face; unbounded old faces remain unbounded, and incidence with a surviving edge is preserved. For finite drawings with dense original complement, this map is surjective because every new face region is open and meets the old complement. Density is still conditional on the unproved empty-interior theorem for embedded edge paths. The map does not establish how many faces merge when an edge is removed, nor the local two sides or cycle-separation theorem. N268 remains `BLOCKED_MATHLIB_INFRASTRUCTURE` at depth 0 and N176 remains `MISSING_PREREQUISITE` at depth 4. No depth-5 node was attempted.
+
+Oxley, *Matroid Theory*, Proposition 5.2.1 supplies an exact published baseline for the matroid correspondence: a geometric dual has the dual cycle matroid. Its connected-case proof, Lemma 2.3.7, invokes Jordan-curve separation; the proposition then handles disconnected graphs by direct sums. This confirms N268 as standard mathematics while pinpointing the formal gap between the project's raw `PlaneEmbedding` and an edge-corresponding geometric dual. The manuscript's local Oxley citation in `prop:r10-proper-minors` covers the two displayed minor identities, so the ledger's `EXTERNAL_CITED` provenance for the later planar-duality sentence is flagged for review in `FORMALIZATION_LOG.md`. Statuses are unchanged; no depth-5 work was attempted.

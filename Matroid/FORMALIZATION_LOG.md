@@ -900,3 +900,145 @@ The initial depth-3 target set was frozen before proof work. Mathematical analys
 - **Lean declarations / source:** `Matroid.isCircuitUnion_iff_binary_sum_eq_zero` exposes the cycle-space characterization; `Matroid.Regular.isCircuitUnion_symmDiff` proves the manuscript conclusion under `[M.Finite]`. LOCAL_PROOF; COMPLETE. The supporting finite-index independence, circuit-removal, and symmetric-difference lemmas are private to `Cycles.lean`.
 - **Mathlib support / deviation:** Uses `Fintype.linearIndependent_iff`, `Matroid.Dep.exists_isCircuit_subset`, `Matroid.IsCircuit.eq_of_not_indep_subset`, and finite-set sum identities. The Lean statement preserves the manuscript's indexed elements and finite matroid convention. No alternate cycle definition or conditional axiom was introduced.
 - **Build / graph:** `lake build` passed with the closure theorem. No new substantive prerequisite, ledger ID, or dependency edge was needed. The earlier N256 blocker entry above records the prior state.
+
+## Depth-3 correspondence cleanup: N048 and N005
+
+- **N048, `prop:represented-minors`:** The previous implementation proved the restriction/deletion identities for the canonical `vectorMatroid E φ`. The manuscript states the result for an arbitrary representation `φ` of a finite matroid `M`. `Matroid.Represents.eq_vectorMatroid` now identifies `M` with that indexed vector matroid; `Matroid.Represents.restrict` and `Matroid.Represents.delete` apply the existing identities and expose the manuscript-facing conclusions. Equal or zero vector values retain distinct element labels. Represented contraction remains the separate N049 obligation. N048 remains `MATHLIB_BRIDGE`, `COMPLETE` after a successful full `lake build`.
+- **N005 provenance:** Checked `prop:cocircuit-separates-closure`, `prop:support-linear-characterization`, and `prop:r10-proper-minors` against `Manuscript/main.tex`. The first two proofs extend an independent set to a whole-matroid basis. The `R10` proper-minors proof instead uses cited single-element minor identities, subsequent minor closure, and planarity; it has no basis-extension step. Removed `prop:r10-proper-minors` from the canonical N005 use list in `LEDGER.md`. The N005 Lean theorem and proof did not change.
+- **Boundary audit:** The direct-edge DAG did not change. `DEPTHS.csv` was checked against the canonical ledger statuses and mechanically recomputed depths: 1/1 complete at depth 0, 9/9 at depth 1, 19/19 at depth 2, and 8/8 at depth 3. Minimum unresolved structural depth remains 4; no depth-4 target was worked on.
+
+## Depth-4 pass: N044 represented rank
+
+- **Ledger ID / structural depth:** N044 / 4.
+- **Manuscript location / requirement:** Unlabeled rank formula immediately after `def:vector-matroid`: rank of `A` equals the dimension of the span of its indexed represented vectors. Uses include `prop:represented-minors` and `prop:support-linear-characterization`.
+- **Manuscript source status:** EXTERNAL_UNCITED_STANDARD.
+- **Mathematical proof plan:** Choose a basis `B` of `A`. Its represented vectors are independent. If a vector indexed by `A` were outside their span, adjoining its index would preserve independence, contradicting basis maximality. Thus both spans agree, and basis cardinality equals their finite dimension and matroid rank.
+- **Lean declaration / formalization source:** `Matroid.Represents.eRk_eq_finrank_span` in `Representation.lean`; LOCAL_PROOF.
+- **Mathlib declarations used:** `Matroid.exists_isBasis`, `Matroid.IsBasis.mem_of_insert_indep`, `finrank_span_eq_card`, `Matroid.isBasis_eRk_eq_ncard`.
+- **Deviation from manuscript route:** None; the Lean theorem states the formula for arbitrary `Represents M φ`, finite `M`, and `A ⊆ M.E`. The set image spans vectors while independence remains indexed by ground elements.
+- **Result / build status / notes:** COMPLETE. `lake build` passed after this theorem. No new direct prerequisite.
+
+## Depth-4 pass: N067 one-sum preserves regularity
+
+- **Ledger ID / structural depth:** N067 / 4.
+- **Manuscript location / requirement:** Unlabeled “Each operation preserves regularity” after `def:regular-matroid-sums`, specialized to the 1-sum.
+- **Manuscript source status:** EXTERNAL_CITED.
+- **Mathematical proof plan:** Over each field, choose representations of the two regular summands. Put left and right columns into separate factors of `V × W`. Disjoint ground sets partition every indexed family, and its linear independence is equivalent to independence of both coordinate families.
+- **Lean declarations / formalization source:** `Matroid.Represents.oneSum` and `Matroid.oneSum_regular` in `Sums.lean`; LOCAL_PROOF. The latter retains the field and representation-space universe parameters of `Matroid.Regular`.
+- **Mathlib declarations used:** `Matroid.disjointSum_indep_iff`, `linearIndependent_sum`, `LinearIndependent.of_comp`, `linearIndependent_inl_union_inr'`, `linearIndependent_equiv'`.
+- **Deviation from manuscript route:** None. The proof uses product coordinates and preserves edge indices, including repeated vector values.
+- **Result / build status / notes:** COMPLETE. Pinned mathlib has no disjoint-sum representability theorem in its matroid API; a local representation construction was needed. `lake build` passed after the sum work.
+
+## Depth-4 pass: N136 direct-sum bases
+
+- **Ledger ID / structural depth:** N136 / 4.
+- **Manuscript location / requirement:** Proof of `prop:seymour-one-sum`: every basis of the direct sum is the disjoint union of factor bases, supporting factorization of weighted basis sums.
+- **Manuscript source status:** EXTERNAL_UNCITED_STANDARD.
+- **Mathematical proof plan:** Restrict a whole-sum basis to each disjoint ground. Conversely, the union of factor bases is a whole-sum basis because its intersections with the two grounds recover the factors.
+- **Lean declaration / formalization source:** `Matroid.oneSum_isBase_iff_exists` in `Sums.lean`; MATHLIB_BRIDGE.
+- **Mathlib declarations used:** `Matroid.disjointSum_isBase_iff`, `Matroid.IsBase.eq_union_image_of_disjointSum`.
+- **Deviation from manuscript route:** None; both directions and whole-matroid bases are stated.
+- **Result / build status / notes:** COMPLETE. `lake build` passed after the sum work. No new direct prerequisite.
+
+## Depth-4 pass: N176 planar graphic-cographic correspondence
+
+- **Ledger ID / structural depth:** N176 / 4.
+- **Manuscript location / requirement:** Proof of `prop:r10-proper-minors`, paragraph beginning “The graph `K_{3,3}` is minor-minimal nonplanar”: graphic matroids of planar graphs are cographic, and dually.
+- **Manuscript source status:** EXTERNAL_CITED.
+- **Mathematical proof plan:** A plane embedding supplies a dual graph with the same labeled edges. Minimal cycles of either graph are minimal nonempty edge cuts (bonds) of the other; circuit extensionality then gives both graphic-cographic equalities.
+- **Lean declarations / formalization source:** `Graph.IsGraphCycle`, `Graph.graphic_isCircuit_iff_isGraphCycle`, `Graph.CycleBondDuality`, and `Graph.CycleBondDuality.matroid_correspondence` in `PlanarDuality.lean` prove the last combinatorial-to-matroid step; FORMALIZATION_SOURCE_UNRESOLVED for the full planar theorem.
+- **Mathlib declarations used:** `Matroid.isCircuit_iff_forall_ssubset`, `Matroid.ext_isCircuit`, the project's `Matroid.graphic_indep_iff` and `Matroid.cographic_isCircuit_iff_isBond`.
+- **Deviation from manuscript route:** The checked theorem is conditional on genuine cycle-bond graph duality data; it does not assert that a planar embedding produces these data. It is therefore not a proof of N176.
+- **Result / build status / notes:** MISSING_PREREQUISITE. `lake build` passed for the conditional bridge. Added direct graph-theoretic prerequisite N268→N176. The exact missing step is production of an edge-corresponding dual graph with cycle-bond equivalence from a plane embedding of a finite labeled multigraph.
+
+## Newly exposed prerequisite: N268 plane dual cycle-bond theorem
+
+- **Ledger ID / structural depth:** N268 / 0 after DAG recomputation; split from N176 and blind M120.
+- **Manuscript location / requirement:** The same proof paragraph of `prop:r10-proper-minors` invokes planar graph duality. Every finite plane-embedded labeled multigraph needs an edge-corresponding dual with cycles of each graph corresponding to bonds of the other.
+- **Manuscript source status:** EXTERNAL_CITED.
+- **Mathematical proof plan:** Define a plane embedding/rotation with faces for the existing `Graph α β`, build a dual graph on faces using the original edge labels, then prove both cycle-bond correspondences, including loops, bridges, and parallel edges.
+- **Lean declaration / formalization source:** `Graph.CycleBondDuality` states the output interface; no plane-embedding-to-dual theorem exists. FORMALIZATION_SOURCE_UNRESOLVED.
+- **Mathlib declarations used:** The pinned `Mathlib.Combinatorics.Graph` and `SimpleGraph` trees were inspected. Neither has the required plane embedding, face/dual graph construction, or cycle-cut duality; `SimpleGraph` also does not preserve this project's loop and parallel-edge semantics.
+- **Deviation from manuscript route:** None in the requirement. The current interface is only conditional output data, not a definition of planarity.
+- **Result / build status / notes:** BLOCKED_MATHLIB_INFRASTRUCTURE. `lake build` passes with the conditional interface. N268 is a genuine reusable mathematical prerequisite and has no direct matroid prerequisite; its structural depth is therefore 0. The new direct edge is N268→N176. Depth 5 was not attacked.
+
+## N176 continuation — geometric statement and faces
+
+- **Ledger ID / structural depth:** N176 / 4, with direct prerequisite N268 / 0; `prop:r10-proper-minors` is the material manuscript use.
+- **Requirement / manuscript source status:** A finite planar graphic matroid is cographic, and dually; EXTERNAL_CITED. The manuscript's “planar graph” is now represented independently of any matroid conclusion by `Graph.PlaneEmbedding` and `Graph.IsPlanar`.
+- **Mathematical proof plan:** Draw each labeled edge as a continuous path in `ℝ × ℝ`; require all edge interiors to be jointly injective and to avoid the drawn vertices. Form the faces as connected components of the complement. Assign each edge its two incident faces, form the face-incidence graph on the original edge labels, and prove that primal minimal cycles are dual bonds. The checked `CycleBondDuality.of_cycles_iff_bonds` derives the reverse correspondence by matroid duality, and `CycleBondDuality.matroid_correspondence` then gives N176.
+- **Lean declarations / formalization source:** `Graph.PlaneEmbedding`, `Graph.IsPlanar`, `Graph.PlaneEmbedding.drawnSet`, `Graph.PlaneEmbedding.Face`, `Graph.PlaneEmbedding.faceIncidenceGraph`, `Graph.PlaneEmbedding.HasCycleBondFaceDual`, `Graph.CycleBondDuality.of_cycles_iff_bonds`, and `Graph.PlaneEmbedding.matroid_correspondence_of_faceDual` are in `PlanarDuality.lean`. LOCAL_PROOF for the auxiliary lemmas; FORMALIZATION_SOURCE_UNRESOLVED for N268 and N176.
+- **Mathlib declarations used:** `Path`, `ConnectedComponents`, `Set.Finite.isClosed`, `isCompact_range`, and `isClosed_iUnion_of_finite`. The pinned mathlib source search found no graph-planarity, planar dual, or Jordan-curve theorem.
+- **Checked supporting facts:** A drawn edge interior avoids all other edge endpoints; edge deletion preserves `IsPlanar` while retaining vertex positions and labels; a finite drawing has closed support and an open complement; the proposed face-incidence graph has exactly the original edge set. These statements elaborate and a full `lake build` passed.
+- **Deviation / exact blocker:** `PlaneEmbedding.HasCycleBondFaceDual` is deliberately separate from `IsPlanar`; it is the unproved N268 theorem, not a hidden planarity hypothesis. Producing the two incident complementary faces of each edge, and proving that every primal minimal cycle is a dual bond and conversely, requires planar separation/Jordan-style topology absent from the pinned library. The reverse dual-cycle/primal-bond clause is now checked as a consequence of the first clause and finite matroid duality. N176 remains `MISSING_PREREQUISITE`; N268 remains `BLOCKED_MATHLIB_INFRASTRUCTURE`. No depth-5 work was done.
+
+## N176 further continuation — genuine face incidence
+
+- **Ledger ID / depth / location:** N176 / 4, prerequisite N268 / 0; `prop:r10-proper-minors`.
+- **Requirement / source status:** Planar graphic-cographic correspondence, EXTERNAL_CITED. The independent `Graph.IsPlanar` predicate still requires only a crossing-free drawing.
+- **Mathematical refinement:** For finite drawings, the complement is open and locally path connected. Two points have the same complementary face exactly when a path in the complement joins them; each face occupies an open set in the plane. `PlaneEmbedding.FaceIncident e f` now means the region of face `f` approaches an interior point of edge `e`. `HasCycleBondFaceDual` requires both chosen faces of every dual edge to satisfy this geometric incidence relation, in addition to cycle-bond duality. This prevents an arbitrary face assignment from being mistaken for a geometric dual.
+- **Lean declarations / source:** `PlaneEmbedding.faceRegion_locallyPathConnected`, `sameFace_iff_joined`, `facePoints`, `isOpen_facePoints`, and `FaceIncident` in `PlanarDuality.lean`; LOCAL_PROOF for these support results, FORMALIZATION_SOURCE_UNRESOLVED for N268/N176.
+- **Mathlib declarations:** `IsOpen.locallyPathConnectedSpace`, `connectedComponent_eq_iff_joined`, `ConnectedComponents.coe_eq_coe`, `isOpen_connectedComponent`, and open-subtype image lemmas.
+- **Deviation / exact blocker / result:** No change to the manuscript theorem. The unproved N268 theorem must show that each edge has incident complementary faces and that, using those actual faces, primal minimal cycles are exactly dual bonds. Proving incidence existence already needs a local side theorem for an embedded arc; the cycle-bond claim needs planar separation of an embedded cycle. No compatible Jordan-curve/local separation theorem was found in pinned mathlib. N268 remains `BLOCKED_MATHLIB_INFRASTRUCTURE`, N176 `MISSING_PREREQUISITE`; `lake build` is required before any status change. No depth-5 work was done.
+
+## N268 continuation — face boundaries and exact geometric gap
+
+- **Ledger ID / structural depth:** N268 / 0, direct prerequisite of N176 / 4.
+- **Manuscript location:** `prop:r10-proper-minors`, proof paragraph asserting that a graphic matroid represented by a planar graph is also cographic, and dually.
+- **Requirement / mathematical proof plan:** For a finite crossing-free drawing, assign to each edge two complementary faces approached by its interior. For every edge set `C`, prove that `C` is a minimal graph cycle exactly when it is an inclusion-minimal nonempty boundary `{e : (leftFace(e) ∈ S) ≠ (rightFace(e) ∈ S)}` for some set `S` of faces. Local separation of embedded arcs is needed to produce the face assignment; planar separation of embedded cycles is needed for the boundary characterization.
+- **Lean declarations / source:** `PlaneEmbedding.faceBoundary`, `PlaneEmbedding.faceIncidenceGraph_edgeCut_eq_faceBoundary`, `PlaneEmbedding.IsMinimalFaceBoundary`, `PlaneEmbedding.faceIncidenceGraph_isBond_iff_minimalFaceBoundary`, and `PlaneEmbedding.hasCycleBondFaceDual_iff_minimalFaceBoundary` in `PlanarDuality.lean` are checked local reductions. The final geometric existence/separation theorem remains `FORMALIZATION_SOURCE_UNRESOLVED`.
+- **Mathlib declarations used:** `Graph.edgeCut`, `Graph.IsBond`, `Graph.IsLink.mem_edgeCut_iff`, `Graph.edgeCut_subset_edgeSet`, and `Minimal`.
+- **Deviation from manuscript route / result:** No mathematical weakening. The checked equivalence removes graph-cut and matroid bookkeeping from the open theorem. Pinned mathlib has no compatible Jordan curve or local arc-side theorem; no proof of face assignment or minimal-boundary characterization was found. N268 stays `BLOCKED_MATHLIB_INFRASTRUCTURE`, and N176 stays `MISSING_PREREQUISITE`. No depth-5 work was attempted.
+
+## N268 continuation — isolating a drawn subarc
+
+- **Ledger ID / structural depth:** N268 / 0, direct prerequisite of N176 / 4.
+- **Manuscript location:** `prop:r10-proper-minors`, the proof's planar graphic-cographic step.
+- **Requirement / mathematical proof plan:** Before applying local plane separation, isolate an interior point of one edge from every other edge, every drawn vertex, and all distant parameter values of that same edge. Compactness of finite edge paths supplies an open plane neighborhood for any prescribed open parameter neighborhood. This works for loops, whose two endpoints may coincide.
+- **Lean declarations / source:** `PlaneEmbedding.interior_unique_preimage`, `otherDrawnSet`, `isClosed_otherDrawnSet`, `interior_not_mem_otherDrawnSet`, `exists_isolated_edge_neighborhood`, `exists_edge_parameter_neighborhood`, and `exists_isolated_subarc_neighborhood` in `PlanarDuality.lean` are checked local proofs.
+- **Mathlib declarations used:** `isCompact_range`, `IsClosed.isCompact`, `IsCompact.image`, `IsCompact.isClosed`, and finite union/closedness lemmas.
+- **Deviation / exact blocker / result:** The isolation argument uses finite vertex and edge sets. Finiteness of edges alone is insufficient to ensure the vertex drawing is closed, so a future geometric N268 theorem should carry both finiteness hypotheses. Isolation does not establish that the complement has two local sides or that an embedded cycle separates the plane; those are the remaining topology steps. N268 remains `BLOCKED_MATHLIB_INFRASTRUCTURE`, N176 remains `MISSING_PREREQUISITE`, and depth 5 was not attacked.
+
+## N268 continuation — conditional existence of an incident face
+
+- **Ledger ID / structural depth:** N268 / 0, required by N176 / 4.
+- **Manuscript location:** `prop:r10-proper-minors`, proof's planar graphic-cographic sentence.
+- **Requirement / mathematical proof plan:** The complementary face regions cover the drawing's complement. For a finite vertex and edge drawing, if each embedded edge path has dense complement, then the drawing's complement is dense by finite nowhere-dense union. If the face type is also finite, closure of the finite union of face regions covers the plane. Every edge interior point therefore lies in the closure of at least one face region.
+- **Lean declarations / source:** `PlaneEmbedding.iUnion_facePoints`, `dense_compl_of_edge_ranges_dense`, `exists_face_closure_of_dense_compl`, `exists_incident_face_of_dense_compl`, and `exists_incident_face_of_edge_ranges_dense` in `PlanarDuality.lean` are checked local implications. They do not prove their arc-density or face-finiteness hypotheses for all plane embeddings.
+- **Mathlib declarations used:** `Set.Countable.dense_compl`, `IsNowhereDense.iUnion`, `isClosed_isNowhereDense_iff_compl`, and `closure_iUnion_of_finite`.
+- **Deviation / exact blocker / result:** No manuscript statement was weakened. The remaining geometric work includes proving that every embedded edge path has empty interior, proving finiteness of the complementary face set, identifying the two local sides of each edge, and proving the cycle/minimal-face-boundary equivalence. The checked existence theorem yields one incident face under its stated assumptions; it does not prove distinct sides or cycle-bond duality. N268 remains `BLOCKED_MATHLIB_INFRASTRUCTURE`, N176 remains `MISSING_PREREQUISITE`; depth 5 was not attacked.
+
+## N268 continuation — exact cycle/boundary decomposition
+
+- **Ledger ID / structural depth:** N268 / 0, prerequisite of N176 / 4.
+- **Manuscript location:** `prop:r10-proper-minors`, planar graphic-cographic step in the proof.
+- **Requirement / mathematical proof plan:** For assigned incident faces of a finite plane drawing, split the cycle–bond theorem into two geometric claims: (1) each primal minimal cycle is the boundary of a partition of complementary faces; (2) every nonempty boundary of a face partition contains a primal minimal cycle. Claim (1) is the cycle-separation direction. Claim (2) rules out spurious dual bonds. Minimality of cycles and a finite minimal-boundary argument prove that these two claims are jointly equivalent to the full cycle/minimal-face-boundary condition.
+- **Lean declarations / source:** `PlaneEmbedding.faceBoundary_subset_edgeSet`, `isGraphCycle_iff_minimalFaceBoundary_of_geometric_conditions`, `cycles_iff_minimalFaceBoundary_iff_geometric_conditions`, and `hasCycleBondFaceDual_iff_geometric_conditions` in `PlanarDuality.lean` are checked local reductions. They do not prove the geometric claims.
+- **Mathlib declarations used:** `Set.Finite.finite_subsets`, `Set.Finite.exists_minimal`, `Minimal.eq_of_subset`, and graphic circuit nonemptiness.
+- **Attempted topology route / exact blocker:** An embedded edge path should have empty interior: if an open disk lay in its image, a small punctured disk around an interior path point would connect the two sides of the locally isolated subarc. Pinned mathlib has connectedness of the whole punctured plane and of an unpunctured ball, but the searched library provides no direct local punctured-ball or arbitrary embedded-arc interior theorem. A proof of this route would still need finite-face and Jordan-style cycle separation arguments. N268 remains `BLOCKED_MATHLIB_INFRASTRUCTURE`, N176 remains `MISSING_PREREQUISITE`; no depth-5 work was attempted.
+
+## N268 continuation — the unique exterior face
+
+- **Ledger ID / structural depth:** N268 / 0, prerequisite of N176 / 4.
+- **Manuscript location:** `prop:r10-proper-minors`, the planar graphic-cographic step.
+- **Requirement / mathematical proof plan:** A finite plane drawing has compact support, hence lies inside a disk. The exterior of that disk is path connected: move each point around its radius circle and then along a radial segment. Its points therefore lie in one complementary face. Any other unbounded face would meet the exterior and coincide with that face.
+- **Lean declarations / source:** `PlaneEmbedding.isCompact_drawnSet`, `exists_outer_circle`, `sameFace_on_avoiding_circle`, `exists_outer_face`, `exists_unbounded_face`, and `existsUnique_unbounded_face` in `PlanarDuality.lean` are checked local proofs. The private `plane_radialJoined` and `plane_outerRegion_pathConnected` prove the required exterior connectivity.
+- **Mathlib declarations used:** `isCompact_iUnion`, compact-set boundedness, `isPathConnected_sphere`, `JoinedIn.ofLine`, `JoinedIn.mono`, `ConnectedComponents.coe_eq_coe`, and `NormedSpace.unbounded_univ`.
+- **Deviation / exact blocker / result:** This identifies a genuine exterior face without assuming the face type is finite. It does not identify the local faces on each edge, prove that arbitrary embedded arcs have empty interior, or establish either cycle/face-boundary separation claim. N268 remains `BLOCKED_MATHLIB_INFRASTRUCTURE`, N176 remains `MISSING_PREREQUISITE`; depth 5 was not attempted.
+
+## N268 continuation — faces under edge deletion
+
+- **Ledger ID / structural depth:** N268 / 0, prerequisite of N176 / 4.
+- **Manuscript location / requirement:** `prop:r10-proper-minors`, proof paragraph using planar graphic-cographic duality after taking a proper minor of `M(K_{3,3})`; current ledger provenance `EXTERNAL_CITED` is flagged for review below.
+- **Mathematical proof plan:** For an inductive plane-duality proof, deleting graph edges removes their drawn paths and enlarges the plane complement. Inclusion of complements sends each old connected face into a well-defined new face. If the old complement is dense, every new face contains an old-complement point because finite-drawing face regions are open; hence this face map is surjective. Unboundedness of a face is preserved by inclusion, and a face incident with a surviving edge remains incident after deletion.
+- **Lean declarations / formalization source:** `PlaneEmbedding.deleteEdges_drawnSet_subset`, `complementInclusion_deleteEdges`, `continuous_complementInclusion_deleteEdges`, `faceMap_deleteEdges`, `faceMap_deleteEdges_mk`, `facePoints_subset_deleteEdges`, `faceMap_deleteEdges_unbounded`, `faceMap_deleteEdges_surjective`, and `faceIncident_deleteEdges` in `PlanarDuality.lean`; LOCAL_PROOF for these supporting facts. N268 itself remains FORMALIZATION_SOURCE_UNRESOLVED.
+- **Mathlib declarations used:** `ConnectedComponents.coe_eq_coe'`, `Continuous.mapsTo_connectedComponent`, `ConnectedComponents.surjective_coe`, `Dense.exists_mem_open`, and `Bornology.IsBounded.subset`.
+- **Deviation / exact blocker / result:** Surjectivity is conditional on density of the original drawing complement; the proof does not assume or derive that every embedded edge path has empty interior. It gives no bound on how many old faces can merge after one deletion. Local edge-side separation and the primal-cycle/face-boundary equivalence are still open. N268 remains `BLOCKED_MATHLIB_INFRASTRUCTURE`, N176 remains `MISSING_PREREQUISITE`; depth 5 was not attempted. `lake build` passed.
+
+## N268 reference audit — Oxley, Proposition 5.2.1
+
+- **Ledger ID / structural depth / manuscript location:** N268 / 0, used by N176 / 4 in the proof of `prop:r10-proper-minors`.
+- **External mathematical baseline:** Oxley, *Matroid Theory* (2nd ed.), Proposition 5.2.1 states that the cycle matroid of a geometric dual of a planar graph is isomorphic to the dual of the original cycle matroid. Lemma 2.3.7 proves the connected case and explicitly uses Jordan-curve separation to send primal circuits to dual cuts; Proposition 5.2.1 extends it to disconnected graphs by splitting components and using matroid direct sums. Section 2.3 defines the geometric dual from complementary faces, including a dual loop when an edge borders only one face. Source: <https://www.math.ens.psl.eu/~benoist/refs/Oxley.pdf>, pp. 89–91 and 140.
+- **Relation to the Lean requirement:** The checked `CycleBondDuality.matroid_correspondence` already proves the matroid conclusion once an edge-corresponding cycle–bond dual pair is supplied. Oxley's proposition assumes that a geometric dual exists; its earlier geometric-dual construction and connected-case Jordan argument identify the work still needed to obtain that pair from `Graph.PlaneEmbedding`. The source confirms the standard theorem but is not a kernel-checked replacement for N268.
+- **Provenance review:** The manuscript's explicit `\cite[Lem.~6.6.9]{Oxley2011}` in `prop:r10-proper-minors` attaches to the two single-element minor identities. Its later planar graphic-cographic sentence has no local citation. The ledger currently says `EXTERNAL_CITED` for N268 and N176; under the manuscript-local provenance rule, `EXTERNAL_UNCITED_STANDARD` is a candidate correction for review. The preserved ledger was not changed here.
+- **Result:** No Lean theorem or status changed. N268 remains `BLOCKED_MATHLIB_INFRASTRUCTURE`; N176 remains `MISSING_PREREQUISITE`. No depth-5 work was attempted.

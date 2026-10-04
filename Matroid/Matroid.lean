@@ -1,6 +1,7 @@
 import Matroid.RankClosure
 import Matroid.ClosureConstruction
 import Matroid.Graphic
+import Matroid.PlanarDuality
 import Matroid.GraphicRepresentation
 import Matroid.Cycles
 import Matroid.Colored
