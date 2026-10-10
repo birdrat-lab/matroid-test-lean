@@ -2,6 +2,17 @@ import Matroid.RankClosure
 import Matroid.ClosureConstruction
 import Matroid.Graphic
 import Matroid.PlanarDuality
+import Matroid.Internal.SimpleCycleTrace
+import Matroid.Internal.PlaneArcDensity
+import Matroid.Internal.CycleFaceBoundary
+import Matroid.Internal.AmbientEmbedding
+import Matroid.Internal.SchoenfliesCycle
+import Matroid.Internal.CycleLocalSides
+import Matroid.Internal.EdgeLocalSides
+import Matroid.Internal.ForestBoundary
+import Matroid.Internal.ArcBoundary
+import Matroid.Internal.ForestLift
+import Matroid.Internal.ForestComplement
 import Matroid.GraphicRepresentation
 import Matroid.Cycles
 import Matroid.Colored

@@ -1,51 +1,20 @@
-# Complete Topological Depth 4
+# Close N268 / N176 Using Existing Jordan-Curve Infrastructure
 
-The active Matroid formalization is complete through topological depth 3.
-
-The current depth-4 layer contains six active nodes, of which two are already complete:
+The only remaining depth-4 blocker is the planar-duality branch:
 
 ```text
-N007  Closure             COMPLETE
-N025  Contraction rank    COMPLETE
+N268  plane embedding → geometric/edge dual with cycle–bond correspondence
+  ↓
+N176  planar graphic ↔ cographic correspondence
 ```
 
-The four unresolved depth-4 targets are:
+Do not begin depth 5.
 
-```text
-N044  Represented rank
-N067  One-sum preserves regularity
-N136  Direct-sum bases
-N176  Planar graphic-cographic correspondence
-```
-
-This task should attack exactly those four unresolved requirements.
-
-The governing rule remains:
-
-> **Do not perform new formalization work at depth 5 while any valid active requirement remains unresolved at depth 4.**
+The goal of this pass is to discharge N268 by importing existing formal planar-topology infrastructure rather than developing Jordan separation from scratch.
 
 ---
 
-## 1. Preflight
-
-Before beginning depth-4 work:
-
-1. run `lake build`;
-2. regenerate or verify `Matroid/DEPTHS.csv`;
-3. verify every active node of depth ≤ 3 is `COMPLETE`;
-4. verify the prior correspondence cleanup is present, especially:
-   - N048 has a manuscript-facing arbitrary-`Represents` restriction/deletion interface;
-   - N005 provenance has been checked.
-
-If a depth ≤ 3 requirement is genuinely unresolved, repair it first.
-
-Otherwise freeze the four targets above as the depth-4 working set.
-
-Do not attack depth 5.
-
----
-
-## 2. Sources of truth
+## 1. Sources
 
 Use:
 
@@ -53,441 +22,30 @@ Use:
 Manuscript/main.tex
 Matroid/LEDGER.md
 Matroid/DEPENDENCY_EDGES.csv
-Matroid/DEPTHS.csv
 Matroid/FORMALIZATION_LOG.md
-Matroid/FRONTIER.md
-```
-
-For every target follow:
-
-```text
-ledger requirement
-    ↓
-exact manuscript statement / cited fact
-    ↓
-mathematical proof plan
-    ↓
-inspect pinned mathlib
-    ↓
-Lean statement
-    ↓
-proof
-    ↓
-lake build
-    ↓
-ledger + log update
-```
-
-The manuscript determines the mathematical requirement.
-
-Do not weaken a requirement to match an available library theorem.
-
----
-
-# 3. N044 — Represented rank
-
-Canonical requirement:
-
-> For a represented matroid, the rank of a set equals the dimension of the span of its represented vectors.
-
-The manuscript states immediately after `def:vector-matroid`:
-
-```text
-r_M(A) = dim span φ(A).
-```
-
-This is an externally uncited standard fact and is used repeatedly later.
-
-The project already has:
-
-```text
-Matroid.Represents
-Matroid.vectorMatroid
-vectorMatroid_indep_iff
-```
-
-and the basis/rank infrastructure from lower depths.
-
-### Desired interface
-
-Prefer a manuscript-facing theorem for an arbitrary representation:
-
-```text
-hφ : Represents M φ
-```
-
-rather than only for the canonical object `vectorMatroid E φ`.
-
-The conclusion should directly identify the finite matroid rank with the finite dimension / `finrank` of the represented span.
-
-Preserve the indexed semantics of the representation. Equal vectors at different ground elements remain distinct matroid elements, even though the resulting span is naturally the span of the image.
-
-### Proof route
-
-The expected mathematical argument is:
-
-```text
-choose a basis B of A
-    ↓
-φ(B) is linearly independent
-    ↓
-φ(B) spans the same represented span as φ(A)
-    ↓
-|B| = dim span φ(A)
-    ↓
-r_M(A) = dim span φ(A).
-```
-
-Use existing mathlib rank/linear-independence lemmas where possible.
-
-Expected home:
-
-```text
-Matroid/Representation.lean
-```
-
----
-
-# 4. N067 — One-sum preserves regularity
-
-Canonical requirement:
-
-> A 1-sum of regular matroids is regular.
-
-The manuscript states after `def:regular-matroid-sums`:
-
-```text
-Each operation preserves regularity.
-```
-
-N067 is only the `1`-sum case.
-
-The completed prerequisites are:
-
-```text
-N051  Regularity
-N064  One-sum construction
-```
-
-### Preferred route
-
-For an arbitrary field `K`:
-
-```text
-M regular + N regular
-    ↓
-choose K-representations φM and φN
-    ↓
-place the two represented families in independent coordinate summands
-    ↓
-prove indexed independence is componentwise
-    ↓
-obtain a representation of oneSum M N
-    ↓
-conclude oneSum is regular.
-```
-
-Before implementing this directly, inspect mathlib for an existing theorem saying representability is preserved by `Matroid.disjointSum`.
-
-If an exact theorem exists, use it.
-
-Otherwise construct the combined representation using an appropriate direct-product/direct-sum vector space.
-
-Do not evade the existing universe issue in `Regular` by weakening the theorem to selected fields.
-
-The resulting theorem should apply directly to the project's:
-
-```text
-oneSum M N hdisj hM hN
-```
-
-Expected home:
-
-```text
-Matroid/Sums.lean
-```
-
-with representation helpers placed in `Representation.lean` only if genuinely reusable.
-
----
-
-# 5. N136 — Direct-sum bases
-
-Canonical requirement:
-
-> Bases of a 1-sum are disjoint unions of bases of its two factors.
-
-The manuscript uses this explicitly in the proof of:
-
-```text
-prop:seymour-one-sum
-```
-
-to factor the weighted basis sums.
-
-The desired theorem should characterize whole-matroid bases, not merely independent sets.
-
-Conceptually:
-
-```text
-B is a basis of M ⊕₁ N
-    ↔
-∃ BM BN,
-    BM is a basis of M
-    ∧ BN is a basis of N
-    ∧ B = BM ∪ BN.
-```
-
-Because the ground sets are disjoint, union and symmetric difference coincide here.
-
-Prefer an existing `disjointSum` basis theorem from mathlib if available.
-
-Otherwise derive the result from:
-
-```text
-oneSum_indep_iff
-+
-maximality / IsBase
-```
-
-Do not prove only one direction.
-
-The final statement should be strong enough to support the basis-sum factorization in `prop:seymour-one-sum` without another substantial combinatorial lemma.
-
-Expected home:
-
-```text
-Matroid/Sums.lean
-```
-
----
-
-# 6. N176 — Planar graphic-cographic correspondence
-
-Canonical requirement:
-
-> If a graphic matroid has a planar graph representation, then it is also cographic, and dually.
-
-The manuscript uses this in `prop:r10-proper-minors`:
-
-```text
-The graph K_{3,3} is minor-minimal nonplanar,
-so every proper minor of M(K_{3,3}) is represented by a planar graph.
-
-A graphic matroid represented by a planar graph is also cographic,
-and dually.
-```
-
-This is an externally cited standard planar-duality fact.
-
-This is likely the hardest target in the layer.
-
-### Required mathematical content
-
-Do not replace the theorem by the tautology:
-
-```text
-cographic G = (graphic G)*
-```
-
-That is N135 and is already complete.
-
-N176 requires **planar graph duality**: for a planar graph representation there must be a dual graph whose cut/cycle structures identify the graphic and cographic matroids.
-
-Conceptually:
-
-```text
-G planar
-    ↓
-construct / obtain planar dual G*
-    ↓
-cycles of G ↔ bonds of G*
-    ↓
-graphic G ≅ cographic G*
-```
-
-and dually:
-
-```text
-cographic G ≅ graphic G*
-```
-
-depending on the chosen labeling/isomorphism formalism.
-
-### First task: inspect infrastructure
-
-After fixing the manuscript statement, inspect pinned mathlib for:
-
-```text
-planar graph
-plane embedding
-dual graph
-cycle-cut duality
-```
-
-for the graph type compatible with the existing labeled-edge `Graph α β` development.
-
-Do not silently replace the manuscript's finite multigraph semantics with `SimpleGraph` if this loses loops, parallel edges, or edge labels.
-
-### If planar-dual infrastructure is missing
-
-Do **not** define:
-
-```text
-"planar" := "its graphic matroid is cographic"
-```
-
-or otherwise build the desired conclusion into the hypothesis.
-
-Instead determine the genuine missing mathematical prerequisite.
-
-If a reusable theorem such as:
-
-```text
-finite plane graph admits an edge-corresponding dual
-```
-
-or:
-
-```text
-cycles of a plane graph correspond to bonds of its dual
-```
-
-must be formalized first, add it to the ledger and DAG as a substantive prerequisite.
-
-Recompute its structural depth.
-
-Remain at depth ≤ 4 until the prerequisite and N176 are discharged.
-
-Routine embedding helpers need not become ledger nodes.
-
-Expected home:
-
-```text
-Matroid/Graphic.lean
-```
-
-or a focused companion module such as:
-
-```text
 Matroid/PlanarDuality.lean
 ```
 
-if the development is substantial.
+Preserve the manuscript's finite labeled-multigraph semantics.
+
+Do not replace the graph model by `SimpleGraph` if loops, parallel edges, or edge labels are lost.
 
 ---
 
-# 7. Same-depth work policy
+## 2. Add a pinned Jordan-curve dependency
 
-Attempt all four depth-4 targets.
+Investigate and, if compatible, pin the existing `jordan_pick` Lean development at an exact revision compatible with this project's pinned Lean/mathlib version.
 
-If one blocks, continue with the other independent depth-4 targets.
-
-A blocked depth-4 node prevents advancement to depth 5 but does not prevent other depth-4 work.
-
-Use precise statuses such as:
+Record:
 
 ```text
-BLOCKED_PROOF
-BLOCKED_MATHLIB_INFRASTRUCTURE
-MISSING_PREREQUISITE
-BLOCKED_STATEMENT
-BLOCKED_SCOPE
+repository
+exact commit/revision
+license
+imported declarations actually used
 ```
 
-A blocker report must identify the exact missing mathematical step.
-
----
-
-# 8. DAG corrections
-
-Formalization may reveal missing dependencies.
-
-If so:
-
-1. distinguish routine Lean helpers from genuine mathematical prerequisites;
-2. add only genuine reusable requirements to `LEDGER.md`;
-3. add only direct prerequisite edges to `DEPENDENCY_EDGES.csv`;
-4. document manuscript evidence and justification;
-5. regenerate `DEPTHS.csv`.
-
-Do not preserve an incorrect depth assignment merely to close depth 4.
-
-If a new prerequisite lands at depth ≤ 4, it becomes part of the current breadth-first obligation.
-
----
-
-# 9. Proof and provenance discipline
-
-For each target record in `FORMALIZATION_LOG.md`:
-
-```text
-Ledger ID:
-Structural depth:
-Manuscript location:
-Requirement:
-Manuscript source status:
-Mathematical proof plan:
-Lean declaration:
-Formalization source:
-Mathlib declarations used:
-Deviation from manuscript route:
-Result:
-Build status:
-Notes:
-```
-
-Use:
-
-```text
-MATHLIB_EXACT
-MATHLIB_BRIDGE
-LOCAL_PROOF
-```
-
-for formalization source.
-
-Do not use manuscript citations as substitutes for Lean proofs.
-
-No:
-
-```text
-sorry
-admit
-axiom
-```
-
-may be used to claim completion.
-
----
-
-# 10. Lean organization
-
-Keep files organized by mathematics.
-
-Expected modules are:
-
-```text
-Matroid/Representation.lean
-Matroid/Sums.lean
-Matroid/Graphic.lean
-```
-
-with `Matroid/PlanarDuality.lean` permitted if N176 warrants a separate development.
-
-Do not create chronological files such as:
-
-```text
-Depth4.lean
-Pass9.lean
-Frontier4.lean
-```
-
-`Matroid/Matroid.lean` remains the public umbrella import.
-
----
-
-# 11. Build discipline
+in `Matroid/SOURCES.md`.
 
 Run:
 
@@ -495,48 +53,199 @@ Run:
 lake build
 ```
 
-after meaningful groups of changes and again before marking any target complete.
+immediately after adding the dependency.
 
-In particular:
-
-```text
-after N044
-after the N067/N136 sum work
-after N176 or its new prerequisites
-final full build
-```
-
-The repository must remain buildable even when a target remains blocked.
+Do not import a theorem as an axiom or copy an unverified statement into the project.
 
 ---
 
-# 12. End-of-pass audit
+## 3. Do not re-prove general planar topology
 
-After all depth-4 targets have been attempted:
+The current blocker is topological, not matroidal.
 
-1. regenerate `Matroid/DEPTHS.csv`;
-2. update `Matroid/FRONTIER.md`;
-3. verify every active node of depth ≤ 4;
-4. record any new prerequisite nodes or edge corrections.
-
-Best-case result:
+Do not continue building an ad hoc general theory of:
 
 ```text
-depth 0: clear
-depth 1: clear
-depth 2: clear
-depth 3: clear
-depth 4: clear
-
-minimum unresolved depth: 5
+Jordan separation
+punctured-disk connectivity
+face counting
+arc density
+general plane topology
 ```
 
-If so, state:
+inside this repository if the imported formalization already provides the required separation theorem.
 
-> **The active Matroid formalization is complete through topological depth 4.**
+Use the external proved infrastructure and add only the bridges required by the manuscript graph model.
 
-List the resulting depth-5 frontier, but do not attack it.
+---
 
-If one or more valid depth-4 requirements remain unresolved, stay at depth 4 and report the exact blockers.
+## 4. Main proof route for N268
 
-Do not begin depth 5 in this task.
+Attack N268 through the following chain:
+
+```text
+graph cycle in the PlaneEmbedding
+        ↓
+concatenate embedded edge paths
+        ↓
+obtain a Jordan curve
+        ↓
+apply formal Jordan separation / boundary theorem
+        ↓
+identify the two sides of the cycle
+        ↓
+show the cycle is the required minimal face boundary / cut boundary
+        ↓
+use the existing finite graph/matroid lemmas
+        ↓
+cycle ↔ bond correspondence
+        ↓
+construct/identify the geometric dual
+        ↓
+N268
+```
+
+Keep each bridge as narrow as possible.
+
+---
+
+## 5. Graph-cycle → Jordan-curve bridge
+
+The first local obligation is to turn the project's formal graph-cycle object into the continuous injective closed curve required by the imported Jordan theorem.
+
+Use the hypotheses already present in `PlaneEmbedding`, especially:
+
+```text
+edge paths have the correct endpoints
+edge interiors avoid graph vertices
+distinct edge interiors are disjoint
+```
+
+Prove only enough to establish:
+
+```text
+a simple graph cycle traces an injective continuous S¹-curve
+```
+
+or the exact equivalent expected by the imported theorem.
+
+Do not develop a general walk-embedding library unless required.
+
+---
+
+## 6. Use the strongest imported separation theorem available
+
+Prefer an imported theorem that gives not only:
+
+```text
+ℝ² \ curve has two components
+```
+
+but also useful boundary information, such as:
+
+```text
+the Jordan curve is the boundary of each complementary component.
+```
+
+That boundary statement is especially useful for translating the topology back into graph cuts/faces.
+
+If `jordan_pick` does not expose enough local separation structure, inspect an existing crosscut/Schoenflies formalization before proving the missing topology locally.
+
+---
+
+## 7. Reuse existing N268 reductions
+
+Do not restart N268 from scratch.
+
+Inspect `Matroid/PlanarDuality.lean` and retain all previously completed graph/matroid reductions.
+
+The intended new work should primarily discharge the missing geometric implication identified by the previous blocker report.
+
+If the existing development already reduces the converse direction to matroid duality once one cycle→bond direction is known, reuse that reduction.
+
+---
+
+## 8. N176 after N268
+
+Once N268 is complete, discharge N176 immediately using the constructed planar dual:
+
+```text
+planar graph G
+    ↓
+N268 gives geometric dual G*
+    ↓
+M(G*) = M(G)*
+    ↓
+graphic M(G) is cographic
+```
+
+and the dual statement analogously.
+
+Do not add a separate large proof of N176 if it is now a short consequence of N268 plus the already completed graphic/cographic duality API.
+
+---
+
+## 9. Provenance
+
+Treat N268/N176 as standard external planar-duality theory unless manuscript inspection shows a specific citation attached to these claims.
+
+Record clearly:
+
+```text
+manuscript provenance
+external mathematical source
+external Lean source
+local bridge lemmas
+```
+
+Do not describe imported standard topology as a manuscript proof.
+
+---
+
+## 10. Fallback
+
+If the external Jordan/crosscut infrastructure cannot be composed with the current `PlaneEmbedding` model without substantial new topology:
+
+1. document the exact incompatibility;
+2. do not weaken N268 by defining planarity in terms of matroid duality;
+3. consider a separate proof of the specific downstream manuscript application using explicit graphic/cographic certificates only as a fallback.
+
+Do not silently replace the general theorem with the special case.
+
+---
+
+## 11. Build and completion
+
+Run:
+
+```text
+lake build
+```
+
+after:
+
+```text
+adding the dependency
+graph-cycle → Jordan bridge
+N268
+N176
+```
+
+Update:
+
+```text
+Matroid/LEDGER.md
+Matroid/FORMALIZATION_LOG.md
+Matroid/DEPTHS.csv
+Matroid/FRONTIER.md
+```
+
+If N268 and N176 close and all other depth-4 nodes remain complete, record:
+
+```text
+The active Matroid formalization is complete through topological depth 4.
+```
+
+Then identify depth 5 and stop.
+
+Do not begin depth 5 in this pass.

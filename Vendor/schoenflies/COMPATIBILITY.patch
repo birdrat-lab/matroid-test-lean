@@ -1,0 +1,147 @@
+diff --git a/Schoenflies/Endgame.lean b/Schoenflies/Endgame.lean
+index 211a08e..1f34912 100644
+--- a/Schoenflies/Endgame.lean
++++ b/Schoenflies/Endgame.lean
+@@ -115,18 +115,18 @@ theorem exists_isHomeoOn_of_homeomorph {S T : Set Plane} (e : ↥S ≃ₜ ↥T)
+     ⟨?_, ?_, ?_, ?_, ?_, ?_⟩, fun z hz => dif_pos hz⟩
+   · exact fun z hz => by simp only [dif_pos hz]; exact (e ⟨z, hz⟩).2
+   · exact fun w hw => by simp only [dif_pos hw]; exact (e.symm ⟨w, hw⟩).2
+-  · rw [continuousOn_iff_continuous_restrict]
+-    have heq : (S.restrict fun z => if hz : z ∈ S then (e ⟨z, hz⟩ : Plane) else z) =
++  · rw [continuousOn_iff_continuous_domRestrict]
++    have heq : (S.domRestrict fun z => if hz : z ∈ S then (e ⟨z, hz⟩ : Plane) else z) =
+         fun z : ↥S => (e z : Plane) := by
+       funext z
+-      simp only [Set.restrict_apply, dif_pos z.2]
++      simp only [Set.domRestrict_apply, dif_pos z.2]
+     rw [heq]
+     exact continuous_subtype_val.comp e.continuous
+-  · rw [continuousOn_iff_continuous_restrict]
+-    have heq : (T.restrict fun w => if hw : w ∈ T then (e.symm ⟨w, hw⟩ : Plane) else w) =
++  · rw [continuousOn_iff_continuous_domRestrict]
++    have heq : (T.domRestrict fun w => if hw : w ∈ T then (e.symm ⟨w, hw⟩ : Plane) else w) =
+         fun w : ↥T => (e.symm w : Plane) := by
+       funext w
+-      simp only [Set.restrict_apply, dif_pos w.2]
++      simp only [Set.domRestrict_apply, dif_pos w.2]
+     rw [heq]
+     exact continuous_subtype_val.comp e.symm.continuous
+   · intro z hz
+diff --git a/Schoenflies/Graph/Cycle.lean b/Schoenflies/Graph/Cycle.lean
+index 8ae81e0..c6ef5ce 100644
+--- a/Schoenflies/Graph/Cycle.lean
++++ b/Schoenflies/Graph/Cycle.lean
+@@ -61,7 +61,7 @@ subgraph can answer differently. `Graph.IsWalk.anti` from `Walk.lean` is the eng
+   edge lies on a cycle if and only if deleting it does not disconnect its endpoints", both
+   directions, with the finiteness the proof does not use dropped. The two halves are
+   `Graph.LiesOnCycle.deleteEdges_reaches` and `Graph.LiesOnCycle.of_deleteEdges_reaches`.
+-* `Graph.IsBridge`, `Graph.isBridge_iff_not_reaches` — the bridges of
++* `Graph.IsSchoenfliesBridge`, `Graph.isBridge_iff_not_reaches` — the bridges of
+   `lem:subdivision-ear-preserve` ("a 2-connected graph has no bridge. Indeed, if `uv` were a
+   bridge, the two components of `G - uv` …"), stated as the separation of the two ends.
+ * `Graph.IsAcyclic`, `Graph.Connected.deleteEdges_singleton` — the acyclicity underneath
+@@ -281,41 +281,41 @@ theorem IsAcyclic.mem_of_isLink_of_mem_walkVertices (hac : G.IsAcyclic) (hP : G.
+ 
+ /-! ### Bridges -/
+ 
+-/-- `G.IsBridge e` : an edge of `G` that lies on no cycle. Equivalently — and this is the
++/-- `G.IsSchoenfliesBridge e` : an edge of `G` that lies on no cycle. Equivalently — and this is the
+ form every use wants — an edge whose deletion separates its two ends
+ (`Graph.isBridge_iff_not_reaches`). -/
+-def IsBridge (G : Graph α β) (e : β) : Prop := e ∈ E(G) ∧ ¬ G.LiesOnCycle e
++def IsSchoenfliesBridge (G : Graph α β) (e : β) : Prop := e ∈ E(G) ∧ ¬ G.LiesOnCycle e
+ 
+-theorem IsBridge.edge_mem (h : G.IsBridge e) : e ∈ E(G) := h.1
++theorem IsSchoenfliesBridge.edge_mem (h : G.IsSchoenfliesBridge e) : e ∈ E(G) := h.1
+ 
+-theorem IsBridge.not_liesOnCycle (h : G.IsBridge e) : ¬ G.LiesOnCycle e := h.2
++theorem IsSchoenfliesBridge.not_liesOnCycle (h : G.IsSchoenfliesBridge e) : ¬ G.LiesOnCycle e := h.2
+ 
+ /-- **Deleting a bridge separates its ends.** -/
+-theorem IsBridge.not_reaches (h : G.IsBridge e) (hl : G.IsLink e u v) :
++theorem IsSchoenfliesBridge.not_reaches (h : G.IsSchoenfliesBridge e) (hl : G.IsLink e u v) :
+     ¬ (G.deleteEdges {e}).Reaches u v :=
+   fun hR ↦ h.not_liesOnCycle (LiesOnCycle.of_deleteEdges_reaches hl hR)
+ 
+ /-- **An edge whose deletion separates its ends is a bridge.** -/
+ theorem isBridge_of_not_reaches (hl : G.IsLink e u v)
+-    (h : ¬ (G.deleteEdges {e}).Reaches u v) : G.IsBridge e :=
++    (h : ¬ (G.deleteEdges {e}).Reaches u v) : G.IsSchoenfliesBridge e :=
+   ⟨hl.edge_mem, fun hc ↦ h (hc.deleteEdges_reaches hl)⟩
+ 
+ /-- **A bridge is exactly an edge whose deletion separates its ends** — the cycle criterion,
+ negated. -/
+ theorem isBridge_iff_not_reaches (hl : G.IsLink e u v) :
+-    G.IsBridge e ↔ ¬ (G.deleteEdges {e}).Reaches u v :=
++    G.IsSchoenfliesBridge e ↔ ¬ (G.deleteEdges {e}).Reaches u v :=
+   ⟨fun h ↦ h.not_reaches hl, isBridge_of_not_reaches hl⟩
+ 
+ /-- A bridge is never a loop: a loop is a cycle. -/
+-theorem IsBridge.not_isLoopAt (h : G.IsBridge e) (x : α) : ¬ G.IsLoopAt e x :=
++theorem IsSchoenfliesBridge.not_isLoopAt (h : G.IsSchoenfliesBridge e) (x : α) : ¬ G.IsLoopAt e x :=
+   fun hloop ↦ h.not_liesOnCycle (liesOnCycle_of_isLoopAt hloop)
+ 
+ /-- **A graph is acyclic exactly when every one of its edges is a bridge.** This is the form
+ the tree module wants acyclicity in: "it is a tree — an edge of a cycle could be deleted"
+ reads backwards as "no edge can be deleted without separating its ends". -/
+-theorem isAcyclic_iff_forall_isBridge : G.IsAcyclic ↔ ∀ e ∈ E(G), G.IsBridge e :=
++theorem isAcyclic_iff_forall_isBridge : G.IsAcyclic ↔ ∀ e ∈ E(G), G.IsSchoenfliesBridge e :=
+   ⟨fun h _ he ↦ ⟨he, h he⟩, fun h _ he ↦ (h _ he).not_liesOnCycle⟩
+ 
+-theorem IsAcyclic.isBridge (h : G.IsAcyclic) (he : e ∈ E(G)) : G.IsBridge e := ⟨he, h he⟩
++theorem IsAcyclic.isBridge (h : G.IsAcyclic) (he : e ∈ E(G)) : G.IsSchoenfliesBridge e := ⟨he, h he⟩
+ 
+ end Graph
+diff --git a/Schoenflies/InitialPair.lean b/Schoenflies/InitialPair.lean
+index a5ff17b..701c38a 100644
+--- a/Schoenflies/InitialPair.lean
++++ b/Schoenflies/InitialPair.lean
+@@ -154,16 +154,16 @@ theorem exists_isSetHomeoOn_modelCurve {C : Set Plane} (hC : IsJordanCurve C) :
+   obtain ⟨h⟩ := hC.homeomorph_modelCurve
+   refine ⟨fun p => if hp : p ∈ C then (h ⟨p, hp⟩ : Plane) else 0,
+     fun q => if hq : q ∈ modelCurve then (h.symm ⟨q, hq⟩ : Plane) else 0, ?_, ?_, ?_, ?_, ?_, ?_⟩
+-  · rw [continuousOn_iff_continuous_restrict]
+-    have : (C.restrict fun p => if hp : p ∈ C then (h ⟨p, hp⟩ : Plane) else 0) =
++  · rw [continuousOn_iff_continuous_domRestrict]
++    have : (C.domRestrict fun p => if hp : p ∈ C then (h ⟨p, hp⟩ : Plane) else 0) =
+         fun p : ↥C => (h p : Plane) := by
+-      funext p; simp [Set.restrict, p.2]
++      funext p; simp [Set.domRestrict, p.2]
+     rw [this]
+     exact continuous_subtype_val.comp h.continuous
+-  · rw [continuousOn_iff_continuous_restrict]
+-    have : (modelCurve.restrict fun q => if hq : q ∈ modelCurve then (h.symm ⟨q, hq⟩ : Plane)
++  · rw [continuousOn_iff_continuous_domRestrict]
++    have : (modelCurve.domRestrict fun q => if hq : q ∈ modelCurve then (h.symm ⟨q, hq⟩ : Plane)
+         else 0) = fun q : ↥modelCurve => (h.symm q : Plane) := by
+-      funext q; simp [Set.restrict, q.2]
++      funext q; simp [Set.domRestrict, q.2]
+     rw [this]
+     exact continuous_subtype_val.comp h.symm.continuous
+   · intro p hp; simp only [dif_pos hp]; exact (h ⟨p, hp⟩).2
+diff --git a/Schoenflies/QuantitativeRecursion.lean b/Schoenflies/QuantitativeRecursion.lean
+index 382ba7b..269b130 100644
+--- a/Schoenflies/QuantitativeRecursion.lean
++++ b/Schoenflies/QuantitativeRecursion.lean
+@@ -3,6 +3,7 @@ Copyright (c) 2026 Álvaro Begué. All rights reserved.
+ Released under Apache 2.0 license as described in the file LICENSE.
+ Authors: Álvaro Begué
+ -/
++import Mathlib.Topology.MetricSpace.PiNat
+ import Schoenflies.QuantitativeForwardStages
+ 
+ /-!
+diff --git a/Schoenflies/Subarc.lean b/Schoenflies/Subarc.lean
+index 56ca247..89e9175 100644
+--- a/Schoenflies/Subarc.lean
++++ b/Schoenflies/Subarc.lean
+@@ -78,7 +78,8 @@ read through the identification of a real segment with an unordered closed inter
+ theorem image_reparam_I : reparam a b '' I = uIcc a b := by
+   have h : (fun θ : ℝ => a + θ • (b - a)) '' Icc (0 : ℝ) 1 = uIcc a b := by
+     rw [← segment_eq_image' ℝ a b, segment_eq_uIcc]
+-  simpa [reparam, smul_eq_mul] using h
++  change (fun t : ℝ => a + t * (b - a)) '' Icc 0 1 = uIcc a b
++  simpa only [smul_eq_mul] using h
+ 
+ theorem mapsTo_reparam : MapsTo (reparam a b) I (uIcc a b) :=
+   mapsTo_iff_image_subset.mpr image_reparam_I.subset

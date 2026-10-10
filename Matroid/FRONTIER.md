@@ -2,6 +2,8 @@
 
 Computed mechanically from `Matroid/LEDGER.md` and `Matroid/DEPENDENCY_EDGES.csv`. Active scopes are `CORE_MATROID` and `MATROID_INTERFACE`; depth is the longest direct-prerequisite chain. `Matroid/DEPTHS.csv` contains the row-level calculation.
 
+**Current status (2026-10-10): The active Matroid formalization is complete through topological depth 4.** N268 and N176 are complete. The next unresolved depth is 5; its targets are listed at the end of this file and were not attempted. Earlier sections are historical pass snapshots.
+
 ## Prior depth-1 baseline
 
 N061 is `COMPLETE`. `Matroid.graphic` has ground set exactly `G.edgeSet`, and `Matroid.graphic_indep_iff` characterizes its independent sets as subsets with no edge closing a finite walk through the other selected edges. The formal graph-cycle criterion includes loops and parallel-edge cycles. The proof derives the graph cut criterion from reachability and constructs the matroid through closure exchange. Provenance: `def:graphic-cographic`.
@@ -235,3 +237,76 @@ The next N268 continuation proved that every finite plane drawing has a unique u
 The latest N268 continuation constructed the map from complementary faces of a plane drawing to those after edge deletion. The deleted drawing has smaller support, so each old face lies in one new face; unbounded old faces remain unbounded, and incidence with a surviving edge is preserved. For finite drawings with dense original complement, this map is surjective because every new face region is open and meets the old complement. Density is still conditional on the unproved empty-interior theorem for embedded edge paths. The map does not establish how many faces merge when an edge is removed, nor the local two sides or cycle-separation theorem. N268 remains `BLOCKED_MATHLIB_INFRASTRUCTURE` at depth 0 and N176 remains `MISSING_PREREQUISITE` at depth 4. No depth-5 node was attempted.
 
 Oxley, *Matroid Theory*, Proposition 5.2.1 supplies an exact published baseline for the matroid correspondence: a geometric dual has the dual cycle matroid. Its connected-case proof, Lemma 2.3.7, invokes Jordan-curve separation; the proposition then handles disconnected graphs by direct sums. This confirms N268 as standard mathematics while pinpointing the formal gap between the project's raw `PlaneEmbedding` and an edge-corresponding geometric dual. The manuscript's local Oxley citation in `prop:r10-proper-minors` covers the two displayed minor identities, so the ledger's `EXTERNAL_CITED` provenance for the later planar-duality sentence is flagged for review in `FORMALIZATION_LOG.md`. Statuses are unchanged; no depth-5 work was attempted.
+
+The latest N268 pass pins and builds `jordan_pick`, then checks the coordinate bridge to its Jordan separation and whole-component-boundary theorems. A simple closed path with only its endpoints identified now has a checked sphere trace. Every loop edge of `PlaneEmbedding` satisfies that condition and has a two-component complement; every nonloop edge is an arc with connected complement. These results use the existing labeled multigraph model. The general `IsGraphCycle` predicate is still a minimal edge set, with no checked extraction of an ordered simple cyclic path. Moreover, Jordan separation of a cycle support alone does not assign the incident faces of the full drawing or prove cycle/minimal-face-boundary equivalence. A separate formal crosscut source was inspected but is pinned to Lean 4.32.2 and not integrated. N268 remains unresolved at depth 0, N176 remains dependent at depth 4, and `DEPTHS.csv` statuses are unchanged. See `SOURCES.md` and the latest `FORMALIZATION_LOG.md` entry. No depth-5 node was attempted.
+
+The next N268 pass established a continuous closed path with image exactly equal to the drawn support of **every** `IsGraphCycle`, using the actual edge labels and a minimality argument on the traversed reachable edges. It also proved those connecting edges are inclusion-minimal, and closed the Jordan-trace bridge for all one-edge loop cycles. The remaining nonloop bridge is a simple labeled walk extraction: the constructed path may backtrack, so it has not been proved injective modulo its endpoints. Face assignment and cycle/face-boundary correspondence remain open after that. The full `lake build` passes; N268 and N176 retain their unresolved statuses, and depth 5 was not attempted.
+
+The latest N268 continuation completed the general graph-cycle-to-Jordan bridge. A minimal connecting edge set now yields a vertex-simple walk with the original edge labels, whose drawn path is injective; a fresh closing edge gives a simple closed path, including parallel-edge cycles. Every `IsGraphCycle` therefore has an exact-support Jordan trace, and its support has two complementary components with the imported whole-boundary theorem available. A map now sends each face of the full drawing to a side of any selected cycle. The still-open step is to show that full-drawing edge-incident faces occupy the required local sides and that minimal face boundaries coincide with primal cycles. N268 remains unresolved at depth 0, N176 remains dependent at depth 4, and `DEPTHS.csv` is unchanged. No depth-5 work was attempted.
+
+The next N268 pass proves a conditional full-face incidence result. If the full drawing's complement is dense and its face type finite, every cycle edge has two distinct incident faces, one mapped to each Jordan side. This uses the checked whole-boundary theorem for the cycle and a finite-face closure argument. The unproved density and finite-face facts remain necessary, as do side assignments for bridge edges and the exact cycle/minimal-face-boundary correspondence. An inspected crosscut development assumes polygonal crosscuts and arc collars, so it does not directly cover the arbitrary continuous edge paths in `PlaneEmbedding`. N268 remains unresolved at depth 0 and N176 at depth 4; no depth-5 work was attempted.
+
+The latest N268 pass proves that every finite plane drawing has dense complement. For nonloop edges, a hypothetical open disk in the drawn arc would embed a circle into an interval; a checked antipodal/connectedness argument rules that out. Loop-edge density follows from the imported Jordan whole-boundary theorem. Consequently, face maps after edge deletion and onto either side of a graph cycle are surjective without a density hypothesis. Every minimal-cycle edge has two incident full-drawing faces on opposite Jordan sides when the full face type is finite. Face finiteness, incident faces for bridge edges, and the two cycle/minimal-face-boundary implications remain open. An additional `schoenflies-lean` audit found a proved face-cycle theorem, but it assumes a finite two-connected polygonal loopless drawing and does not identify this project's original faces. N268 and N176 remain unresolved; no depth-5 work was attempted.
+
+## N268 / N176 audit after relative Schoenflies integration
+
+The pinned Jordan dependency and the pinned, adapted Schoenflies import closure both build with Lean/mathlib 4.35.0-rc3. Every labeled graph cycle has an exact-support Jordan trace. The relative Schoenflies bridge now moves the whole drawing to standardize a selected cycle, and checked ambient transport identifies all original full-drawing faces, their regions, edge incidence, and minimal face boundaries. At a selected edge's interior point, a checked open neighborhood excludes the other finite support. These bridges preserve loops, parallel edges, and edge labels.
+
+The remaining obligation is to construct a complete incident-face assignment and prove the two geometric face-boundary clauses. The audited crosscut API requires polygonality and collars; the graph face-cycle API requires polygonality, two-connectedness, and loopless drawings. The polygonal redrawing theorem supplies no original-face correspondence or ambient homeomorphism. See [N268_BLOCKER.md](N268_BLOCKER.md) for the exact hypotheses, missing conclusions, and separate downstream-certificate fallback assessment.
+
+The canonical ledger now records both claims as `EXTERNAL_UNCITED_STANDARD`. N268 is `BLOCKED_PROOF` at depth 0; N176 is `MISSING_PREREQUISITE` at depth 4. The unchanged direct-edge DAG and regenerated `DEPTHS.csv` give 197 active nodes, 53 complete, and 144 unresolved. At depths 1–3 all 9, 19, and 8 active nodes remain complete; at depth 4, 5 of 6 remain complete. N268/N176 are the only unresolved active requirements through depth 4. The active formalization is not complete through topological depth 4. No depth-5 or downstream application proof was begun. Full `lake build` passes (9119 jobs).
+
+## N268 frontier after complete cycle-edge incidence
+
+Relative Schoenflies now sends a chosen cycle point to the midpoint of a square side. In a small ball there, the full drawing equals the selected cycle and its complement is two convex half-balls. The checked `graphCycle_local_faces` identifies their actual full-drawing faces, excludes any third incident face locally, and proves the two faces occupy opposite Jordan sides. `graphCycle_edge_incidence_all_interior` makes that pair consistent along the whole edge. Thus `graphCycle_edge_has_complete_incidentFaces` holds for every cycle edge, including loops and parallel-edge cycles, without a finite-face assumption.
+
+The checked `graphCycles_are_faceBoundaries_of_complete_incidence_no_faceFinite` now supplies the cycle-boundary direction from complete incidence. `hasCycleBondFaceDual_of_complete_incidence_and_forestBoundary` reduces N268 to two supplied geometric inputs: extend complete incidence to edges lying in no cycle, and prove that a face-partition boundary that is a primal forest is empty. The edgewise result when every edge belongs to a cycle discharges only the first input for that subcase. Neither input is silently assumed for the general drawing. See [N268_BLOCKER.md](N268_BLOCKER.md).
+
+Full `lake build` passes (9120 jobs); the new declarations depend only on `propext`, `Classical.choice`, and `Quot.sound`. The ledger/DAG depth calculation was revalidated with unchanged statuses: N268 remains `BLOCKED_PROOF` at depth 0, and N176 remains `MISSING_PREREQUISITE` at depth 4. Active totals remain 197 nodes / 53 complete. The active formalization is not yet complete through topological depth 4. No depth-5 work was begun.
+
+## N268 frontier after complete all-edge incidence
+
+`Matroid/Internal/EdgeLocalSides.lean` now constructs complete incident-face pairs for every edge of a finite drawing, including bridge edges, with no containing-cycle or finite-face hypothesis. The imported accessibility and arc-joining theorems close a nonloop subarc into an auxiliary Jordan curve; compactness excludes the added arc locally, and relative Schoenflies models the actual drawing by a line. Loop edges reuse the existing cycle result. Incidence is constant along each entire edge interior, and `exists_incidence_with_cycle_boundaries` supplies both a complete assignment and every exact primal cycle boundary.
+
+`Matroid/Internal/ForestBoundary.lean` proves that any nonempty face-partition boundary separates the complement of its own retained edge support plus the original vertices. Its `hasCycleBondFaceDual_of_forest_complement` leaves one explicit sufficient input: the complement of every retained finite embedded forest is preconnected. The audited isolated-arc theorem does not cover arbitrary finite branching or disjoint unions of trees. The additional inspected finite-complex PL approximation theorem supplies no ambient homeomorphism or original-face connectivity transport and was not imported. See [N268_BLOCKER.md](N268_BLOCKER.md) and [SOURCES.md](SOURCES.md) for the exact statement and source audit.
+
+Full `lake build` passes (9122 jobs). Axiom audits of the new imports and local bridges report only `propext`, `Classical.choice`, and `Quot.sound`. N268 remains `BLOCKED_PROOF` at depth 0; N176 remains `MISSING_PREREQUISITE` at depth 4. The ledger/DAG calculation was revalidated with 197 active nodes / 53 complete and unchanged statuses and depths. The active formalization is not yet complete through topological depth 4. No depth-5 work was begun.
+
+## Prior N268 frontier after the cycle-to-bond direction
+
+`Matroid/Internal/ArcBoundary.lean` proves that a nonempty face boundary cannot fit inside a simple drawn arc, even with all original vertices retained. Every proper edge subset of a primal cycle fits inside a proper arc of its Jordan trace by imported `JordanCurve.Arcs.exists_proper_arc`. Consequently every primal cycle is a minimal actual face boundary and a bond of the constructed incidence graph. `exists_incidence_with_cycle_bonds` supplies a complete assignment with the unconditional cycle-to-bond direction, including loop and parallel-edge cycles.
+
+The same module proves that finitely many original vertex points do not affect connectivity outside a selected edge support, using the imported ball homeomorphism and connected punctured plane. The remaining sufficient input is therefore connectivity of `(P.edgeSupport D)ᶜ` for every primal forest `D`; no isolated-vertex input remains. The converse dual-bond-to-primal-cycle direction still needs exclusion of arbitrary forest boundaries, which may branch or have multiple components. The leaf-endpoint bypass needed for an alternative induction is not supplied by the audited global arc-complement theorem. See [N268_BLOCKER.md](N268_BLOCKER.md).
+
+Full `lake build` passes (9123 jobs). All 13 audited imported and local declarations use only `propext`, `Classical.choice`, and `Quot.sound`. N268 remains `BLOCKED_PROOF`; N176 remains `MISSING_PREREQUISITE`. Active totals remain 197 nodes / 53 complete, and all statuses, structural depths, and dependency edges are unchanged. The active formalization is not yet complete through topological depth 4. No depth-5 work was begun.
+
+## N268 / N176 completion — 2026-10-10
+
+`PlaneEmbedding.hasCycleBondFaceDual` now constructs the dual on the original drawing’s faces. The existing cycle/Jordan/Schoenflies/incidence reductions are retained. The final forest bridge uses graph-cut potentials to make covering-space lifts agree at vertices, then Tietze extension and the imported disk no-retraction theorem to rule out bounded complementary components. The imported connected disk exterior identifies all remaining components. No polygonal redrawing, matroidal definition of planarity, or special-case substitution is used.
+
+`PlaneEmbedding.matroid_correspondence` and `IsPlanar.matroid_correspondence` discharge N176 in both directions on the original edge labels. Full `lake build` passes after N268 and again after N176 (9125 jobs). All 12 audited imported/local declarations depend only on `propext`, `Classical.choice`, and `Quot.sound`.
+
+The unchanged direct-edge DAG and regenerated `DEPTHS.csv` contain **197 active nodes, 55 complete, 142 unresolved**. All active nodes at depths 0–4 are complete: 2, 9, 19, 8, and 6 nodes respectively.
+
+The active Matroid formalization is complete through topological depth 4.
+
+## Next frontier: depth 5 (identified only)
+
+There are 24 active depth-5 nodes: 10 already complete and the following 14 unresolved. No depth-5 proof was begun. Existing statuses are retained.
+
+| ID | Name | Status |
+| --- | --- | --- |
+| N026 | Minor | `IDENTIFIED` |
+| N028 | Contraction composition | `IDENTIFIED` |
+| N029 | Deletion-contraction commutation | `IDENTIFIED` |
+| N041 | Closure under extension restriction | `IDENTIFIED` |
+| N045 | Represented closure | `IDENTIFIED` |
+| N049 | Represented contraction | `IDENTIFIED` |
+| N053 | TU representation over every field | `MISSING_PREREQUISITE` |
+| N125 | TU weighted basis determinant | `MISSING_PREREQUISITE` |
+| N131 | Rank-one uniform target closure | `IDENTIFIED` |
+| N134 | Deletion-contraction duality | `IDENTIFIED` |
+| N137 | One-sum target ratio | `IDENTIFIED` |
+| N143 | Negative restriction coloop | `IDENTIFIED` |
+| N262 | Row-restriction matroid equivalence | `IDENTIFIED` |
+| N264 | Graphic target-edge closure | `IDENTIFIED` |

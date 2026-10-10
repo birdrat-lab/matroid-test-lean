@@ -9,10 +9,19 @@ weak.linter.mathlibStandardSet = true
 maxSynthPendingDepth = 3
 
 [[require]]
+name = "jordan_pick"
+git = "https://github.com/rkirov/jordan_pick.git"
+rev = "b3c9b7cf7358bf81a077d78ad67e6e8247869ddd"
+
+[[require]]
+name = "schoenflies-lean"
+path = "Vendor/schoenflies"
+
+[[require]]
 name = "mathlib"
 scope = "leanprover-community"
 rev = "v4.35.0-rc3"
 
 [[lean_lib]]
 name = "Matroid"
-roots = ["Matroid.Matroid", "Matroid.RankClosure", "Matroid.ClosureConstruction", "Matroid.Graphic", "Matroid.PlanarDuality", "Matroid.GraphicRepresentation", "Matroid.Cycles", "Matroid.Colored", "Matroid.Representation", "Matroid.Regular", "Matroid.TotallyUnimodular", "Matroid.R10", "Matroid.Sums", "Matroid.Uniform", "Matroid.ThreeSum", "Matroid.Pointed", "Matroid.WeightedBases", "Matroid.Minors", "Matroid.Extensions"]
+roots = ["Matroid.Matroid", "Matroid.RankClosure", "Matroid.ClosureConstruction", "Matroid.Graphic", "Matroid.Internal.JordanPath", "Matroid.PlanarDuality", "Matroid.Internal.CycleWalkTrace", "Matroid.Internal.SimpleCycleTrace", "Matroid.Internal.PlaneArcDensity", "Matroid.Internal.CycleFaceBoundary", "Matroid.Internal.AmbientEmbedding", "Matroid.Internal.SchoenfliesCycle", "Matroid.Internal.CycleLocalSides", "Matroid.Internal.EdgeLocalSides", "Matroid.Internal.ForestBoundary", "Matroid.Internal.ArcBoundary", "Matroid.Internal.ForestLift", "Matroid.Internal.ForestComplement", "Matroid.GraphicRepresentation", "Matroid.Cycles", "Matroid.Colored", "Matroid.Representation", "Matroid.Regular", "Matroid.TotallyUnimodular", "Matroid.R10", "Matroid.Sums", "Matroid.Uniform", "Matroid.ThreeSum", "Matroid.Pointed", "Matroid.WeightedBases", "Matroid.Minors", "Matroid.Extensions"]

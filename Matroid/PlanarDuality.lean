@@ -9,12 +9,15 @@ import Mathlib.Topology.GDelta.Basic
 import Mathlib.Order.Preorder.Finite
 import Mathlib.Data.Set.Finite.Powerset
 import Mathlib.Analysis.Normed.Module.Connected
+import Matroid.Internal.JordanPath
+import JordanPick.JordanCurve
 
 /-! # Graph cycle and bond interface for planar duality
 
 The cycle-bond comparison below is the combinatorial part of planar graph
-duality. A separate geometric theorem must produce this data from a plane
-embedding of a finite labeled multigraph. -/
+duality. `PlaneEmbedding.hasCycleBondFaceDual` in
+`Matroid.Internal.ForestComplement` produces this data from a plane
+embedding of a finite labeled multigraph, using this interface. -/
 
 namespace Graph
 
@@ -54,6 +57,122 @@ def PlaneEmbedding.drawnSet {G : Graph α β} (P : PlaneEmbedding G) : Set (ℝ 
 /-- A face is a connected component of the complement of a plane drawing. -/
 def PlaneEmbedding.Face {G : Graph α β} (P : PlaneEmbedding G) : Type :=
   ConnectedComponents {p : ℝ × ℝ // p ∉ P.drawnSet}
+
+/-- The coordinate identification between the product plane used by graph
+drawings and the Euclidean plane used by the imported Jordan theorem. -/
+private noncomputable def jordanPlaneHomeomorph :
+    (ℝ × ℝ) ≃ₜ JordanCurve.Plane :=
+  (Homeomorph.finTwoArrow (X := ℝ)).symm.trans
+    (EuclideanSpace.equiv (Fin 2) ℝ).toHomeomorph.symm
+
+private noncomputable def jordanPlaneComponentsHomeomorph
+    (s : Set (ℝ × ℝ)) :
+    ConnectedComponents s ≃ₜ
+      ConnectedComponents (jordanPlaneHomeomorph '' s) := by
+  let e := jordanPlaneHomeomorph.image s
+  have hfiber (y : ↥(jordanPlaneHomeomorph '' s)) :
+      IsConnected (e ⁻¹' {y}) := by
+    have heq : e ⁻¹' {y} = {e.symm y} := by
+      ext x
+      simpa only [Set.mem_preimage, Set.mem_singleton_iff] using
+        (e.eq_symm_apply (x := x) (y := y)).symm
+    rw [heq]
+    exact isConnected_singleton
+  exact e.isQuotientMap.isCoinducing.connectedComponentsHomeomorph hfiber
+
+/-- The imported continuous Jordan theorem in the drawing's product-plane
+coordinates. No graph-cycle tracing hypothesis is hidden in this statement. -/
+theorem jordanCurve_complement_card
+    (r : Metric.sphere (0 : JordanCurve.Plane) 1 → ℝ × ℝ)
+    (hc : Continuous r) (hi : Function.Injective r) :
+    Nat.card (ConnectedComponents ((Set.range r)ᶜ : Set (ℝ × ℝ))) = 2 := by
+  have hset : jordanPlaneHomeomorph '' (Set.range r)ᶜ =
+      (Set.range (jordanPlaneHomeomorph ∘ r))ᶜ := by
+    rw [Set.image_compl_eq jordanPlaneHomeomorph.bijective]
+    rw [Set.range_comp]
+  have hcard := Nat.card_congr
+    (jordanPlaneComponentsHomeomorph ((Set.range r)ᶜ : Set (ℝ × ℝ))).toEquiv
+  rw [hset] at hcard
+  exact hcard.trans
+    (JordanCurve.jordan_curve (jordanPlaneHomeomorph ∘ r)
+      (jordanPlaneHomeomorph.continuous.comp hc)
+      (jordanPlaneHomeomorph.injective.comp hi))
+
+/-- In the drawing coordinates, a complementary component of a Jordan curve
+has the whole curve as its boundary when another component is present. -/
+theorem jordanCurve_component_boundary
+    (r : Metric.sphere (0 : JordanCurve.Plane) 1 → ℝ × ℝ)
+    (hc : Continuous r) (hi : Function.Injective r)
+    (x : ℝ × ℝ) (hx : x ∈ (Set.range r)ᶜ)
+    (hy : ∃ y ∈ (Set.range r)ᶜ,
+      connectedComponentIn (Set.range r)ᶜ y ≠
+        connectedComponentIn (Set.range r)ᶜ x) :
+    frontier (connectedComponentIn (Set.range r)ᶜ x) = Set.range r := by
+  let e := jordanPlaneHomeomorph
+  have hset : e '' (Set.range r)ᶜ = (Set.range (e ∘ r))ᶜ := by
+    rw [Set.image_compl_eq e.bijective, Set.range_comp]
+  have hcc (z : ℝ × ℝ) (hz : z ∈ (Set.range r)ᶜ) :
+      e '' connectedComponentIn (Set.range r)ᶜ z =
+        connectedComponentIn (Set.range (e ∘ r))ᶜ (e z) := by
+    rw [← hset]
+    exact e.image_connectedComponentIn hz
+  obtain ⟨y, hy, hydiff⟩ := hy
+  have hy' : ∃ y ∈ (Set.range (e ∘ r))ᶜ,
+      connectedComponentIn (Set.range (e ∘ r))ᶜ y ≠
+        connectedComponentIn (Set.range (e ∘ r))ᶜ (e x) := by
+    refine ⟨e y, ?_, ?_⟩
+    · rw [← hset]
+      exact ⟨y, hy, rfl⟩
+    · intro h
+      apply hydiff
+      apply (Set.image_injective.mpr e.injective)
+      rw [hcc y hy, hcc x hx]
+      exact h
+  have hx' : e x ∈ (Set.range (e ∘ r))ᶜ := by
+    rw [← hset]
+    exact ⟨x, hx, rfl⟩
+  have hb := JordanCurve.component_boundary_eq JordanCurve.Brouwer.brouwerFPT
+    (e.continuous.comp hc) (e.injective.comp hi) hx' hy'
+  apply (Set.image_injective.mpr e.injective)
+  rw [e.image_frontier, hcc x hx, Set.range_comp]
+  simpa only [Set.range_comp] using hb
+
+/-- The drawn support of a selected set of labeled edges. -/
+def PlaneEmbedding.edgeSupport {G : Graph α β}
+    (P : PlaneEmbedding G) (C : Set β) : Set (ℝ × ℝ) :=
+  ⋃ e : G.EdgeIndex, ⋃ (_ : (e : β) ∈ C), Set.range (P.edgePath e)
+
+/-- The exact geometric trace needed to apply the imported Jordan theorem to a
+graph cycle. The open graph-cycle bridge must construct this data from a
+minimal cycle; it is not part of the definition of `IsGraphCycle`. -/
+def PlaneEmbedding.HasJordanTrace {G : Graph α β}
+    (P : PlaneEmbedding G) (C : Set β) : Prop :=
+  ∃ r : Metric.sphere (0 : JordanCurve.Plane) 1 → ℝ × ℝ,
+    Continuous r ∧ Function.Injective r ∧ Set.range r = P.edgeSupport C
+
+/-- A checked Jordan trace separates the product plane into two components. -/
+theorem PlaneEmbedding.edgeSupport_complement_card_of_jordanTrace
+    {G : Graph α β} (P : PlaneEmbedding G) (C : Set β)
+    (h : P.HasJordanTrace C) :
+    Nat.card (ConnectedComponents ((P.edgeSupport C)ᶜ : Set (ℝ × ℝ))) = 2 := by
+  obtain ⟨r, hc, hi, hr⟩ := h
+  rw [← hr]
+  exact jordanCurve_complement_card r hc hi
+
+/-- A component of the complement of a checked cycle trace has the cycle's
+whole drawn support as its boundary, provided a second component is chosen. -/
+theorem PlaneEmbedding.edgeSupport_component_boundary_of_jordanTrace
+    {G : Graph α β} (P : PlaneEmbedding G) (C : Set β)
+    (h : P.HasJordanTrace C)
+    (x : ℝ × ℝ) (hx : x ∈ (P.edgeSupport C)ᶜ)
+    (hy : ∃ y ∈ (P.edgeSupport C)ᶜ,
+      connectedComponentIn (P.edgeSupport C)ᶜ y ≠
+        connectedComponentIn (P.edgeSupport C)ᶜ x) :
+    frontier (connectedComponentIn (P.edgeSupport C)ᶜ x) =
+      P.edgeSupport C := by
+  obtain ⟨r, hc, hi, hr⟩ := h
+  rw [← hr] at hx hy ⊢
+  exact jordanCurve_component_boundary r hc hi x hx hy
 
 /-- For a finite drawing, the union of vertices and edge paths is closed;
 its complementary faces therefore occupy an open subset of the plane. -/
@@ -407,6 +526,172 @@ theorem PlaneEmbedding.interior_unique_preimage {G : Graph α β}
     exact ⟨lt_of_le_of_ne hsbound.1 h0.symm,
       lt_of_le_of_ne hsbound.2 h1⟩
   exact P.interior_injective e f t s ht hs h
+
+private theorem endpoint_or_interior (t : I) :
+    t = 0 ∨ t = 1 ∨ IsInteriorTime t := by
+  by_cases h0 : t = 0
+  · exact Or.inl h0
+  by_cases h1 : t = 1
+  · exact Or.inr (Or.inl h1)
+  have h0' : (t : ℝ) ≠ 0 := fun h => h0 (Subtype.ext h)
+  have h1' : (t : ℝ) ≠ 1 := fun h => h1 (Subtype.ext h)
+  exact Or.inr (Or.inr ⟨lt_of_le_of_ne t.property.1 h0'.symm,
+    lt_of_le_of_ne t.property.2 h1'⟩)
+
+/-- Two distinct labeled edge paths can intersect only at endpoints of
+both edges. The embedding axioms exclude an interior point of either path
+from any other edge path. -/
+theorem PlaneEmbedding.edgePath_intersection_endpoints {G : Graph α β}
+    (P : PlaneEmbedding G) (e f : G.EdgeIndex) (hne : e ≠ f)
+    {x : ℝ × ℝ}
+    (hx : x ∈ Set.range (P.edgePath e) ∩ Set.range (P.edgePath f)) :
+    (x = P.vertexPoint (P.ends e).1 ∨
+      x = P.vertexPoint (P.ends e).2) ∧
+    (x = P.vertexPoint (P.ends f).1 ∨
+      x = P.vertexPoint (P.ends f).2) := by
+  obtain ⟨⟨t, rfl⟩, ⟨s, heq⟩⟩ := hx
+  have ht : t = 0 ∨ t = 1 := by
+    rcases endpoint_or_interior t with ht | ht | ht
+    · exact Or.inl ht
+    · exact Or.inr ht
+    · exact False.elim (hne (P.interior_unique_preimage e f t s ht heq.symm).1)
+  have hs : s = 0 ∨ s = 1 := by
+    rcases endpoint_or_interior s with hs | hs | hs
+    · exact Or.inl hs
+    · exact Or.inr hs
+    · exact False.elim (hne.symm
+        (P.interior_unique_preimage f e s t hs heq).1)
+  constructor
+  · rcases ht with rfl | rfl
+    · exact Or.inl (Path.source _)
+    · exact Or.inr (Path.target _)
+  · rw [← heq]
+    rcases hs with rfl | rfl
+    · exact Or.inl (Path.source _)
+    · exact Or.inr (Path.target _)
+
+/-- A nonloop edge path is injective on the whole unit interval. Interior
+injectivity alone needs the endpoint cases supplied here. -/
+theorem PlaneEmbedding.edgePath_injective_of_nonloop {G : Graph α β}
+    (P : PlaneEmbedding G) (e : G.EdgeIndex)
+    (hne : (P.ends e).1 ≠ (P.ends e).2) :
+    Function.Injective (P.edgePath e) := by
+  have h01 : P.edgePath e 0 ≠ P.edgePath e 1 := by
+    rw [Path.source, Path.target]
+    intro h
+    exact hne (P.vertex_injective
+      (G.left_mem_of_isLink (P.ends_valid e))
+      (G.left_mem_of_isLink ((P.ends_valid e).symm)) h)
+  intro t s h
+  rcases endpoint_or_interior t with ht | ht | ht
+  · subst t
+    rcases endpoint_or_interior s with hs | hs | hs
+    · exact hs.symm
+    · exact False.elim (h01 (hs ▸ h))
+    · exact False.elim (P.interior_ne_edge_source e e s hs h.symm)
+  · subst t
+    rcases endpoint_or_interior s with hs | hs | hs
+    · exact False.elim (h01 (hs ▸ h.symm))
+    · exact hs.symm
+    · exact False.elim (P.interior_ne_edge_target e e s hs h.symm)
+  · exact (P.interior_unique_preimage e e t s ht h).2
+
+/-- A nonloop drawn edge is a topological arc. -/
+noncomputable def PlaneEmbedding.edgeArcHomeomorph {G : Graph α β}
+    (P : PlaneEmbedding G) (e : G.EdgeIndex)
+    (hne : (P.ends e).1 ≠ (P.ends e).2) :
+    Set.range (P.edgePath e) ≃ₜ I := by
+  let f : I ≃ Set.range (P.edgePath e) :=
+    Equiv.ofInjective (P.edgePath e) (P.edgePath_injective_of_nonloop e hne)
+  have hf : Continuous f :=
+    (P.edgePath e).continuous.subtype_mk _
+  exact (Continuous.homeoOfEquivCompactToT2 (f := f) hf).symm
+
+/-- A single nonloop edge arc does not separate the plane. This is a direct
+application of the imported arc theorem to the actual edge path. -/
+theorem PlaneEmbedding.isConnected_compl_edgePath_of_nonloop {G : Graph α β}
+    (P : PlaneEmbedding G) (e : G.EdgeIndex)
+    (hne : (P.ends e).1 ≠ (P.ends e).2) :
+    IsConnected (Set.range (P.edgePath e))ᶜ := by
+  let E : ↥(jordanPlaneHomeomorph '' Set.range (P.edgePath e)) ≃ₜ I :=
+    (jordanPlaneHomeomorph.image (Set.range (P.edgePath e))).symm.trans
+      (P.edgeArcHomeomorph e hne)
+  have hc : IsConnected
+      (jordanPlaneHomeomorph '' Set.range (P.edgePath e))ᶜ :=
+    JordanCurve.arc_not_separates JordanCurve.Brouwer.brouwerFPT E
+  have himage : jordanPlaneHomeomorph.symm ''
+      (jordanPlaneHomeomorph '' Set.range (P.edgePath e))ᶜ =
+      (Set.range (P.edgePath e))ᶜ := by
+    rw [← Set.image_compl_eq jordanPlaneHomeomorph.bijective]
+    simp only [Set.image_image]
+    simp
+  rw [← himage]
+  exact hc.image jordanPlaneHomeomorph.symm
+    jordanPlaneHomeomorph.symm.continuous.continuousOn
+
+/-- A loop edge is injective on the half-open parameter interval. Its equal
+endpoints are the only repeated drawn point. -/
+private theorem PlaneEmbedding.loopEdge_simple {G : Graph α β}
+    (P : PlaneEmbedding G) (e : G.EdgeIndex)
+    (hloop : (P.ends e).1 = (P.ends e).2) :
+    ∀ s t : I, (s : ℝ) < 1 → (t : ℝ) < 1 →
+      (P.edgePath e).cast rfl (congrArg P.vertexPoint hloop) s =
+        (P.edgePath e).cast rfl (congrArg P.vertexPoint hloop) t → s = t := by
+  intro s t hs ht hst
+  have heq : P.edgePath e s = P.edgePath e t := by
+    simpa only [Path.cast_coe] using hst
+  have interior_of_ne_zero (u : I) (hu : (u : ℝ) < 1) (hu0 : u ≠ 0) :
+      IsInteriorTime u := by
+    have hu0' : (u : ℝ) ≠ 0 := fun h => hu0 (Subtype.ext h)
+    exact ⟨lt_of_le_of_ne u.property.1 hu0'.symm, hu⟩
+  by_cases hs0 : s = 0
+  · subst s
+    by_cases ht0 : t = 0
+    · exact ht0.symm
+    · exact False.elim (P.interior_ne_edge_source e e t
+        (interior_of_ne_zero t ht ht0) heq.symm)
+  · exact (P.interior_unique_preimage e e s t
+      (interior_of_ne_zero s hs hs0) heq).2
+
+private theorem PlaneEmbedding.edgeSupport_singleton {G : Graph α β}
+    (P : PlaneEmbedding G) (e : G.EdgeIndex) :
+    P.edgeSupport {(e : β)} = Set.range (P.edgePath e) := by
+  ext x
+  simp only [PlaneEmbedding.edgeSupport, Set.mem_iUnion, Set.mem_singleton_iff,
+    Set.mem_range]
+  constructor
+  · rintro ⟨f, hf, t, rfl⟩
+    have hfe : f = e := Subtype.ext hf
+    subst f
+    exact ⟨t, rfl⟩
+  · rintro ⟨t, rfl⟩
+    exact ⟨e, rfl, t, rfl⟩
+
+/-- A drawn loop edge has a Jordan trace with exactly its drawn edge image.
+This discharges the graph-cycle-to-Jordan bridge for one-edge cycles. -/
+theorem PlaneEmbedding.loopEdge_hasJordanTrace {G : Graph α β}
+    (P : PlaneEmbedding G) (e : G.EdgeIndex)
+    (hloop : (P.ends e).1 = (P.ends e).2) :
+    P.HasJordanTrace {(e : β)} := by
+  let p : Path (P.vertexPoint (P.ends e).1) (P.vertexPoint (P.ends e).1) :=
+    (P.edgePath e).cast rfl (congrArg P.vertexPoint hloop)
+  obtain ⟨r, hc, hi, hr⟩ := JordanPath.exists_jordanTrace p
+    (P.loopEdge_simple e hloop)
+  refine ⟨r, hc, hi, ?_⟩
+  rw [hr]
+  rw [show Set.range p = Set.range (P.edgePath e) by
+    simp only [p, Path.cast_coe]]
+  exact (P.edgeSupport_singleton e).symm
+
+/-- The complement of a drawn loop edge has exactly two connected
+components, by the imported Jordan curve theorem. -/
+theorem PlaneEmbedding.loopEdge_complement_card {G : Graph α β}
+    (P : PlaneEmbedding G) (e : G.EdgeIndex)
+    (hloop : (P.ends e).1 = (P.ends e).2) :
+    Nat.card (ConnectedComponents ((P.edgeSupport {(e : β)})ᶜ :
+      Set (ℝ × ℝ))) = 2 :=
+  P.edgeSupport_complement_card_of_jordanTrace {(e : β)}
+    (P.loopEdge_hasJordanTrace e hloop)
 
 /-- All drawn vertices and all edge paths other than the chosen edge. -/
 def PlaneEmbedding.otherDrawnSet {G : Graph α β}
@@ -866,7 +1151,7 @@ theorem CycleBondDuality.of_cycles_iff_bonds
     _ ↔ (Matroid.cographic G hG).IsCircuit C := by rw [hcographic]
     _ ↔ G.IsBond C := Matroid.cographic_isCircuit_iff_isBond G hG C
 
-/-- The exact missing N268 obligation for a fixed geometric drawing: assign
+/-- The N268 certificate for a fixed geometric drawing: assign
 the two incident complementary faces to each edge so that the resulting
 face graph has the two cycle-bond correspondences. This predicate is kept
 separate from `IsPlanar`, which only asserts a crossing-free drawing. -/
@@ -960,8 +1245,9 @@ theorem CycleBondDuality.matroid_correspondence {G : Graph α β} {H : Graph γ 
         Matroid.cographic_isCircuit_iff_isBond]
       exact h.dual_cycles_iff_bonds C
 
-/-- The manuscript-facing conclusion follows from the missing geometric
-face-duality theorem once it is supplied for a given plane drawing. -/
+/-- The manuscript-facing conclusion from a geometric face-duality
+certificate. `ForestComplement` supplies this certificate for every finite
+plane drawing and exports the unconditional correspondence. -/
 theorem PlaneEmbedding.matroid_correspondence_of_faceDual {G : Graph α β}
     (P : PlaneEmbedding G) (hdual : P.HasCycleBondFaceDual)
     (hE : G.edgeSet.Finite) :
