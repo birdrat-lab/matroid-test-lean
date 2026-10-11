@@ -2,7 +2,7 @@
 
 Computed mechanically from `Matroid/LEDGER.md` and `Matroid/DEPENDENCY_EDGES.csv`. Active scopes are `CORE_MATROID` and `MATROID_INTERFACE`; depth is the longest direct-prerequisite chain. `Matroid/DEPTHS.csv` contains the row-level calculation.
 
-**Current status (2026-10-10): The active Matroid formalization is complete through topological depth 4.** N268 and N176 are complete. The next unresolved depth is 5; its targets are listed at the end of this file and were not attempted. Earlier sections are historical pass snapshots.
+**Current status (2026-10-11): The active Matroid formalization is kernel-certified through topological depth 4.** N268 and N176 remain complete. The one depth-5 pass below proved ten of the fourteen frozen unresolved nodes. Four remain at depth 5. Earlier sections are historical pass snapshots.
 
 ## Prior depth-1 baseline
 
@@ -310,3 +310,30 @@ There are 24 active depth-5 nodes: 10 already complete and the following 14 unre
 | N143 | Negative restriction coloop | `IDENTIFIED` |
 | N262 | Row-restriction matroid equivalence | `IDENTIFIED` |
 | N264 | Graphic target-edge closure | `IDENTIFIED` |
+
+## Frozen depth-5 pass — 2026-10-11
+
+The active direct-edge DAG was recomputed before any depth-5 proof: 197 active nodes, no unresolved node at depths 0–4, and exactly the following 14 unresolved nodes at depth 5. This table preserves their **initial** statuses. The proof classification is recorded separately in `PROOF_STATUS.csv`.
+
+| ID | Direct active prerequisites | Mathematical source | Initial status | Depth | Final trust status |
+| --- | --- | --- | --- | ---: | --- |
+| N026 | N024, N025 | MANUSCRIPT_DEFINITION | IDENTIFIED | 5 | KERNEL_PROVED |
+| N028 | N025 | EXTERNAL_UNCITED_STANDARD | IDENTIFIED | 5 | KERNEL_PROVED |
+| N029 | N024, N025 | EXTERNAL_UNCITED_STANDARD | IDENTIFIED | 5 | KERNEL_PROVED |
+| N041 | N006, N007, N036 | EXTERNAL_UNCITED_STANDARD | IDENTIFIED | 5 | KERNEL_PROVED |
+| N045 | N007, N043, N044 | EXTERNAL_UNCITED_STANDARD | IDENTIFIED | 5 | KERNEL_PROVED |
+| N049 | N025, N043 | MANUSCRIPT_PROVED | IDENTIFIED | 5 | KERNEL_PROVED |
+| N053 | N042, N044, N051 | EXTERNAL_UNCITED_STANDARD | MISSING_PREREQUISITE | 5 | UNRESOLVED |
+| N125 | N042, N044, N122 | EXTERNAL_CITED | MISSING_PREREQUISITE | 5 | UNRESOLVED |
+| N131 | N007, N129 | EXTERNAL_UNCITED_STANDARD | IDENTIFIED | 5 | KERNEL_PROVED |
+| N134 | N024, N025, N132 | EXTERNAL_UNCITED_STANDARD | IDENTIFIED | 5 | KERNEL_PROVED |
+| N137 | N122, N136 | MANUSCRIPT_PROVED | IDENTIFIED | 5 | UNRESOLVED |
+| N143 | N007, N022, N023 | MANUSCRIPT_PROVED | IDENTIFIED | 5 | KERNEL_PROVED |
+| N262 | N043, N044 | EXTERNAL_UNCITED_STANDARD | IDENTIFIED | 5 | UNRESOLVED |
+| N264 | N007, N061 | EXTERNAL_UNCITED_STANDARD | IDENTIFIED | 5 | KERNEL_PROVED |
+
+The ledger has `COMPLETE` only for the ten kernel proofs. N053 and N125 retain `MISSING_PREREQUISITE`; N137 and N262 retain `IDENTIFIED`. There are no `CITED_ASSUMPTION` or `CONDITIONAL_PROOF` rows and no admitted external declarations. No DAG edge was changed. `DEPTHS.csv` was regenerated from the same direct-edge DAG and the updated ledger: 65 of 197 active nodes are complete.
+
+**Unconditional kernel-certified depth: 4. Citation-relative completed depth: 4.** The two figures agree because this pass introduced no cited assumptions. The next mathematical frontier remains N053, N125, N137, and N262 at depth 5. Their precise proof obligations and resource records are in `FORMALIZATION_LOG.md` and `PROOF_BUDGET.md`. Depth 6 was not attempted.
+
+Final full `lake build` passed (9125 jobs). `#print axioms` for each new depth-5 theorem and the unchanged N268/N176 declarations listed only `propext`, `Classical.choice`, and `Quot.sound`; no `sorryAx` appeared. The Lean-source scan found no admitted declarations, and the ledger/DAG/status consistency check passed.

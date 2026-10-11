@@ -1,6 +1,7 @@
 import Matroid.RankClosure
 import Mathlib.Combinatorics.Matroid.Minor.Contract
 import Mathlib.Combinatorics.Matroid.Minor.Delete
+import Mathlib.Combinatorics.Matroid.Minor.Order
 import Mathlib.Combinatorics.Matroid.Rank.ENat
 
 /-! # Minor rank -/
@@ -19,6 +20,47 @@ the union, including the disjoint case used in the manuscript. -/
 theorem deletion_composition {α : Type*} (M : Matroid α)
     (A B : Set α) : M ＼ A ＼ B = M ＼ (A ∪ B) :=
   M.delete_delete A B
+
+/-- Manuscript `def:matroid-minors` (N026): the minor relation is generated
+by deletion and contraction. Mathlib normalizes every finite sequence to
+one contraction followed by one deletion. -/
+theorem minor_iff_contract_delete {α : Type*} (N M : Matroid α) :
+    N ≤m M ↔ ∃ C D : Set α, N = M ／ C ＼ D := Iff.rfl
+
+/-- A deletion is a minor in the manuscript sense (N026). -/
+theorem deletion_isMinor {α : Type*} (M : Matroid α) (D : Set α) :
+    M ＼ D ≤m M := by
+  simpa using M.contract_delete_isMinor ∅ D
+
+/-- A contraction is a minor in the manuscript sense (N026). -/
+theorem contraction_isMinor {α : Type*} (M : Matroid α) (C : Set α) :
+    M ／ C ≤m M := by
+  simpa using M.contract_delete_isMinor C ∅
+
+/-- Composition of the two generating operations keeps a minor a minor;
+induction gives the manuscript's arbitrary finite sequence (N026). -/
+theorem minor_trans {α : Type*} {L N M : Matroid α}
+    (hLN : L ≤m N) (hNM : N ≤m M) : L ≤m M := hLN.trans hNM
+
+/-- Manuscript minor algebra (N028). The identity also holds without a
+disjointness hypothesis because repeated contraction removes any overlap. -/
+theorem contraction_composition {α : Type*} (M : Matroid α)
+    (A B : Set α) : M ／ A ／ B = M ／ (A ∪ B) := M.contract_contract A B
+
+/-- Manuscript minor algebra (N029), with the required disjoint sets. -/
+theorem deletion_contraction_commutation {α : Type*} (M : Matroid α)
+    (D C : Set α) (hDC : Disjoint D C) :
+    M ＼ D ／ C = M ／ C ＼ D := by
+  rw [M.contract_delete_comm hDC.symm]
+
+/-- Manuscript duality law (N134): duality exchanges deletion and
+contraction on the original element labels. -/
+theorem deletion_dual_eq_contraction {α : Type*} (M : Matroid α)
+    (D : Set α) : (M ＼ D)✶ = M✶ ／ D := M.dual_delete D
+
+/-- The converse duality law of N134. -/
+theorem contraction_dual_eq_deletion {α : Type*} (M : Matroid α)
+    (C : Set α) : (M ／ C)✶ = M✶ ＼ C := M.dual_contract C
 
 /-- Manuscript ledger N181; the proof of `prop:r10-no-three-sum` deletes an
 element outside a circuit. -/

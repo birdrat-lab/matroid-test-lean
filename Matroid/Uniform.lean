@@ -1,5 +1,7 @@
 import Mathlib.Combinatorics.Matroid.IndepAxioms
 import Mathlib.Combinatorics.Matroid.Circuit
+import Mathlib.Combinatorics.Matroid.Closure
+import Mathlib.Combinatorics.Matroid.Loop
 
 /-! # Uniform -/
 
@@ -70,5 +72,38 @@ theorem uniformOn_unique_target_circuit {α : Type*} (E : Set α)
   refine ⟨E, ⟨(uniformOn_isCircuit_iff_eq_ground E hE r hcard E).2 rfl, hτ⟩, ?_⟩
   intro C hC
   exact (uniformOn_isCircuit_iff_eq_ground E hE r hcard C).1 hC.1
+
+/-- Manuscript rank-one uniform target clause (N131). A target in the
+ground set is a nonloop, and every nonempty set of other ground elements
+spans it. Distinct labels may still represent parallel elements. -/
+theorem uniformOn_one_target_closure {α : Type*} (E : Set α)
+    (hE : E.Finite) (τ : α) (hτ : τ ∈ E) (A : Set α)
+    (hA : A ⊆ E \ {τ}) (hne : A.Nonempty) :
+    (uniformOn E hE 1).IsNonloop τ ∧ τ ∈ (uniformOn E hE 1).closure A := by
+  let M := uniformOn E hE 1
+  have hτindep : M.Indep {τ} := by
+    rw [uniformOn_indep_iff]
+    exact ⟨Set.singleton_subset_iff.mpr hτ, by simp⟩
+  refine ⟨hτindep.isNonloop, ?_⟩
+  obtain ⟨a, ha⟩ := hne
+  have haE : a ∈ E := (hA ha).1
+  have ha_ne : a ≠ τ := by
+    intro h
+    subst a
+    exact (hA ha).2 (by simp)
+  have hI : M.Indep {a} := by
+    rw [uniformOn_indep_iff]
+    exact ⟨Set.singleton_subset_iff.mpr haE, by simp⟩
+  have hτnot : τ ∉ ({a} : Set α) := by simpa [ha_ne.symm]
+  have htwo : (insert τ ({a} : Set α)).ncard = 2 := by
+    rw [Set.ncard_insert_of_notMem hτnot (Set.toFinite {a})]
+    simp
+  have hτcl : τ ∈ M.closure {a} := by
+    apply (hI.mem_closure_iff').2
+    refine ⟨hτ, ?_⟩
+    intro hind
+    have hcard := (uniformOn_indep_iff E hE 1 (insert τ {a})).1 hind |>.2
+    omega
+  exact M.closure_subset_closure (Set.singleton_subset_iff.mpr ha) hτcl
 
 end Matroid

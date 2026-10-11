@@ -433,6 +433,51 @@ theorem graphic_indep_iff (hE : (Graph.edgeSet G).Finite)
     intro e heA
     exact ⟨⟨e, hA heA⟩, rfl⟩
 
+/-- Manuscript graphic closure clause (N264) on actual edge labels. The
+reflexive path is essential: a loop closes even over the empty edge set. -/
+theorem graphic_mem_closure_iff_reachableOn
+    (hE : (Graph.edgeSet G).Finite) (A : Set β) (e : β)
+    (he : e ∈ G.edgeSet) {u v : α} (hlink : G.IsLink e u v) :
+    e ∈ (graphic G hE).closure A ↔
+      G.ReachableOn (G.edgeEmbedding ⁻¹' A) u v := by
+  letI : Finite G.EdgeIndex := hE.to_subtype
+  let e' : G.EdgeIndex := ⟨e, he⟩
+  have hcut (B : Set G.EdgeIndex) :
+      (G.edgeCutMatroid hE).closure B =
+        {f | ∀ C, G.IsLiftedEdgeCut C → Disjoint B C → f ∉ C} := by
+    unfold Graph.edgeCutMatroid
+    exact Matroid.ofFiniteClosure_closure _ _ B
+  have hreach (B : Set G.EdgeIndex) :
+      e' ∈ (G.edgeCutMatroid hE).closure B ↔ G.ReachableOn B u v := by
+    rw [hcut]
+    change (∀ C, G.IsLiftedEdgeCut C → Disjoint B C → e' ∉ C) ↔ _
+    constructor
+    · intro hc
+      by_contra hn
+      obtain ⟨S, hecut, hno⟩ :=
+        (Graph.not_reachable_iff_separating_cut (e := e') G hlink).mp hn
+      let C : Set G.EdgeIndex := {f | (f : β) ∈ G.edgeCut S}
+      have hdisj : Disjoint B C := Set.disjoint_left.mpr (by
+        intro f hfB hfC
+        exact hno f hfB hfC)
+      exact hc C ⟨S, rfl⟩ hdisj hecut
+    · intro hr C hC hBC heC
+      obtain ⟨S, rfl⟩ := hC
+      have hno : ∀ f ∈ B, (f : β) ∉ G.edgeCut S := by
+        intro f hfB hfC
+        exact (Set.disjoint_left.mp hBC) hfB hfC
+      exact ((Graph.not_reachable_iff_separating_cut (e := e') G hlink).mpr
+        ⟨S, heC, hno⟩) hr
+  change e ∈ ((G.edgeCutMatroid hE).mapEmbedding G.edgeEmbedding).closure A ↔ _
+  rw [Matroid.mapEmbedding, Matroid.map_closure_eq]
+  constructor
+  · rintro ⟨f, hf, hfe⟩
+    have hfe' : f = e' := Subtype.ext hfe
+    subst f
+    exact (hreach _).mp hf
+  · intro hr
+    exact ⟨e', (hreach _).mpr hr, rfl⟩
+
 /-- Manuscript: `def:graphic-cographic` (N062). The cographic matroid is
 the dual of the graphic matroid on the same labeled edge ground set. -/
 noncomputable def cographic (hE : (Graph.edgeSet G).Finite) : Matroid β :=

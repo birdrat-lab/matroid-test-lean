@@ -1,0 +1,15 @@
+id,mathematical_source,trust_status,admitted_premises,proof_declaration,reference,budget_record
+N026,MANUSCRIPT_DEFINITION,KERNEL_PROVED,,Matroid.minor_iff_contract_delete,Manuscript/main.tex def:matroid-minors,
+N028,EXTERNAL_UNCITED_STANDARD,KERNEL_PROVED,,Matroid.contraction_composition,Mathlib.Combinatorics.Matroid.Minor.Contract contract_contract,PROOF_BUDGET.md N028
+N029,EXTERNAL_UNCITED_STANDARD,KERNEL_PROVED,,Matroid.deletion_contraction_commutation,Mathlib.Combinatorics.Matroid.Minor.Contract contract_delete_comm,PROOF_BUDGET.md N029
+N041,EXTERNAL_UNCITED_STANDARD,KERNEL_PROVED,,Matroid.IsSingleElementExtension.closure_rank_and_target,Mathlib matroid restriction closure and rank lemmas,PROOF_BUDGET.md N041
+N045,EXTERNAL_UNCITED_STANDARD,KERNEL_PROVED,,Matroid.Represents.mem_closure_iff_mem_span,Mathlib linearIndepOn_insert and matroid basis closure,PROOF_BUDGET.md N045
+N049,MANUSCRIPT_PROVED,KERNEL_PROVED,,Matroid.Represents.contract,Manuscript/main.tex prop:represented-minors,
+N053,EXTERNAL_UNCITED_STANDARD,UNRESOLVED,,,Manuscript/main.tex remark after def:regular-matroid,PROOF_BUDGET.md N053
+N125,EXTERNAL_CITED,UNRESOLVED,,,Choe-Oxley-Sokal-Wagner 2004 Theorem 8.1 and Corollary 8.2,PROOF_BUDGET.md N125
+N131,EXTERNAL_UNCITED_STANDARD,KERNEL_PROVED,,Matroid.uniformOn_one_target_closure,Mathlib matroid closure and uniformOn independent-set definition,PROOF_BUDGET.md N131
+N134,EXTERNAL_UNCITED_STANDARD,KERNEL_PROVED,,Matroid.deletion_dual_eq_contraction,Mathlib.Combinatorics.Matroid.Minor.Contract dual_delete and dual_contract,PROOF_BUDGET.md N134
+N137,MANUSCRIPT_PROVED,UNRESOLVED,,,Manuscript/main.tex prop:seymour-one-sum,
+N143,MANUSCRIPT_PROVED,KERNEL_PROVED,,Matroid.nonspanned_target_weightedBasesOut_eq_zero,Manuscript/main.tex prop:seymour-two-sum-input-minors,
+N262,EXTERNAL_UNCITED_STANDARD,UNRESOLVED,,,Manuscript/main.tex thm:regular-matroid-energy proof,PROOF_BUDGET.md N262
+N264,EXTERNAL_UNCITED_STANDARD,KERNEL_PROVED,,Matroid.graphic_mem_closure_iff_reachableOn,Mathlib matroid closure plus project graph cut construction,PROOF_BUDGET.md N264

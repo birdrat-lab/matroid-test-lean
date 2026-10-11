@@ -9,6 +9,7 @@ import Mathlib.Combinatorics.Matroid.Circuit
 import Mathlib.Combinatorics.Matroid.Loop
 import Mathlib.LinearAlgebra.LinearIndependent.Basic
 import Mathlib.Combinatorics.Matroid.Minor.Delete
+import Mathlib.Combinatorics.Matroid.Minor.Contract
 
 /-! # Representation -/
 
@@ -205,6 +206,85 @@ theorem Represents.eRk_eq_finrank_span {α K V : Type*} [Field K]
     M.eRk A = (B.ncard : ℕ∞) := M.isBasis_eRk_eq_ncard hB
     _ = (Module.finrank K (Submodule.span K (φ '' A)) : ℕ∞) := by
       rw [← hspan, ← hBcard]
+
+/-- Manuscript prose after `def:vector-matroid` (N045). Closure of an
+indexed represented set is tested in the linear span of its columns. The
+ground-membership hypothesis matters for labels outside the matroid. -/
+theorem Represents.mem_closure_iff_mem_span {α K V : Type*} [Field K]
+    [AddCommGroup V] [Module K V] {M : Matroid α} [M.Finite]
+    {φ : α → V} (hφ : M.Represents (K := K) φ)
+    {A : Set α} (hA : A ⊆ M.E) {e : α} (he : e ∈ M.E) :
+    e ∈ M.closure A ↔ φ e ∈ Submodule.span K (φ '' A) := by
+  obtain ⟨B, hB⟩ := M.exists_isBasis A
+  have hBli : LinearIndepOn K φ B :=
+    (hφ B hB.left_subset_ground).1 hB.indep
+  have hspan : Submodule.span K (φ '' B) = Submodule.span K (φ '' A) := by
+    apply le_antisymm
+    · exact Submodule.span_mono (Set.image_mono hB.subset)
+    · apply Submodule.span_le.mpr
+      rintro v ⟨a, haA, rfl⟩
+      by_contra hn
+      have hli : LinearIndepOn K φ (insert a B) := hBli.insert hn
+      have hi : M.Indep (insert a B) :=
+        (hφ (insert a B) (Set.insert_subset (hA haA) hB.left_subset_ground)).2 hli
+      exact hn (Submodule.subset_span ⟨a, hB.mem_of_insert_indep haA hi, rfl⟩)
+  rw [← hB.closure_eq_closure, ← hspan, hB.indep.mem_closure_iff']
+  constructor
+  · rintro ⟨_, hi⟩
+    by_contra hn
+    have hli : LinearIndepOn K φ (insert e B) := hBli.insert hn
+    have hind : M.Indep (insert e B) :=
+      (hφ (insert e B) (Set.insert_subset he hB.left_subset_ground)).2 hli
+    exact hn (Submodule.subset_span ⟨e, hi hind, rfl⟩)
+  · intro hs
+    refine ⟨he, ?_⟩
+    intro hind
+    by_contra hne
+    have hli : LinearIndepOn K φ (insert e B) :=
+      (hφ (insert e B) (Set.insert_subset he hB.left_subset_ground)).1 hind
+    exact ((linearIndepOn_insert hne).1 hli).2 hs
+
+/-- Manuscript `prop:represented-minors` (N049): quotienting by the span
+of all contracted columns represents contraction, including when those
+columns are dependent. The survivor labels remain indexed in the quotient. -/
+theorem Represents.contract {α K V : Type*} [Field K]
+    [AddCommGroup V] [Module K V] {M : Matroid α} [M.Finite]
+    {φ : α → V} (hφ : M.Represents (K := K) φ)
+    {A : Set α} (hA : A ⊆ M.E) :
+    (M ／ A).Represents (K := K)
+      (fun e => (Submodule.Quotient.mk (p := Submodule.span K (φ '' A))) (φ e)) := by
+  let U := Submodule.span K (φ '' A)
+  obtain ⟨B, hB⟩ := M.exists_isBasis A
+  have hBli : LinearIndepOn K φ B :=
+    (hφ B hB.left_subset_ground).1 hB.indep
+  have hspan : Submodule.span K (φ '' B) = U := by
+    apply le_antisymm
+    · exact Submodule.span_mono (Set.image_mono hB.subset)
+    · apply Submodule.span_le.mpr
+      rintro v ⟨a, haA, rfl⟩
+      by_contra hn
+      have hli : LinearIndepOn K φ (insert a B) := hBli.insert hn
+      have hi : M.Indep (insert a B) :=
+        (hφ (insert a B) (Set.insert_subset (hA haA) hB.left_subset_ground)).2 hli
+      exact hn (Submodule.subset_span ⟨a, hB.mem_of_insert_indep haA hi, rfl⟩)
+  intro I hI
+  have hIE : I ⊆ M.E \ A := by simpa only [contract_ground] using hI
+  have hdisj : Disjoint A I := Set.disjoint_left.mpr (by
+    intro e heA heI
+    exact (hIE heI).2 heA)
+  have hBI : B ∪ I ⊆ M.E :=
+    Set.union_subset hB.left_subset_ground (hIE.trans Set.sdiff_subset)
+  rw [hB.contract_indep_iff_of_disjoint hdisj, Set.union_comm I B,
+    hφ (B ∪ I) hBI]
+  have hdisjBI : Disjoint B I := Set.disjoint_left.mpr (by
+    intro e heB heI
+    exact (Set.disjoint_left.mp hdisj) (hB.subset heB) heI)
+  change LinearIndepOn K φ (B ∪ I) ↔
+    LinearIndepOn K (fun e => Submodule.Quotient.mk (p := U) (φ e)) I
+  rw [linearIndepOn_union_iff_quotient hdisjBI]
+  simp only [hBli, true_and]
+  rw [hspan]
+  exact Iff.rfl
 
 /-- Manuscript: prose after `def:vector-matroid` (N046). Minimal dependence
 is tested on element indices, including distinct equal or zero columns. -/

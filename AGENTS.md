@@ -1,251 +1,140 @@
-# Close N268 / N176 Using Existing Jordan-Curve Infrastructure
+# Depth 5: Resource-Aware Matroid Formalization
 
-The only remaining depth-4 blocker is the planar-duality branch:
+## Objective and scope
 
-```text
-N268  plane embedding → geometric/edge dual with cycle–bond correspondence
-  ↓
-N176  planar graphic ↔ cographic correspondence
-```
+The manuscript-facing Matroid library is complete through structural topological depth 4 in the current repository snapshot. This task performs **one depth-5 pass only**, while introducing a resource-aware policy for established external mathematics.
 
-Do not begin depth 5.
+The standing objective remains to **prove every requirement in Lean whenever practical**. Manuscript-local mathematical claims must receive actual Lean proofs. Established external results may, after a bounded good-faith attempt and source verification, be carried as **explicitly cited admissions**. Such admissions are not kernel proofs and must never be counted as such.
 
-The goal of this pass is to discharge N268 by importing existing formal planar-topology infrastructure rather than developing Jordan separation from scratch.
+Workflow: verify depth 4 → freeze depth-5 targets → manuscript and proof-plan audit → mathlib search → bounded proof attempts → prove or carefully admit eligible external facts → build and axiom audit → update ledger/depth report → **STOP before depth 6**.
 
----
+## 1. Canonical sources and invariants
 
-## 1. Sources
+Read these before any new proofs:
 
-Use:
+- `Manuscript/main.tex` — mathematical statement and actual manuscript proof/citations.
+- `Matroid/LEDGER.md` — canonical requirements, classification, provenance, status.
+- `Matroid/DEPENDENCY_EDGES.csv` — direct prerequisite DAG.
+- `Matroid/DEPTHS.csv` and `Matroid/FRONTIER.md` — regenerated depth and status views.
+- `Matroid/FORMALIZATION_LOG.md` and `Matroid/SOURCES.md` — proof and external-source records.
 
-```text
-Manuscript/main.tex
-Matroid/LEDGER.md
-Matroid/DEPENDENCY_EDGES.csv
-Matroid/FORMALIZATION_LOG.md
-Matroid/PlanarDuality.lean
-```
+Recompute longest-path depths from the active DAG: roots have depth 0; otherwise `depth(v) = 1 + max(depth(u))` over active edges `u → v`. Active scopes are `CORE_MATROID` and `MATROID_INTERFACE`.
 
-Preserve the manuscript's finite labeled-multigraph semantics.
+Preflight: run `lake build`; verify no outstanding active requirements through depth 4, and confirm previously proved N268/N176 are unchanged and have no project-local `sorryAx`. Do not reopen these results unless a genuine regression appears.
 
-Do not replace the graph model by `SimpleGraph` if loops, parallel edges, or edge labels are lost.
+## 2. Freeze the current depth-5 layer
 
----
+The **expected** 14 unresolved nodes in the 2026-10-11 archive are:
 
-## 2. Add a pinned Jordan-curve dependency
+| ID | Mathematical requirement | Manuscript provenance |
+|---|---|---|
+| N026 | Minor (deletions and contractions) | Definition |
+| N028 | Contraction composition | External standard |
+| N029 | Deletion–contraction commutation | External standard |
+| N041 | Closure/rank compatibility in a single-element extension | External standard |
+| N045 | Represented closure | External standard |
+| N049 | Represented contraction (including dependent contracted sets) | **Manuscript proved:** `prop:represented-minors` |
+| N053 | TU matrices represent the same column matroid over every field | External standard; partial minor bridge exists |
+| N125 | Weighted TU determinant equals weighted basis sum | **Externally cited:** Cauchy–Binet + TU; partial minor lemma exists |
+| N131 | Rank-one uniform target closure | External standard |
+| N134 | Duality interchanges deletion and contraction | External standard |
+| N137 | Target ratio under one-sum | **Manuscript proved:** `prop:seymour-one-sum` |
+| N143 | Nonspanned target becomes coloop in restriction | **Manuscript proved:** `prop:seymour-two-sum-input-minors` |
+| N262 | Dependent-row removal preserves column matroid and reconstruction equations | External standard |
+| N264 | Graphic closure characterized by paths between endpoints | External standard |
 
-Investigate and, if compatible, pin the existing `jordan_pick` Lean development at an exact revision compatible with this project's pinned Lean/mathlib version.
+**Recompute and freeze**, do not force this list if the actual DAG differs. Record ID, prerequisites, provenance, initial status and depth in `Matroid/FRONTIER.md`. Do not pull in newly exposed depth-6 requirements. Nodes may be attempted independently within depth 5.
 
-Record:
+## 3. Proof classification: not all completions are equal
 
-```text
-repository
-exact commit/revision
-license
-imported declarations actually used
-```
+First classify the **mathematical source**, separately from the **formal trust state**.
 
-in `Matroid/SOURCES.md`.
+Mathematical sources:
+- `MANUSCRIPT_DEFINITION`, `MANUSCRIPT_PROVED`, `MANUSCRIPT_SKETCH`, `MANUSCRIPT_STATEMENT_ONLY` for work belonging to the manuscript; determine whether the claim is original/manuscript-local or a restated standard fact before choosing a policy.
+- `EXTERNAL_CITED`, `EXTERNAL_UNCITED_STANDARD` for results originating in established literature. An uncited standard result requires finding and recording a precise reputable mathematical source before admission.
 
-Run:
+Trust statuses (add these distinctions without erasing existing provenance or history):
 
-```text
-lake build
-```
+- `KERNEL_PROVED`: requirement discharged using Lean proofs with no admitted external axioms among its transitive dependencies. Record `COMPLETE` in the existing ledger only when this is true.
+- `CITED_ASSUMPTION`: exact externally established theorem is isolated as a named admitted Lean declaration; **not** `COMPLETE`.
+- `CONDITIONAL_PROOF`: the manuscript-facing Lean proof is finished but transitively depends on one or more `CITED_ASSUMPTION` declarations; **not** unconditionally `COMPLETE`.
+- `UNRESOLVED`: still missing an adequate proof, exact source, or statement design.
 
-immediately after adding the dependency.
+If adding a new ledger status column would disrupt current tooling, keep the original columns intact and maintain `Matroid/PROOF_STATUS.csv` with `id`, `mathematical_source`, `trust_status`, `admitted_premises`, `proof_declaration`, `reference`, `budget_record`. Make ledger status and the new file agree explicitly. Never set a row to `COMPLETE` simply because it builds with `sorry`.
 
-Do not import a theorem as an axiom or copy an unverified statement into the project.
+**Two depth reports are mandatory:** (a) unconditional kernel-certified depth, and (b) depth completed *relative to cited assumptions*. For citation-relative frontier calculations only, `KERNEL_PROVED`, `CITED_ASSUMPTION`, and `CONDITIONAL_PROOF` may count as available premises; for unconditional certification only `KERNEL_PROVED` counts. Do not obscure this difference under one `COMPLETE` flag.
 
----
+## 4. Proof attempt order, for every node
 
-## 3. Do not re-prove general planar topology
+1. Read the exact ledger entry and manuscript location or semantic use; inspect the actual proof if present.
+2. Fix the mathematical statement and hypotheses **before** looking for library lemmas. Record a short mathematical proof/construction plan.
+3. Search the project's pinned mathlib and already imported proved dependencies. Reuse exact results first; add manuscript-facing bridges if needed.
+4. Implement and test a precise Lean signature. Compare indexed elements, finite sets, loops, contractions, ground sets, dimensions, and positivity assumptions with the manuscript.
+5. Prove the statement locally, or apply the external-result policy below if—and only if—the obligation is eligible.
+6. Update proof provenance, status, import tree and any justified direct dependency edges. Run `lake build` and validate final axioms.
 
-The current blocker is topological, not matroidal.
+Do not silently weaken a theorem to match available library infrastructure. A narrower lemma is useful as partial progress but is not closure of the canonical requirement.
 
-Do not continue building an ad hoc general theory of:
+## 5. Resource threshold for established external results
 
-```text
-Jordan separation
-punctured-disk connectivity
-face counting
-arc density
-general plane topology
-```
+**Default cumulative budget per external mathematical theorem, across all Codex sessions/passes:**
 
-inside this repository if the imported formalization already provides the required separation theorem.
+- Up to **10 minutes** of focused manuscript/literature/mathlib reconnaissance.
+- Up to **20 minutes** for a first serious mathematical Lean proof route.
+- One further **20-minute** attempt only if it has a distinct concrete route or demonstrable progress.
+- **Stop at approximately 50 minutes total** (or sooner after two unsuccessful proof routes); do not reset the budget on a new run or after discovering a helper lemma.
+- Secondary safeguard: at most **12 substantive Lean edit–check/debug cycles** in total for that external theorem, whichever cutoff is reached first. A cycle includes a meaningful attempted proof change followed by Lean feedback; do not artificially split cycles.
 
-Use the external proved infrastructure and add only the bridges required by the manuscript graph model.
+These are policy budgets, not promises that an autonomous model can enforce accurate wall-clock/token limits. Log real elapsed time and token figures **only if accessible**; do not fabricate them. Codex session usage may be available via its CLI interface, but individual theorem token accounting is not guaranteed. If time measurements are unavailable, use the **two-attempt / twelve-cycle** safeguards, with recorded checkpoints. A hard clock or token cutoff requires an external runner, not merely `AGENTS.md`.
 
----
+Record in `Matroid/PROOF_BUDGET.md` per external theorem: ledger ID, source, first-attempt date, accumulated verified time (or `UNKNOWN`), observed tokens if available (or `UNKNOWN`), attempt count, check/debug cycles, proved intermediates, precise remaining goal, and final disposition. Never silently restart the cumulative budget. N268 is the motivating historical example, **not** a precedent requiring future standard topology to be rebuilt.
 
-## 4. Main proof route for N268
+A meaningful exception requires explicit user authorization. If a cited external result is one small lemma away from closing, record that fact, preserve the buildable partial work, and request a decision in the end-of-pass report rather than automatically spending another unbounded run.
 
-Attack N268 through the following chain:
+### Admission gate (all required)
 
-```text
-graph cycle in the PlaneEmbedding
-        ↓
-concatenate embedded edge paths
-        ↓
-obtain a Jordan curve
-        ↓
-apply formal Jordan separation / boundary theorem
-        ↓
-identify the two sides of the cycle
-        ↓
-show the cycle is the required minimal face boundary / cut boundary
-        ↓
-use the existing finite graph/matroid lemmas
-        ↓
-cycle ↔ bond correspondence
-        ↓
-construct/identify the geometric dual
-        ↓
-N268
-```
+`CITED_ASSUMPTION` is permitted only if:
 
-Keep each bridge as narrow as possible.
+1. The requirement is genuinely established external mathematics; **no manuscript-local/original result** is being admitted.
+2. A specific source, theorem/section or exact proof location, and its relevant hypotheses have been inspected. `EXTERNAL_UNCITED_STANDARD` alone does not suffice.
+3. The Lean statement is checked against that source and the manuscript use: no stronger conclusion or missing hypotheses; graph/matroid indexing conventions are reconciled.
+4. A good-faith mathlib/proof search and the bounded attempt budget are logged, including the precise remaining obligation.
+5. The admission is **one narrow theorem**, not an entire module, blanket assumption, or downstream manuscript theorem.
+6. The admitted theorem is isolated in a mathematically named file under `Matroid/External/`, with a nearby source citation, ledger ID, explicit admission comment and `sorry`. Do not write `axiom`, do not hide the admission with a helper alias, and do not scatter `sorry` in ordinary mathematical files.
+7. Transitive dependents are marked `CONDITIONAL_PROOF` and their `#print axioms` result is recorded.
 
----
+If exact citation/assumptions are uncertain, leave the node `UNRESOLVED` rather than asserting a source supports it.
 
-## 5. Graph-cycle → Jordan-curve bridge
+### Manuscript results: no admission
 
-The first local obligation is to turn the project's formal graph-cycle object into the continuous injective closed curve required by the imported Jordan theorem.
+N049, N137, and N143 are explicitly manuscript-proved. Their mathematical claims must be formally proved in Lean. They may rely on a precisely documented admitted **external** theorem, but then they are `CONDITIONAL_PROOF`, not unconditionally certified. Never place `sorry` in a manuscript result or treat an external citation as a substitute for its project-specific argument.
 
-Use the hypotheses already present in `PlaneEmbedding`, especially:
+## 6. Mathematical priorities within depth 5
 
-```text
-edge paths have the correct endpoints
-edge interiors avoid graph vertices
-distinct edge interiors are disjoint
-```
+Work on the exact/easier structural facts first: N026, N028, N029, N045, N131, N134, N264. Then tackle the manuscript proofs N049, N137, N143 and the extension/row bridge facts N041/N262. Treat N053 and N125 as the main candidates for bounded external proof effort, **not** automatic admissions.
 
-Prove only enough to establish:
+- **N049:** use the manuscript's quotient-by-span proof for arbitrary, possibly dependent contraction sets. Do not prove only independent-set contraction.
+- **N137:** use basis factorization and the existing weighted-basis sums; preserve the target-free factor and zero-denominator conventions from the manuscript.
+- **N143:** prove the nonspanning-target / coloop equivalence in the specified restriction; do not admit the local zero-case argument.
+- **N053:** build from the already-checked TU minor nonvanishing bridge and N044 represented rank. Check the arbitrary-field quantifier, including characteristic 2, before concluding regularity.
+- **N125:** isolate precisely what rectangular weighted Cauchy–Binet is missing; prefer proving/admitting *that exact standard identity* and proving the TU basis-indicator filtering locally. Do not admit the entire manuscript-use weighted-basis theorem when a smaller external prerequisite suffices.
+- **N262:** check that row deletion preserves the claimed **reconstruction equations**, not merely rank or the represented matroid.
+- **N264:** handle loops and parallel labeled graph edges consistently with N061; include the loop convention in the path criterion.
 
-```text
-a simple graph cycle traces an injective continuous S¹-curve
-```
+Maintain topical Lean source files (`Matroid/Minors.lean`, `Matroid/Representation.lean`, `Matroid/TotallyUnimodular.lean`, `Matroid/Graphic.lean`, etc.). Avoid `Depth5.lean`, `Frontier5.lean`, and other chronological code files.
 
-or the exact equivalent expected by the imported theorem.
+## 7. Build, axiom audit, and stop
 
-Do not develop a general walk-embedding library unless required.
+After meaningful groups of targets and once at the end, run `lake build`. Do not leave failed/unfinished proof code in live modules. Source-scan the entire project for `sorry`, `admit`, and `axiom`: any `sorry` must correspond **exactly** to an approved, indexed `Matroid/External/` declaration; any other occurrence is a blocker. Run `#print axioms` for each new project-facing depth-5 theorem, paying attention to `sorryAx`; imported trusted foundational axioms such as `propext`, `Classical.choice`, `Quot.sound` are not cited admissions.
 
----
+For each target, update `FORMALIZATION_LOG.md` with manuscript evidence, proof plan, Lean declaration, exact formal dependencies, proof route, budget, trust status, and build/axiom outcome. Record all external sources in `SOURCES.md`. Recompute the DAG and depth table after justified graph corrections, preserving direct edges only and explaining every change. Retain the original mathematical provenance; do not rewrite the manuscript to accommodate a convenient Lean proof.
 
-## 6. Use the strongest imported separation theorem available
+Final report must include:
 
-Prefer an imported theorem that gives not only:
+- the 14-node frozen snapshot and result for each node;
+- which are `KERNEL_PROVED`, `CITED_ASSUMPTION`, `CONDITIONAL_PROOF`, or `UNRESOLVED`;
+- an exact list of the cited admitted theorems and their literature references;
+- cumulative proof effort and the concrete unresolved obstruction for each admission/blocker;
+- the kernel-certified depth, the citation-relative depth, any DAG repairs, and the next mathematical frontier.
 
-```text
-ℝ² \ curve has two components
-```
-
-but also useful boundary information, such as:
-
-```text
-the Jordan curve is the boundary of each complementary component.
-```
-
-That boundary statement is especially useful for translating the topology back into graph cuts/faces.
-
-If `jordan_pick` does not expose enough local separation structure, inspect an existing crosscut/Schoenflies formalization before proving the missing topology locally.
-
----
-
-## 7. Reuse existing N268 reductions
-
-Do not restart N268 from scratch.
-
-Inspect `Matroid/PlanarDuality.lean` and retain all previously completed graph/matroid reductions.
-
-The intended new work should primarily discharge the missing geometric implication identified by the previous blocker report.
-
-If the existing development already reduces the converse direction to matroid duality once one cycle→bond direction is known, reuse that reduction.
-
----
-
-## 8. N176 after N268
-
-Once N268 is complete, discharge N176 immediately using the constructed planar dual:
-
-```text
-planar graph G
-    ↓
-N268 gives geometric dual G*
-    ↓
-M(G*) = M(G)*
-    ↓
-graphic M(G) is cographic
-```
-
-and the dual statement analogously.
-
-Do not add a separate large proof of N176 if it is now a short consequence of N268 plus the already completed graphic/cographic duality API.
-
----
-
-## 9. Provenance
-
-Treat N268/N176 as standard external planar-duality theory unless manuscript inspection shows a specific citation attached to these claims.
-
-Record clearly:
-
-```text
-manuscript provenance
-external mathematical source
-external Lean source
-local bridge lemmas
-```
-
-Do not describe imported standard topology as a manuscript proof.
-
----
-
-## 10. Fallback
-
-If the external Jordan/crosscut infrastructure cannot be composed with the current `PlaneEmbedding` model without substantial new topology:
-
-1. document the exact incompatibility;
-2. do not weaken N268 by defining planarity in terms of matroid duality;
-3. consider a separate proof of the specific downstream manuscript application using explicit graphic/cographic certificates only as a fallback.
-
-Do not silently replace the general theorem with the special case.
-
----
-
-## 11. Build and completion
-
-Run:
-
-```text
-lake build
-```
-
-after:
-
-```text
-adding the dependency
-graph-cycle → Jordan bridge
-N268
-N176
-```
-
-Update:
-
-```text
-Matroid/LEDGER.md
-Matroid/FORMALIZATION_LOG.md
-Matroid/DEPTHS.csv
-Matroid/FRONTIER.md
-```
-
-If N268 and N176 close and all other depth-4 nodes remain complete, record:
-
-```text
-The active Matroid formalization is complete through topological depth 4.
-```
-
-Then identify depth 5 and stop.
-
-Do not begin depth 5 in this pass.
+**Stop after this one depth-5 attempt. Do not start depth 6**, even if depth 5 is citation-relatively clear. No automatic multi-depth or perpetual loop.
