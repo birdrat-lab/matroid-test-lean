@@ -2,7 +2,7 @@
 
 Computed mechanically from `Matroid/LEDGER.md` and `Matroid/DEPENDENCY_EDGES.csv`. Active scopes are `CORE_MATROID` and `MATROID_INTERFACE`; depth is the longest direct-prerequisite chain. `Matroid/DEPTHS.csv` contains the row-level calculation.
 
-**Current status (2026-10-11): The active Matroid formalization is kernel-certified through topological depth 4.** N268 and N176 remain complete. The one depth-5 pass below proved ten of the fourteen frozen unresolved nodes. Four remain at depth 5. Earlier sections are historical pass snapshots.
+**Current status (2026-10-11): The active Matroid formalization is kernel-certified through topological depth 5.** N268 and N176 remain complete. The initial depth-5 pass proved ten of fourteen frozen targets; the continuation proved the remaining four. Earlier sections are historical pass snapshots.
 
 ## Prior depth-1 baseline
 
@@ -337,3 +337,18 @@ The ledger has `COMPLETE` only for the ten kernel proofs. N053 and N125 retain `
 **Unconditional kernel-certified depth: 4. Citation-relative completed depth: 4.** The two figures agree because this pass introduced no cited assumptions. The next mathematical frontier remains N053, N125, N137, and N262 at depth 5. Their precise proof obligations and resource records are in `FORMALIZATION_LOG.md` and `PROOF_BUDGET.md`. Depth 6 was not attempted.
 
 Final full `lake build` passed (9125 jobs). `#print axioms` for each new depth-5 theorem and the unchanged N268/N176 declarations listed only `propext`, `Classical.choice`, and `Quot.sound`; no `sorryAx` appeared. The Lean-source scan found no admitted declarations, and the ledger/DAG/status consistency check passed.
+
+## Depth-5 continuation audit — 2026-10-11
+
+The four rows left open by the preceding historical snapshot are now kernel proved. Their final signatures and audit are in `Depth5AxiomAudit.lean`; `PROOF_BUDGET.md` records observed and unknown resource use.
+
+| ID | Final Lean declaration | Trust status |
+| --- | --- | --- |
+| N137 | `Matroid.weightedBasisRatio_oneSum`, with separate `weightedBasesIn_oneSum` and `weightedBasesOut_oneSum` | `KERNEL_PROVED` |
+| N262 | `Matroid.rowCompression_after_columnRestriction` | `KERNEL_PROVED` |
+| N053 | `Matroid.vectorMatroid_realTU_represents_over_field` | `KERNEL_PROVED` |
+| N125 | `Matroid.weightedGram_det_eq_weightedBasesTotal_of_tu` | `KERNEL_PROVED` |
+
+The active direct-edge DAG is unchanged. `DEPTHS.csv` was recomputed from all 197 active ledger rows and `DEPENDENCY_EDGES.csv`; every stored depth and direct-prerequisite list agreed with the graph. There are now **69/197** active `COMPLETE` nodes, and depth 5 has **24/24 complete**. All layers 0–5 are complete. Depth 6 contains 24 active nodes, of which one was already complete; no depth-6 proof was attempted.
+
+**Unconditional kernel-certified depth: 5. Citation-relative completed depth: 5.** There are no cited assumptions or conditional proofs in this continuation. The final `lake build` passed (9131 jobs), and the committed audit source printed only `propext`, `Classical.choice`, and `Quot.sound` for all four interfaces and their new premises. The Lean-source declaration scan found no `sorry` or `admit`; no direct dependency edge was changed.

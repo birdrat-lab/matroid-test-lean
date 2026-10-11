@@ -7,6 +7,13 @@ open Set
 
 namespace Matroid
 
+/-- The weighted basis sum of a finite matroid, with no distinguished target. -/
+noncomputable def weightedBasesTotal {α R : Type*} [CommSemiring R]
+    (M : Matroid α) (hE : M.E.Finite) (w : α → R) : R := by
+  classical
+  exact ∑ B ∈ hE.toFinset.powerset,
+    if M.IsBase (B : Set α) then ∏ e ∈ B, w e else 0
+
 /-- Manuscript: prose before `thm:regular-matroid-energy` (N122).
 The product omits the distinguished element even for bases containing it. -/
 noncomputable def weightedBasesIn {α R : Type*} [CommSemiring R]

@@ -2,6 +2,8 @@ import Mathlib.LinearAlgebra.Matrix.Determinant.TotallyUnimodular
 import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
 import Mathlib.LinearAlgebra.Matrix.ToLinearEquiv
 import Mathlib.LinearAlgebra.Matrix.SchurComplement
+import Mathlib.LinearAlgebra.Matrix.Rank
+import Mathlib.Basic.Real.Basic
 import Matroid.Representation
 
 /-! # Totally unimodular matrix operations used by quotient constructions -/
@@ -238,6 +240,73 @@ theorem IsTotallyUnimodular.basisStandardForm {r c K : Type*} [Field K]
 /-- Manuscript ledger N053, determinant part: a minor of an integer TU
 matrix is nonzero over any field exactly when it is nonzero over the
 integers. This includes characteristic two. -/
+theorem linearIndependent_cols_of_minor_det_ne_zero
+    {m n K : Type*} [Field K] (A : Matrix m n K) (k : ℕ)
+    (f : Fin k → m) (g : Fin k → n)
+    (hdet : (A.submatrix f g).det ≠ 0) :
+    LinearIndependent K (A.col ∘ g) := by
+  let P : (m → K) →ₗ[K] (Fin k → K) := LinearMap.funLeft K K f
+  have hcol : (A.submatrix f g).col = P ∘ (A.col ∘ g) := rfl
+  have hLI := Matrix.linearIndependent_cols_of_det_ne_zero hdet
+  rw [hcol] at hLI
+  exact LinearIndependent.of_comp P hLI
+
+/-- A full independent indexed column family has a nonsingular square row
+restriction. This is the rectangular rank/minor direction needed by N053. -/
+theorem exists_minor_det_ne_zero_of_linearIndependent_cols
+    {m K : Type*} [Field K] [Fintype m] {k : ℕ}
+    (A : Matrix m (Fin k) K) (hLI : LinearIndependent K A.col) :
+    ∃ f : Fin k → m, (A.submatrix f id).det ≠ 0 := by
+  classical
+  have hrowLI : LinearIndependent K Aᵀ.row := by
+    simpa only [Matrix.row_transpose] using hLI
+  have hRank : A.rank = k := by
+    have h := hrowLI.rank_matrix
+    rw [Matrix.rank_transpose] at h
+    simpa using h
+  letI : Module.Finite K (Submodule.span K (Set.range A.row)) :=
+    Module.Finite.span_of_finite K (Set.finite_range A.row)
+  have hfinrank : Module.finrank K (Submodule.span K (Set.range A.row)) = k := by
+    rw [← A.rank_eq_finrank_span_row]
+    exact hRank
+  have hex := Submodule.exists_fun_fin_finrank_span_eq K (Set.range A.row)
+  rw [hfinrank] at hex
+  obtain ⟨f, hfmem, _, hfLI⟩ := hex
+  choose g hg using hfmem
+  have hrows : (A.submatrix g id).row = f := by
+    funext i
+    exact hg i
+  have hminorLI : LinearIndependent K (A.submatrix g id).row := by
+    rw [hrows]
+    exact hfLI
+  refine ⟨g, ?_⟩
+  have hunit := Matrix.linearIndependent_rows_iff_isUnit.mp hminorLI
+  exact isUnit_iff_ne_zero.mp ((Matrix.isUnit_iff_isUnit_det _).mp hunit)
+
+/-- Exact rectangular indexed independence criterion: a selected family of
+`k` columns is independent iff some `k × k` row minor is nonzero. -/
+theorem linearIndependent_cols_iff_exists_minor_det_ne_zero
+    {m n K : Type*} [Field K] [Fintype m]
+    (A : Matrix m n K) (k : ℕ) (g : Fin k → n) :
+    LinearIndependent K (A.col ∘ g) ↔
+      ∃ f : Fin k → m, (A.submatrix f g).det ≠ 0 := by
+  constructor
+  · intro hLI
+    have hLI' : LinearIndependent K (A.submatrix id g).col := by
+      change LinearIndependent K (A.col ∘ g)
+      exact hLI
+    obtain ⟨f, hf⟩ :=
+      exists_minor_det_ne_zero_of_linearIndependent_cols
+        (A.submatrix id g) hLI'
+    refine ⟨f, ?_⟩
+    change (A.submatrix f g).det ≠ 0 at hf
+    exact hf
+  · rintro ⟨f, hf⟩
+    exact linearIndependent_cols_of_minor_det_ne_zero A k f g hf
+
+/-- Manuscript ledger N053, determinant part: a minor of an integer TU
+matrix is nonzero over any field exactly when it is nonzero over the
+integers. This includes characteristic two. -/
 theorem IsTotallyUnimodular.intCast_minor_ne_zero_iff
     {m n K : Type*} [Field K] {A : Matrix m n ℤ}
     (hA : A.IsTotallyUnimodular) (k : ℕ)
@@ -254,6 +323,117 @@ theorem IsTotallyUnimodular.intCast_minor_ne_zero_iff
   | neg =>
       have hn : (A.submatrix f g).det = -1 := by simpa using hs.symm
       simp [hn]
+
+/-- The indexed columns of an integer TU matrix have the same independence
+predicate after casting to any two fields, including characteristic two. -/
+theorem IsTotallyUnimodular.linearIndependent_intCast_iff
+    {m n K L : Type*} [Field K] [Field L] [Fintype m]
+    {A : Matrix m n ℤ} (hA : A.IsTotallyUnimodular)
+    (k : ℕ) (g : Fin k → n) :
+    LinearIndependent K ((A.map fun z : ℤ => (z : K)).col ∘ g) ↔
+      LinearIndependent L ((A.map fun z : ℤ => (z : L)).col ∘ g) := by
+  rw [linearIndependent_cols_iff_exists_minor_det_ne_zero,
+    linearIndependent_cols_iff_exists_minor_det_ne_zero]
+  apply exists_congr
+  intro f
+  have hK : ((A.map fun z : ℤ => (z : K)).submatrix f g).det =
+      ((A.submatrix f g).det : K) := by
+    rw [Matrix.submatrix_map]
+    exact (Int.cast_det (A.submatrix f g)).symm
+  have hL : ((A.map fun z : ℤ => (z : L)).submatrix f g).det =
+      ((A.submatrix f g).det : L) := by
+    rw [Matrix.submatrix_map]
+    exact (Int.cast_det (A.submatrix f g)).symm
+  rw [hK, hL]
+  exact (hA.intCast_minor_ne_zero_iff k f g).trans
+    (hA.intCast_minor_ne_zero_iff k f g).symm
+
+/-- A real totally unimodular matrix is the real cast of an integer totally
+unimodular matrix with the same row and column labels. -/
+theorem IsTotallyUnimodular.exists_intCast_eq
+    {m n : Type*} (A : Matrix m n ℝ)
+    (hA : A.IsTotallyUnimodular) :
+    ∃ B : Matrix m n ℤ,
+      B.IsTotallyUnimodular ∧
+      B.map (fun z : ℤ => (z : ℝ)) = A := by
+  classical
+  choose s hs using fun i j => hA.apply i j
+  let B : Matrix m n ℤ := fun i j => (s i j : ℤ)
+  have hBA : B.map (fun z : ℤ => (z : ℝ)) = A := by
+    ext i j
+    change (((s i j : ℤ) : ℝ)) = A i j
+    simpa using hs i j
+  refine ⟨B, ?_, hBA⟩
+  rw [Matrix.isTotallyUnimodular_iff]
+  intro k f g
+  obtain ⟨sgn, hsgn⟩ := (Matrix.isTotallyUnimodular_iff A).mp hA k f g
+  refine ⟨sgn, ?_⟩
+  apply Int.cast_injective (α := ℝ)
+  rw [Int.cast_det]
+  simpa [← hBA, Matrix.submatrix_map] using hsgn
+
+end Matrix
+
+namespace Matroid
+
+/-- N053: an integer totally unimodular matrix defines the same labeled
+column matroid over any two fields, with no characteristic restriction. -/
+theorem vectorMatroid_intCast_eq_of_totallyUnimodular
+    {m n K L : Type*} [Field K] [Field L] [Fintype m]
+    (A : Matrix m n ℤ) (hA : A.IsTotallyUnimodular)
+    (E : Set n) (hE : E.Finite) :
+    vectorMatroid (K := K) E hE (A.map fun z : ℤ => (z : K)).col =
+      vectorMatroid (K := L) E hE (A.map fun z : ℤ => (z : L)).col := by
+  classical
+  apply Matroid.ext_indep (by simp)
+  intro I hI
+  rw [vectorMatroid_indep_iff, vectorMatroid_indep_iff]
+  constructor
+  · rintro ⟨_, hLI⟩
+    refine ⟨hI, ?_⟩
+    letI : Fintype I := (hE.subset hI).fintype
+    let e : Fin (Fintype.card I) ≃ I := (Fintype.equivFin I).symm
+    let g : Fin (Fintype.card I) → n := fun j => (e j).1
+    have hFinK : LinearIndependent K
+        ((A.map fun z : ℤ => (z : K)).col ∘ g) := by
+      simpa [g, Function.comp_def] using hLI.comp e e.injective
+    have hFinL :=
+      (hA.linearIndependent_intCast_iff (K := K) (L := L) (Fintype.card I) g).mp hFinK
+    simpa [g, Function.comp_def] using hFinL.comp e.symm e.symm.injective
+  · rintro ⟨_, hLI⟩
+    refine ⟨hI, ?_⟩
+    letI : Fintype I := (hE.subset hI).fintype
+    let e : Fin (Fintype.card I) ≃ I := (Fintype.equivFin I).symm
+    let g : Fin (Fintype.card I) → n := fun j => (e j).1
+    have hFinL : LinearIndependent L
+        ((A.map fun z : ℤ => (z : L)).col ∘ g) := by
+      simpa [g, Function.comp_def] using hLI.comp e e.injective
+    have hFinK :=
+      (hA.linearIndependent_intCast_iff (K := K) (L := L) (Fintype.card I) g).mpr hFinL
+    simpa [g, Function.comp_def] using hFinK.comp e.symm e.symm.injective
+
+/-- A real TU coordinate matrix represents the same labeled matroid over an
+arbitrary field after taking its integral entries, including in characteristic
+two. The integral lift retains the original real matrix exactly. -/
+theorem vectorMatroid_realTU_represents_over_field
+    {m n K : Type*} [Field K] [Fintype m]
+    (A : Matrix m n ℝ) (hA : A.IsTotallyUnimodular)
+    (E : Set n) (hE : E.Finite) :
+    ∃ B : Matrix m n ℤ,
+      B.IsTotallyUnimodular ∧
+      B.map (fun z : ℤ => (z : ℝ)) = A ∧
+      vectorMatroid (K := ℝ) E hE A.col =
+        vectorMatroid (K := K) E hE
+          (B.map fun z : ℤ => (z : K)).col := by
+  obtain ⟨B, hB, hBA⟩ := hA.exists_intCast_eq A
+  refine ⟨B, hB, hBA, ?_⟩
+  rw [← hBA]
+  exact vectorMatroid_intCast_eq_of_totallyUnimodular
+    (K := ℝ) (L := K) B hB E hE
+
+end Matroid
+
+namespace Matrix
 
 /-- Manuscript ledger N125, TU part of the Cauchy–Binet argument: every
 nonzero maximal minor contributes square `1` to the basis sum. -/

@@ -25,5 +25,10 @@ import Matroid.Uniform
 import Matroid.ThreeSum
 import Matroid.Pointed
 import Matroid.WeightedBases
+import Matroid.OneSumWeights
+import Matroid.RowCompression
+import Matroid.WeightedCauchyBinet
+import Matroid.External.WeightedCauchyBinet
+import Matroid.TUWeightedBasisDeterminant
 import Matroid.Minors
 import Matroid.Extensions
