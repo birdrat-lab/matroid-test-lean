@@ -32,3 +32,8 @@ import Matroid.External.WeightedCauchyBinet
 import Matroid.TUWeightedBasisDeterminant
 import Matroid.Minors
 import Matroid.Extensions
+import Matroid.Depth6Basics
+import Matroid.Depth6Quotient
+import Matroid.Depth6Support
+import Matroid.Depth6TriangleWeights
+import Matroid.Depth6UniformRegular

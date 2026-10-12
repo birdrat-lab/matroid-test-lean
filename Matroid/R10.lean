@@ -1,5 +1,6 @@
 import Matroid.Representation
 import Mathlib.LinearAlgebra.Matrix.Notation
+import Mathlib.LinearAlgebra.Matrix.Rank
 import Mathlib.Basic.Real.Basic
 
 /-! # The exceptional ten-element matroid R10 -/
@@ -44,5 +45,28 @@ noncomputable def r10 : Matroid (Fin 10) :=
 theorem r10_ground_card : r10.E.ncard = 10 := by
   rw [r10_ground]
   simp
+
+/-- N070: the displayed matrix has rank exactly five. The identity left
+block gives the lower bound, and its five rows give the upper bound. -/
+theorem r10Matrix_rank : r10Matrix.rank = 5 := by
+  apply le_antisymm
+  · simpa using Matrix.rank_le_card_height r10Matrix
+  · have h := Matrix.rank_submatrix_le r10Matrix id (Fin.castAdd 5)
+    rw [r10Matrix_left, Matrix.rank_one] at h
+    simpa using h
+
+/-- The represented ten-element matroid has rank five. -/
+theorem r10_eRank : r10.eRank = (5 : ℕ∞) := by
+  have hrep := vectorMatroid_represents (K := ℝ) Set.univ
+    Set.finite_univ r10Matrix.col
+  have h := hrep.eRk_eq_finrank_span Set.univ (by simp)
+  rw [← r10.eRk_univ_eq]
+  change (vectorMatroid (K := ℝ) Set.univ Set.finite_univ
+    r10Matrix.col).eRk Set.univ = _
+  rw [h]
+  have hcast := congrArg (fun n : ℕ => (n : ℕ∞)) r10Matrix_rank
+  rw [Matrix.rank_eq_finrank_span_cols] at hcast
+  rw [Set.image_univ]
+  simpa using hcast
 
 end Matroid

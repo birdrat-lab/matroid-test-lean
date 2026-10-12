@@ -2,7 +2,7 @@
 
 Computed mechanically from `Matroid/LEDGER.md` and `Matroid/DEPENDENCY_EDGES.csv`. Active scopes are `CORE_MATROID` and `MATROID_INTERFACE`; depth is the longest direct-prerequisite chain. `Matroid/DEPTHS.csv` contains the row-level calculation.
 
-**Current status (2026-10-11): The active Matroid formalization is kernel-certified through topological depth 5.** N268 and N176 remain complete. The initial depth-5 pass proved ten of fourteen frozen targets; the continuation proved the remaining four. Earlier sections are historical pass snapshots.
+**Current status (2026-10-11): The active Matroid formalization is kernel-certified through topological depth 5.** The corrected depth-6 layer has 17/23 complete, including the previously complete N081; six remain unresolved. Of the 22 frozen open depth-6 targets, 16 were proved in this pass. The active total is 85/197 complete. Both unconditional and citation-relative certified depths are 5; no admission was added. Earlier sections are historical pass snapshots.
 
 ## Prior depth-1 baseline
 
@@ -352,3 +352,20 @@ The four rows left open by the preceding historical snapshot are now kernel prov
 The active direct-edge DAG is unchanged. `DEPTHS.csv` was recomputed from all 197 active ledger rows and `DEPENDENCY_EDGES.csv`; every stored depth and direct-prerequisite list agreed with the graph. There are now **69/197** active `COMPLETE` nodes, and depth 5 has **24/24 complete**. All layers 0–5 are complete. Depth 6 contains 24 active nodes, of which one was already complete; no depth-6 proof was attempted.
 
 **Unconditional kernel-certified depth: 5. Citation-relative completed depth: 5.** There are no cited assumptions or conditional proofs in this continuation. The final `lake build` passed (9131 jobs), and the committed audit source printed only `propext`, `Classical.choice`, and `Quot.sound` for all four interfaces and their new premises. The Lean-source declaration scan found no `sorry` or `admit`; no direct dependency edge was changed.
+
+## Corrected depth-6 pass — 2026-10-11
+
+Before freezing the pass, the manuscript's converse of `thm:regular-quotient-form` was checked against the DAG. It chooses a TU representation of an arbitrary regular matroid, so N052 is a direct prerequisite of N059. The evidenced `N052 → N059` edge was added and longest-path depths recomputed: N059 moved 6→7 and N060 moved 7→8. All other active depths stayed fixed. N059 was excluded from this pass and no depth-7 proof was started.
+
+The corrected layer consists of N081 (previously complete) and the 22 rows audited individually in `DEPTH6_AUDIT.md`. Sixteen formerly open rows now have complete axiom-clean Lean declarations: N013, N014, N017, N030, N033, N050, N054, N097, N109, N214, N243, N246, N247, N248, N257, and N266. N070 gained exact rank-five proofs but is not complete. There are no cited assumptions or conditional proofs.
+
+| Remaining depth-6 ID | Exact blocker | Next proof step |
+| --- | --- | --- |
+| N052 | Regular⇒existence of a labeled real TU coordinate matrix is absent from pinned mathlib and local Lean. Oxley Lemma 4.4 confirms the finite theorem but not a project signature bridge. | State and attempt the narrow labeled converse; preserve arbitrary-field `Regular` and exact ground labels. |
+| N065 | No complete labeled proper 2-sum construction with cycle symmetric differences. | Formalize the Oxley circuit construction, prove the cycle equivalence, and retain the manuscript's nonloop/noncoloop and size conditions. |
+| N070 | The displayed 5×10 matrix is proved rank five; a kernel-checked TU certificate is missing. | Use canonical minor indexing or a compact auditable finite checker, then apply N053. |
+| N174 | No labeled multigraph edge-contraction/graphic-matroid correspondence, including loops and parallel edges. | Build graph edge contraction and prove deletion/contraction matroid identities. |
+| N175 | Cographic minor closure needs the labeled N174 bridge. | Dualize the completed N174 identities using existing local matroid duality. |
+| N207 | The six-path graph and its target-reachability calculation have not been formalized. | Define its 18 response edges and target edge, apply N264, and prove the row/column and nine-minimal-support equivalences. |
+
+Recomputed active counts by depth are 0: 2/2, 1: 9/9, 2: 19/19, 3: 8/8, 4: 6/6, 5: 24/24, 6: 17/23, where each pair is complete/total. Overall, 85/197 active nodes are kernel-complete. The minimum unresolved depth is 6. Both unconditional kernel-certified depth and citation-relative completed depth are 5. This pass stopped at the depth-6 frontier.

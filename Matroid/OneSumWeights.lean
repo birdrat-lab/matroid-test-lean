@@ -306,4 +306,31 @@ theorem weightedBasisRatio_oneSum {α : Type*}
       Set.disjoint_left.mp hdisj hτ (heq ▸ he))
   exact weightedBasisRatio_mul_cancel _ _ _ (weightedBasesTotal_pos N hNE w hNpos)
 
+/-- N214: in the manuscript's two-sum convention `P₀/P₁`, a target loop
+has infinite ratio at positive non-target weights. -/
+theorem twoSumPortRatio_eq_top_of_isLoop {α : Type*}
+    (M : Matroid α) (hE : M.E.Finite) (τ : α) (w : α → ℝ≥0)
+    (hw : ∀ e ∈ M.E, e ≠ τ → 0 < w e) (hτ : M.IsLoop τ) :
+    ((weightedBasesOut M hE τ w : ℝ≥0) : ℝ≥0∞) /
+      ((weightedBasesIn M hE τ w : ℝ≥0) : ℝ≥0∞) = ∞ := by
+  have hin : weightedBasesIn M hE τ w = 0 :=
+    weightedBasesIn_eq_zero_of_isLoop M hE τ w hτ
+  have hout : weightedBasesOut M hE τ w ≠ 0 :=
+    (weightedBasisSums_nonzero M hE τ w hw).resolve_left (by simpa [hin])
+  rw [hin]
+  exact ENNReal.div_zero (by simpa using hout)
+
+/-- N214: in the two-sum convention `P₀/P₁`, a target coloop has zero
+ratio; the denominator is nonzero at positive non-target weights. -/
+theorem twoSumPortRatio_eq_zero_of_isColoop {α : Type*}
+    (M : Matroid α) (hE : M.E.Finite) (τ : α) (w : α → ℝ≥0)
+    (hw : ∀ e ∈ M.E, e ≠ τ → 0 < w e) (hτ : M.IsColoop τ) :
+    ((weightedBasesOut M hE τ w : ℝ≥0) : ℝ≥0∞) /
+      ((weightedBasesIn M hE τ w : ℝ≥0) : ℝ≥0∞) = 0 := by
+  have hout : weightedBasesOut M hE τ w = 0 :=
+    weightedBasesOut_eq_zero_of_isColoop M hE τ w hτ
+  have hin : weightedBasesIn M hE τ w ≠ 0 :=
+    (weightedBasisSums_nonzero M hE τ w hw).resolve_right (by simpa [hout])
+  simp [hout]
+
 end Matroid

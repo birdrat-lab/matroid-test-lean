@@ -13,3 +13,25 @@ N137,MANUSCRIPT_PROVED,KERNEL_PROVED,,Matroid.weightedBasisRatio_oneSum,Manuscri
 N143,MANUSCRIPT_PROVED,KERNEL_PROVED,,Matroid.nonspanned_target_weightedBasesOut_eq_zero,Manuscript/main.tex prop:seymour-two-sum-input-minors,
 N262,EXTERNAL_UNCITED_STANDARD,KERNEL_PROVED,,Matroid.rowCompression_after_columnRestriction,Manuscript/main.tex thm:regular-matroid-energy proof,PROOF_BUDGET.md N262
 N264,EXTERNAL_UNCITED_STANDARD,KERNEL_PROVED,,Matroid.graphic_mem_closure_iff_reachableOn,Mathlib matroid closure plus project graph cut construction,PROOF_BUDGET.md N264
+N013,EXTERNAL_UNCITED_STANDARD,KERNEL_PROVED,,Matroid.isFlat_iff_forall_eRk_lt_insert,Manuscript/main.tex def:matroid-flat; pinned mathlib Matroid.isFlat_iff_closure_eq,PROOF_BUDGET.md depth-6 pass
+N014,EXTERNAL_UNCITED_STANDARD,KERNEL_PROVED,,Matroid.IsFlat.eq_ground_of_isBase_subset,Manuscript/main.tex def:matroid-flat; pinned mathlib IsBase.closure_of_superset,PROOF_BUDGET.md depth-6 pass
+N017,MANUSCRIPT_DEFINITION,KERNEL_PROVED,,Matroid.IsHyperplane,Manuscript/main.tex def:hyperplane-cocircuit,PROOF_BUDGET.md depth-6 pass
+N030,EXTERNAL_UNCITED_STANDARD,KERNEL_PROVED,,Matroid.isLoop_contract_of_mem_closure,Manuscript/main.tex def:matroid-minors; pinned mathlib contract_isLoop_iff_mem_closure,PROOF_BUDGET.md depth-6 pass
+N033,MANUSCRIPT_DEFINITION,KERNEL_PROVED,,Matroid.IsModularPair,Manuscript/main.tex def:modular-pair,PROOF_BUDGET.md depth-6 pass
+N050,MANUSCRIPT_PROVED,KERNEL_PROVED,,Matroid.Represents.isFlat_functional_zero,Manuscript/main.tex prop:functional-zero-flat,PROOF_BUDGET.md depth-6 pass
+N054,EXTERNAL_CITED,KERNEL_PROVED,,Matroid.Regular.contract_any; Matroid.Regular.delete,Manuscript/main.tex prop:regular-basic-properties; N048/N049,PROOF_BUDGET.md depth-6 pass
+N097,EXTERNAL_UNCITED_STANDARD,KERNEL_PROVED,,Matroid.flat_join_least; Matroid.flat_join_upper; Matroid.flat_join_isFlat,Manuscript/main.tex prop:mobius-source-potential; pinned mathlib closure,PROOF_BUDGET.md depth-6 pass
+N109,MANUSCRIPT_PROVED,KERNEL_PROVED,,Matroid.positiveSpanningSupport_eq_reconstruction,Manuscript/main.tex prop:support-linear-characterization positive half,PROOF_BUDGET.md depth-6 pass
+N214,EXTERNAL_UNCITED_STANDARD,KERNEL_PROVED,,Matroid.twoSumPortRatio_eq_top_of_isLoop; Matroid.twoSumPortRatio_eq_zero_of_isColoop,Manuscript/main.tex eq:seymour-two-sum-P; N122,PROOF_BUDGET.md depth-6 pass
+N243,MANUSCRIPT_PROVED,KERNEL_PROVED,,Matroid.freeRelation_generators_isBase,Manuscript/main.tex prop:relation-fundamental-circuits basis clause,PROOF_BUDGET.md depth-6 pass
+N246,MANUSCRIPT_PROVED,KERNEL_PROVED,,Matroid.freeRelation_contract_eq_quotient,Manuscript/main.tex prop:quotient-normal-form-contraction,PROOF_BUDGET.md depth-6 pass
+N247,MANUSCRIPT_PROVED,KERNEL_PROVED,,Matroid.freeRelation_positive_closure_of_equation,Manuscript/main.tex thm:quotient-normal-form-correct positive matroid implication,PROOF_BUDGET.md depth-6 pass
+N248,MANUSCRIPT_PROVED,KERNEL_PROVED,,Matroid.freeRelation_negative_nonclosure,Manuscript/main.tex thm:quotient-normal-form-correct negative matroid implication,PROOF_BUDGET.md depth-6 pass
+N257,EXTERNAL_UNCITED_STANDARD,KERNEL_PROVED,,Matroid.uniformOn_one_regular,Manuscript/main.tex prop:grover-program-value; N053,PROOF_BUDGET.md depth-6 pass
+N266,MANUSCRIPT_DEFINITION,KERNEL_PROVED,,Matroid.weightedTrianglePhi; Matroid.weightedTriangleSignature; Matroid.weightedTrianglePhi_eq_zero_of_not_five,Manuscript/main.tex eq:seymour-three-sum-phi and eq:seymour-three-sum-five,PROOF_BUDGET.md depth-6 pass
+N052,EXTERNAL_CITED,UNRESOLVED,,,Oxley Introduction to Matroid Theory Lemma 4.4; Tutte 1958,PROOF_BUDGET.md depth-6 pass
+N065,MANUSCRIPT_DEFINITION,UNRESOLVED,,,Manuscript/main.tex def:regular-matroid-sums; Seymour 1980,PROOF_BUDGET.md depth-6 pass
+N070,MANUSCRIPT_DEFINITION,UNRESOLVED,,Matroid.r10_eRank (partial),Manuscript/main.tex def:r10; finite TU certificate open,PROOF_BUDGET.md depth-6 pass
+N174,EXTERNAL_UNCITED_STANDARD,UNRESOLVED,,,Manuscript/main.tex prop:r10-proper-minors proof; labeled multigraph minor bridge open,PROOF_BUDGET.md depth-6 pass
+N175,EXTERNAL_UNCITED_STANDARD,UNRESOLVED,,,Manuscript/main.tex prop:r10-proper-minors proof; dependent on N174 graph minor bridge,PROOF_BUDGET.md depth-6 pass
+N207,MANUSCRIPT_PROVED,UNRESOLVED,,,Manuscript/main.tex sec:r10-pointed six-path H; graphic target reachability open,PROOF_BUDGET.md depth-6 pass
