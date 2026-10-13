@@ -1,140 +1,113 @@
-# Depth 5: Resource-Aware Matroid Formalization
+# AGENTS.md — Depth-7 Matroid-First Formalization Pass
 
-## Objective and scope
+## Mission and certified baseline
 
-The manuscript-facing Matroid library is complete through structural topological depth 4 in the current repository snapshot. This task performs **one depth-5 pass only**, while introducing a resource-aware policy for established external mathematics.
+Work only on the currently active **structural depth 7** of the formalization of `Manuscript/main.tex`. The current source archive (2026-10-13) has 197 active requirements, 448 active direct dependency edges, and maximum recorded structural depth 12. Depths 0–5 are kernel-certified. At depth 6, **21 of 22 requirements are kernel-proved**; **N052** is available only as an explicitly cited, admitted external premise. Citation-relative certification reaches depth 6; unconditional kernel certification reaches depth 5. There are 89 kernel-proved active nodes. Do not change these numbers except after recomputation from the current files.
 
-The standing objective remains to **prove every requirement in Lean whenever practical**. Manuscript-local mathematical claims must receive actual Lean proofs. Established external results may, after a bounded good-faith attempt and source verification, be carried as **explicitly cited admissions**. Such admissions are not kernel proofs and must never be counted as such.
+The frozen *candidate* depth-7 set has **34 unresolved IDs**:
 
-Workflow: verify depth 4 → freeze depth-5 targets → manuscript and proof-plan audit → mathlib search → bounded proof attempts → prove or carefully admit eligible external facts → build and axiom audit → update ledger/depth report → **STOP before depth 6**.
+`N018 N034 N055 N059 N068 N106 N118 N138 N144 N146 N149 N152 N161 N162 N163 N169 N170 N172 N173 N175 N182 N185 N186 N193 N194 N195 N204 N218 N225 N238 N239 N244 N255 N267`.
 
-## 1. Canonical sources and invariants
+Verify this list mechanically against `Matroid/LEDGER.md`, `Matroid/DEPENDENCY_EDGES.csv`, and `Matroid/DEPTHS.csv` before proving anything. All active direct prerequisites of depth-7 nodes are at depths <= 6, hence no depth-7 theorem is an actual prerequisite of another depth-7 theorem in the present DAG. If an *essential mathematical* dependency is missing, record its direct edge, recompute **all** depths, and re-freeze the in-scope layer. Do not hide same-depth dependencies to preserve the schedule. Stop before attempting any depth-8 theorem. A partial depth-7 pass is acceptable if targets exhaust their allotted focused attempts; report the remaining frontier precisely.
 
-Read these before any new proofs:
+## Authoritative material
 
-- `Manuscript/main.tex` — mathematical statement and actual manuscript proof/citations.
-- `Matroid/LEDGER.md` — canonical requirements, classification, provenance, status.
-- `Matroid/DEPENDENCY_EDGES.csv` — direct prerequisite DAG.
-- `Matroid/DEPTHS.csv` and `Matroid/FRONTIER.md` — regenerated depth and status views.
-- `Matroid/FORMALIZATION_LOG.md` and `Matroid/SOURCES.md` — proof and external-source records.
+Read first, in this order:
 
-Recompute longest-path depths from the active DAG: roots have depth 0; otherwise `depth(v) = 1 + max(depth(u))` over active edges `u → v`. Active scopes are `CORE_MATROID` and `MATROID_INTERFACE`.
+1. `Manuscript/main.tex` (exact definition/proposition, hypotheses, and proof or cited source).
+2. `Matroid/LEDGER.md` (atomic requirement, provenance, scope).
+3. `Matroid/DEPENDENCY_EDGES.csv` and `Matroid/DEPTHS.csv` (direct mathematical prerequisites).
+4. `Matroid/DEPTH6_AUDIT.md`, `Matroid/Depth6AxiomAudit.lean`, `Matroid/PROOF_STATUS.csv`, `Matroid/PROOF_BUDGET.md`, `Matroid/FORMALIZATION_LOG.md`, `Matroid/SOURCES.md`.
+5. Existing proof modules, then pinned mathlib. The project pins Lean/mathlib `v4.35.0-rc3`.
 
-Preflight: run `lake build`; verify no outstanding active requirements through depth 4, and confirm previously proved N268/N176 are unchanged and have no project-local `sorryAx`. Do not reopen these results unless a genuine regression appears.
+Do not substitute a downstream use for the actual manuscript assertion. Preserve the source's distinction between definitions, proved propositions, externally cited facts, and finite certificate-derived claims. A claimed `COMPLETE` row or a passing `lake build` is not by itself a statement-correspondence audit.
 
-## 2. Freeze the current depth-5 layer
+## Mandatory matroid-first proof search
 
-The **expected** 14 unresolved nodes in the 2026-10-11 archive are:
+**This is a real proof-search constraint, not a ban on matrices or graphs.**
 
-| ID | Mathematical requirement | Manuscript provenance |
-|---|---|---|
-| N026 | Minor (deletions and contractions) | Definition |
-| N028 | Contraction composition | External standard |
-| N029 | Deletion–contraction commutation | External standard |
-| N041 | Closure/rank compatibility in a single-element extension | External standard |
-| N045 | Represented closure | External standard |
-| N049 | Represented contraction (including dependent contracted sets) | **Manuscript proved:** `prop:represented-minors` |
-| N053 | TU matrices represent the same column matroid over every field | External standard; partial minor bridge exists |
-| N125 | Weighted TU determinant equals weighted basis sum | **Externally cited:** Cauchy–Binet + TU; partial minor lemma exists |
-| N131 | Rank-one uniform target closure | External standard |
-| N134 | Duality interchanges deletion and contraction | External standard |
-| N137 | Target ratio under one-sum | **Manuscript proved:** `prop:seymour-one-sum` |
-| N143 | Nonspanned target becomes coloop in restriction | **Manuscript proved:** `prop:seymour-two-sum-input-minors` |
-| N262 | Dependent-row removal preserves column matroid and reconstruction equations | External standard |
-| N264 | Graphic closure characterized by paths between endpoints | External standard |
+For *every* target, before implementing a proof, write in the formalization log:
 
-**Recompute and freeze**, do not force this list if the actual DAG differs. Record ID, prerequisites, provenance, initial status and depth in `Matroid/FRONTIER.md`. Do not pull in newly exposed depth-6 requirements. Nodes may be attempted independently within depth 5.
+- The **exact manuscript-level statement** and the minimal abstract hypotheses it uses.
+- A **matroid-only proof candidate** using bases, circuits/cycles, rank, closure, deletion/contraction, duality, flats, or weighted basis sums. Inspect existing matroid/mathlib APIs first.
+- Whether a realization is **logically necessary** (e.g. total unimodularity, projective equivalence, explicit determinant, a particular graphic representation, or finite `R10` certificate) or merely convenient.
+- If using a matrix or graph, one sentence stating **which representation-specific step cannot reasonably be avoided**, and a precise bridge returning the result to the general matroid interface.
 
-## 3. Proof classification: not all completions are equal
+Preference hierarchy:
 
-First classify the **mathematical source**, separately from the **formal trust state**.
+1. Prove general matroid statements on arbitrary finite matroids, preferably under the weakest hypotheses supported by the manuscript proof.
+2. If the proof needs binary/regular representability, isolate a **single bridge lemma** and carry out the remaining argument with matroid objects; use `[regular]` only where needed.
+3. Use concrete graphs and matrices for **explicit** `R10`, `K4`, `K3,3`, TU, and coordinate/determinant calculations, not as replacements for an abstract 2-sum or closure theorem.
+4. Budget-admit a precisely identified *external standard theorem* only under the trust rules below. Do not turn the desired manuscript result into a hypothesis or a definition.
 
-Mathematical sources:
-- `MANUSCRIPT_DEFINITION`, `MANUSCRIPT_PROVED`, `MANUSCRIPT_SKETCH`, `MANUSCRIPT_STATEMENT_ONLY` for work belonging to the manuscript; determine whether the claim is original/manuscript-local or a restated standard fact before choosing a policy.
-- `EXTERNAL_CITED`, `EXTERNAL_UNCITED_STANDARD` for results originating in established literature. An uncited standard result requires finding and recording a precise reputable mathematical source before admission.
+No unnecessary graphic specialization of general sums. Do not call a theorem “matroidal” if its interface assumes an arbitrary chosen representation when the manuscript claims it for every matroid in the specified class. Conversely, do not force a purely abstract argument for a genuinely coordinate-based determinant statement; separating representation input from matroid output is the goal.
 
-Trust statuses (add these distinctions without erasing existing provenance or history):
+## Proof/admission and resource policy
 
-- `KERNEL_PROVED`: requirement discharged using Lean proofs with no admitted external axioms among its transitive dependencies. Record `COMPLETE` in the existing ledger only when this is true.
-- `CITED_ASSUMPTION`: exact externally established theorem is isolated as a named admitted Lean declaration; **not** `COMPLETE`.
-- `CONDITIONAL_PROOF`: the manuscript-facing Lean proof is finished but transitively depends on one or more `CITED_ASSUMPTION` declarations; **not** unconditionally `COMPLETE`.
-- `UNRESOLVED`: still missing an adequate proof, exact source, or statement design.
+- **MANUSCRIPT_PROVED, MANUSCRIPT_DEFINITION, and manuscript-specific CERTIFICATE_DERIVED requirements must never be admitted.** Definitions need exact faithful interfaces; claimed facts need proved consequences. A manuscript proof may depend on a *separately admitted, independently established external theorem*, but then its trust classification is `CONDITIONAL_PROOF`, not `KERNEL_PROVED`.
+- For an **EXTERNAL_CITED** or **EXTERNAL_UNCITED_STANDARD** requirement, attempt a real proof first. Default cumulative budget: ~10 minutes reconnaissance plus at most **two focused 20-minute routes**, with up to **12 observed substantive edit/check cycles** over *all* passes. Stop earlier after two unproductive proof routes. Allow at most one documented extra cycle for a nearly closed goal; do not repeatedly extend or reset the budget. If per-node time/tokens are unavailable, record `UNKNOWN`, not invented values. The count of substantive edit-plus-Lean-feedback cycles is the auditable fallback.
+- Admit only a **precise literature theorem**, with actual source, location, matching hypotheses, and a minimal theorem signature in `Matroid/External/<Subject>.lean`, after budget exhaustion. Mark it `CITED_ASSUMPTION`; downstream proof is conditional. Never use `sorry` to bypass matrix/graph bridging that is manuscript-local or to suppress a genuine counterexample/statement mismatch.
+- N052 remains a **cited premise**, not a kernel theorem: `Matroid.External.regular_ground_exists_realTU` in `External/TutteRegularTU.lean`. You may use `Matroid.Regular.hasLabeledRealTU`, but record the resulting **transitive `sorryAx`** for N055, N059, N118, or anything else that actually imports the premise. Do not attempt to reprove Tutte's full theorem as part of depth 7 unless a short library bridge has genuinely appeared.
+- Use four distinct proof states in `PROOF_STATUS.csv`: `KERNEL_PROVED`, `CITED_ASSUMPTION`, `CONDITIONAL_PROOF`, `UNRESOLVED`. `LEDGER.md` `COMPLETE` is reserved for admission-free proofs. Do not reclassify a cited prerequisite as kernel-proved just because downstream Lean code typechecks.
+- Manuscript-local work has no admission-based exit. If it stalls after ~12 substantive cycles, preserve compiling intermediate lemmas, the exact remaining goal and hypotheses, record it as unresolved, and move to another **independent** depth-7 target. Do not spend N268-scale resources on a single secondary theory.
 
-If adding a new ledger status column would disrupt current tooling, keep the original columns intact and maintain `Matroid/PROOF_STATUS.csv` with `id`, `mathematical_source`, `trust_status`, `admitted_premises`, `proof_declaration`, `reference`, `budget_record`. Make ledger status and the new file agree explicitly. Never set a row to `COMPLETE` simply because it builds with `sorry`.
+## Attack order: abstract structural claims first
 
-**Two depth reports are mandatory:** (a) unconditional kernel-certified depth, and (b) depth completed *relative to cited assumptions*. For citation-relative frontier calculations only, `KERNEL_PROVED`, `CITED_ASSUMPTION`, and `CONDITIONAL_PROOF` may count as available premises; for unconditional certification only `KERNEL_PROVED` counts. Do not obscure this difference under one `COMPLETE` flag.
+### A. Matroidal foundations and short consequences
 
-## 4. Proof attempt order, for every node
+Attack **N018** (cocircuit = complement of hyperplane), **N034** (modular cut axioms), **N106** (minimal positive support via target circuits), **N144** (contraction makes a spanned element a loop; weight convention), **N149** (proper 2-sum ground cardinality), and **N175** (cographic minor closure).
 
-1. Read the exact ledger entry and manuscript location or semantic use; inspect the actual proof if present.
-2. Fix the mathematical statement and hypotheses **before** looking for library lemmas. Record a short mathematical proof/construction plan.
-3. Search the project's pinned mathlib and already imported proved dependencies. Reuse exact results first; add manuscript-facing bridges if needed.
-4. Implement and test a precise Lean signature. Compare indexed elements, finite sets, loops, contractions, ground sets, dimensions, and positivity assumptions with the manuscript.
-5. Prove the statement locally, or apply the external-result policy below if—and only if—the obligation is eligible.
-6. Update proof provenance, status, import tree and any justified direct dependency edges. Run `lake build` and validate final axioms.
+- Prefer matroid `dual`, hyperplanes, finite closure, `IsCircuitUnion`, and the existing N174 graphic minor theorem. For N175, derive the cographic statement **through duality and N174**, preserving labels, loops and parallel edges. Do not construct another graph contraction theory.
+- For N106, include target excluded from availability and the exact `|C|-1` minimum, not merely the existence of a spanning circuit.
+- For N144, keep the loop/extended-weight interpretation separate from the elementary matroid lemma.
 
-Do not silently weaken a theorem to match available library infrastructure. A narrower lemma is useful as partial progress but is not closure of the canonical requirement.
+### B. Matroidal 2-sum and recursive ports
 
-## 5. Resource threshold for established external results
+Attack **N138** (proper 2-sum basis correspondence), **N146** (target circuit gluing), **N152** (2-circuit child collapses to a relabeling), **N204** (parallel target copy), **N218** (recursive pointed construction), and **N068** (regularity preservation).
 
-**Default cumulative budget per external mathematical theorem, across all Codex sessions/passes:**
+- Start from N065's **abstract, labeled cycle characterization** and the ordinary basis/circuit/duality axioms. The finished N065 uses a binary quotient internally; this does not license expressing every downstream theorem as a matrix calculation.
+- Require exact nonloop/noncoloop, shared-port, size, disjointness, and target-retention hypotheses. Record whether `N138` follows directly from circuit/cocircuit exchange. Keep union of *cycles* distinct from a single *circuit*.
+- N204 is `STATEMENT_DESIGN`: write its precise source-matched statement before proof; do not manufacture a theorem by defining the answer. Confirm that parallel addition and subsequent 2-sum preserve the intended target label.
+- N068 is externally cited regularity of a proper 2-sum. Try an abstract closure route or an existing regular/binary/representability theorem first. If an arbitrary-field representation bridge is required, isolate it; apply the external budget rather than rebuilding Seymour theory.
 
-- Up to **10 minutes** of focused manuscript/literature/mathlib reconnaissance.
-- Up to **20 minutes** for a first serious mathematical Lean proof route.
-- One further **20-minute** attempt only if it has a distinct concrete route or demonstrable progress.
-- **Stop at approximately 50 minutes total** (or sooner after two unsuccessful proof routes); do not reset the budget on a new run or after discovering a helper lemma.
-- Secondary safeguard: at most **12 substantive Lean edit–check/debug cycles** in total for that external theorem, whichever cutoff is reached first. A cycle includes a meaningful attempted proof change followed by Lean feedback; do not artificially split cycles.
+### C. Triangle identities and positivity (priority manuscript work)
 
-These are policy budgets, not promises that an autonomous model can enforce accurate wall-clock/token limits. Log real elapsed time and token figures **only if accessible**; do not fabricate them. Codex session usage may be available via its CLI interface, but individual theorem token accounting is not guaranteed. If time measurements are unavailable, use the **two-attempt / twelve-cycle** safeguards, with recorded checkpoints. A hard clock or token cutoff requires an external runner, not merely `AGENTS.md`.
+Attack **N162**, **N163** (positivity of the `a` and `c` classes), **N161** (the identity `a*c = p1*p2 + p1*p3 + p2*p3`), and **N267** (five weighted `K4` triangle classes).
 
-Record in `Matroid/PROOF_BUDGET.md` per external theorem: ledger ID, source, first-attempt date, accumulated verified time (or `UNKNOWN`), observed tokens if available (or `UNKNOWN`), attempt count, check/debug cycles, proved intermediates, precise remaining goal, and final disposition. Never silently restart the cumulative budget. N268 is the motivating historical example, **not** a precedent requiring future standard topology to be rebuilt.
+- N162/N163 must use the actual coindependent triangle, basis-extension, and **strictly positive weights**; do not silently assume a contributing subset exists. Express the proof in bases/closure if possible.
+- For N161, first seek a **basis-generating / matroid polynomial** proof using `weightedTrianglePhi` (N266) and existing weighted-basis identities. The manuscript's determinant/Plücker argument is permitted as an isolated bridge if an intrinsic route is not reasonably available; prove the identity for the manuscript's full coindependent regular-triangle hypotheses, including all zero-class cases. Do not assume all `p_i>0` (that is the later replacement theorem's hypothesis, not this identity's).
+- For N267, a concrete `M(K4)` calculation is the stated object, so explicit edge enumeration is appropriate; package the result as the **five matroid closure-class sums** in the manuscript's `(a,p1,p2,p3,c)` order, not just a graph path count.
 
-A meaningful exception requires explicit user authorization. If a cited external result is one small lemma away from closing, record that fact, preserve the buildable partial work, and request a decision in the end-of-pass report rather than automatically spending another unbounded run.
+### D. Quotient, circuit signs, and representation-specific facts
 
-### Admission gate (all required)
+Attack **N244** (fundamental-circuit support of the free relation basis), **N059** (regular free quotient form), **N055** (real projective uniqueness of regular representations), and **N118** (signed TU circuit dependency).
 
-`CITED_ASSUMPTION` is permitted only if:
+- N244 is a **matroid basis/fundamental circuit** claim; use N243, then relate the nonzero response coordinates to the represented dependence. Include zero coefficient response labels and the positive relation label itself.
+- N059 is manuscript-proved: formalize **both** directions, including finite disjoint relation labels, deletion giving the *free* matroid, regularity of the extension, and contraction giving the original matroid with identity on `E`. Use N052's admitted regular→TU **only at the exact point the manuscript does**. Its final result is `CONDITIONAL_PROOF` if that premise is transitive, regardless of a completed local proof.
+- N055 and N118 are external and potentially expensive. Attempt precise, short proofs using existing APIs; if the source requires a large representation uniqueness or circuit-sign theory, apply the external budget. Do not confuse regularity with arbitrary real representability or assume projective equivalence for general nonregular matroids.
 
-1. The requirement is genuinely established external mathematics; **no manuscript-local/original result** is being admitted.
-2. A specific source, theorem/section or exact proof location, and its relevant hypotheses have been inspected. `EXTERNAL_UNCITED_STANDARD` alone does not suffice.
-3. The Lean statement is checked against that source and the manuscript use: no stronger conclusion or missing hypotheses; graph/matroid indexing conventions are reconciled.
-4. A good-faith mathlib/proof search and the bounded attempt budget are logged, including the precise remaining obligation.
-5. The admission is **one narrow theorem**, not an entire module, blanket assumption, or downstream manuscript theorem.
-6. The admitted theorem is isolated in a mathematically named file under `Matroid/External/`, with a nearby source citation, ledger ID, explicit admission comment and `sorry`. Do not write `axiom`, do not hide the admission with a helper alias, and do not scatter `sorry` in ordinary mathematical files.
-7. Transitive dependents are marked `CONDITIONAL_PROOF` and their `#print axioms` result is recorded.
+### E. Explicit finite `R10` certificates and applications
 
-If exact citation/assumptions are uncertain, leave the node `UNRESOLVED` rather than asserting a source supports it.
+Attack **N169** (4-/6-circuit counts), **N170** (no triangles), **N172/N173** (each labeled deletion/contraction is graphic/cographic `K3,3`), **N182** (162 bases), **N185** (automorphism order 720), **N186** (element transitivity), **N193/N194** (pointed determinant and cofactor), **N195** (six matchings plus nine double-star minimal supports), **N225** (neither graphic nor cographic), **N238** (256/256 closure balance), **N239** (two five-sensitive witnesses), and **N255** (connectedness).
 
-### Manuscript results: no admission
+- First derive **matroid-level finite predicates** from the already verified **exact N070 5x10 TU matrix**. Reuse a kernel-proved circuit/basis/closure oracle or a sound finite certificate checker; avoid duplicating determinant enumeration for every invariant. All element labels and relabeling/isomorphism witnesses must be explicit.
+- For N172/N173, exhibit a labeled isomorphism (or an explicitly proved equivariant relabeling) with `M(K3,3)` / its dual. A mere rank/circuit-count match is not sufficient. Explicit graph/matrix witnesses are legitimate *only here*.
+- For N185/N186, prove automorphism completeness and the group order/transitivity, not just 720 exhibited permutations or one element orbit. If cost grows, build sound finite verification certificates rather than hand-coded permutation case trees.
+- For N193/N194, determinants and cofactors are intrinsic to the manuscript assertion; a representation-based proof is appropriate. Preserve the precise pointed basis-polynomial factors and indexed coordinates.
+- For N195, distinguish six perfect matchings and nine `R_i∪C_j` supports as **matroid minimal spanning sets**, not just patterns in N207's separate graphic program.
+- N255 has `PROVENANCE_UNRESOLVED` in the ledger: audit its actual manuscript role and whether it is a genuine mathematical prerequisite before certifying. Do not claim that a generic matroid connectivity proof automatically yields the R10 fact.
+- The `CERTIFICATE_DERIVED` labels do not authorize a `sorry`: these are claims about the manuscript's *specific finite object* and must have a sound, kernel-checked certificate or remain unresolved. External literature may guide construction but cannot replace the promised local verification without explicit reclassification/review.
 
-N049, N137, and N143 are explicitly manuscript-proved. Their mathematical claims must be formally proved in Lean. They may rely on a precisely documented admitted **external** theorem, but then they are `CONDITIONAL_PROOF`, not unconditionally certified. Never place `sorry` in a manuscript result or treat an external citation as a substitute for its project-specific argument.
+## Workflow, integrity, and deliverables
 
-## 6. Mathematical priorities within depth 5
+For each target:
 
-Work on the exact/easier structural facts first: N026, N028, N029, N045, N131, N134, N264. Then tackle the manuscript proofs N049, N137, N143 and the extension/row bridge facts N041/N262. Treat N053 and N125 as the main candidates for bounded external proof effort, **not** automatic admissions.
+1. Record the manuscript quote/label and provenance and write a matroid-first proof plan; search existing pinned mathlib/project lemmas.
+2. Implement the narrowest faithful public signature in **mathematically named modules** (`Matroid/…`), retaining separate graph/matrix certificates as necessary. Avoid chronological `Depth7Foo.lean` implementations except for the axiom audit.
+3. Compile a focused module, run full `lake build` at stable checkpoints, and compare the **exact Lean theorem assumptions/conclusion** with the manuscript. Check degenerate cases (empty sets, loops, coloops, dependent port, zero weight, target exclusion) relevant to that theorem.
+4. Add entries to `Matroid/DEPTH7_AUDIT.md` with target ID, exact source, public Lean declaration, dependency list, proof route (matroid-first or justified representation bridge), status, transitive admissions, deviations, and next step.
+5. Update `Matroid/PROOF_STATUS.csv`, `Matroid/PROOF_BUDGET.md`, `Matroid/LEDGER.md`, `Matroid/FORMALIZATION_LOG.md`, `Matroid/FRONTIER.md`, `Matroid/DEPTHS.csv`, and `Matroid/DEPENDENCY_EDGES.csv` consistently. Update `SOURCES.md` for cited theorems or new verified external imports.
+6. Commit and run `Matroid/Depth7AxiomAudit.lean` containing `#print axioms` for every final public result, its exact external premise, and any imported critical proof. Verify `sorryAx` and its transitive consumers. A project source scan must identify all `sorry`, `admit`, and `axiom`; **do not claim unconditional proof from a passing build**. Run `git diff --check`.
+7. Report the **full depth-7 table**, differentiating kernel proofs, cited premises, conditional proofs, and unresolved/statement-design targets; verified budget observations versus unknown time/tokens; newly discovered direct edges; and **both** certified-depth notions. A user-facing source-level correspondence audit is required before moving deeper.
 
-- **N049:** use the manuscript's quotient-by-span proof for arbitrary, possibly dependent contraction sets. Do not prove only independent-set contraction.
-- **N137:** use basis factorization and the existing weighted-basis sums; preserve the target-free factor and zero-denominator conventions from the manuscript.
-- **N143:** prove the nonspanning-target / coloop equivalence in the specified restriction; do not admit the local zero-case argument.
-- **N053:** build from the already-checked TU minor nonvanishing bridge and N044 represented rank. Check the arbitrary-field quantifier, including characteristic 2, before concluding regularity.
-- **N125:** isolate precisely what rectangular weighted Cauchy–Binet is missing; prefer proving/admitting *that exact standard identity* and proving the TU basis-indicator filtering locally. Do not admit the entire manuscript-use weighted-basis theorem when a smaller external prerequisite suffices.
-- **N262:** check that row deletion preserves the claimed **reconstruction equations**, not merely rank or the represented matroid.
-- **N264:** handle loops and parallel labeled graph edges consistently with N061; include the loop convention in the path criterion.
-
-Maintain topical Lean source files (`Matroid/Minors.lean`, `Matroid/Representation.lean`, `Matroid/TotallyUnimodular.lean`, `Matroid/Graphic.lean`, etc.). Avoid `Depth5.lean`, `Frontier5.lean`, and other chronological code files.
-
-## 7. Build, axiom audit, and stop
-
-After meaningful groups of targets and once at the end, run `lake build`. Do not leave failed/unfinished proof code in live modules. Source-scan the entire project for `sorry`, `admit`, and `axiom`: any `sorry` must correspond **exactly** to an approved, indexed `Matroid/External/` declaration; any other occurrence is a blocker. Run `#print axioms` for each new project-facing depth-5 theorem, paying attention to `sorryAx`; imported trusted foundational axioms such as `propext`, `Classical.choice`, `Quot.sound` are not cited admissions.
-
-For each target, update `FORMALIZATION_LOG.md` with manuscript evidence, proof plan, Lean declaration, exact formal dependencies, proof route, budget, trust status, and build/axiom outcome. Record all external sources in `SOURCES.md`. Recompute the DAG and depth table after justified graph corrections, preserving direct edges only and explaining every change. Retain the original mathematical provenance; do not rewrite the manuscript to accommodate a convenient Lean proof.
-
-Final report must include:
-
-- the 14-node frozen snapshot and result for each node;
-- which are `KERNEL_PROVED`, `CITED_ASSUMPTION`, `CONDITIONAL_PROOF`, or `UNRESOLVED`;
-- an exact list of the cited admitted theorems and their literature references;
-- cumulative proof effort and the concrete unresolved obstruction for each admission/blocker;
-- the kernel-certified depth, the citation-relative depth, any DAG repairs, and the next mathematical frontier.
-
-**Stop after this one depth-5 attempt. Do not start depth 6**, even if depth 5 is citation-relatively clear. No automatic multi-depth or perpetual loop.
+**Stopping rule:** Do no depth-8 proof work. If all depth-7 targets are kernel-proved except exact permitted external citations and conditional descendants, declare only **citation-relative** depth 7 and retain the correct lower unconditional depth. If some manuscript target remains blocked, stop with detailed work-in-progress artifacts rather than admitting it or claiming completion.

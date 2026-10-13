@@ -2,7 +2,39 @@
 
 Computed mechanically from `Matroid/LEDGER.md` and `Matroid/DEPENDENCY_EDGES.csv`. Active scopes are `CORE_MATROID` and `MATROID_INTERFACE`; depth is the longest direct-prerequisite chain. `Matroid/DEPTHS.csv` contains the row-level calculation.
 
-**Current status (2026-10-12): 89/197 active nodes are kernel-proved; depths 0–5 remain kernel-certified.** The corrected depth-6 layer has 21/22 kernel-proved; N052 is citation-relative through one narrowly sourced external premise. Thus citation-relative depth is 6 and kernel-certified depth is 5. The evidenced N174→N175 edge moves N175 to depth 7, outside this pass. Earlier sections are historical pass snapshots.
+**Current status (2026-10-13): 99/197 active nodes are kernel-proved; depths 0–5 remain kernel-certified.** At depth 6, 21/22 are kernel-proved and N052 is a cited external premise, so citation-relative certification reaches depth 6 and unconditional kernel certification reaches depth 5. The evidenced N068→N218 edge gives 449 active edges, moves N218 to depth 8, and leaves 33 depth-7 requirements. Ten depth-7 rows have new kernel proofs; 23 remain unresolved. No depth-8 proof was attempted. Earlier sections below are historical pass snapshots.
+
+## Corrected depth-7 frontier
+
+The completed rows are N018, N034, N106, N144, N149, N162, N163, N170, N175, and N244. Their exact declarations and source correspondence are in `DEPTH7_AUDIT.md`. The remaining requirements are:
+
+| ID | Requirement | Direct prerequisites | Current blocker |
+| --- | --- | --- | --- |
+| N055 | Projective uniqueness of regular matroids | N047, N051, N052 | Projective uniqueness needs exact literature/signature match and proof routes. |
+| N059 | Regular free quotient form | N020, N049, N051, N052, N056, N057 | Both directions of the regular free quotient theorem; N052 would make forward proof conditional. |
+| N068 | Two-sum preserves regularity | N051, N065 | Regularity of N065 proper 2-sum over all fields. |
+| N118 | Signed circuit dependency | N015, N052 | TU signed circuit dependency with target normalization. |
+| N138 | Proper 2-sum basis correspondence | N002, N065 | Both directions of exactly-one-port basis correspondence. |
+| N146 | Two-sum target-circuit gluing | N015, N065 | Classify target circuits from N065 cycle unions. |
+| N152 | Recover parent across a two-element circuit | N015, N025, N065 | Explicit relabeling for two-circuit child. |
+| N161 | Triangle five-sum identity | N051, N125, N266 | Five-class triangle identity including zero classes. |
+| N169 | R10 circuit counts | N015, N070 | Certified counts of 4- and 6-circuits. |
+| N172 | R10 single deletion | N024, N061, N070 | Labeled graphic K3,3 deletion isomorphism. |
+| N173 | R10 single contraction | N025, N062, N070 | Labeled cographic K3,3 contraction isomorphism. |
+| N182 | R10 total basis count | N002, N070 | Compact kernel-checked 162-base count and computable-index/base bridge; `#eval` alone is insufficient. |
+| N185 | R10 automorphism order | N070 | Complete automorphism order 720 certificate. |
+| N186 | R10 element transitivity | N070 | Certified automorphism transitivity. |
+| N193 | R10 pointed determinant | N070, N122, N125 | Exact pointed determinant polynomial. |
+| N194 | R10 pointed cofactor | N070, N122, N125 | Exact pointed cofactor polynomial. |
+| N195 | Pointed R10 target circuits | N070, N081 | Six matching plus nine row-column minimal supports. |
+| N204 | Parallel target construction | N021, N065 | Parallel target/glue labels and target-preservation statement design. |
+| N225 | R10 nongraphic/noncographic status | N061, N062, N070 | Both nongraphic and noncographic proofs. |
+| N238 | Pointed R10 closure balance | N007, N070 | Certified 256/256 target closure split. |
+| N239 | Pointed R10 sensitivity witnesses | N007, N070 | Two labeled five-sensitive witnesses. |
+| N255 | R10 connectedness | N015, N070 | Source provenance and R10 connectedness/common-circuit certificate. |
+| N267 | Weighted K4 triangle signature | N061, N266 | Five weighted K4 closure-class sums. |
+
+N182 was evaluated from N070's exact integer matrix and returned 162, but two `decide` routes exhausted kernel heartbeats; it remains unresolved. No new `sorry`, `admit`, or `axiom` was introduced. `PROOF_BUDGET.md` records observed cycles and unknown time/token data. N218 and the downstream nodes shifted by the new edge are outside this pass.
 
 ## Prior depth-1 baseline
 

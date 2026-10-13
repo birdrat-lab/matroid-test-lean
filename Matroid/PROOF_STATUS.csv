@@ -33,5 +33,37 @@ N052,EXTERNAL_CITED,CITED_ASSUMPTION,Matroid.External.regular_ground_exists_real
 N065,MANUSCRIPT_DEFINITION,KERNEL_PROVED,,Matroid.regularTwoSum_ground; Matroid.regularTwoSum_isCircuitUnion_iff,Manuscript/main.tex def:regular-matroid-sums; local binary quotient proof,PROOF_BUDGET.md depth-6 continuation
 N070,MANUSCRIPT_DEFINITION,KERNEL_PROVED,,Matroid.r10IntegerMatrix_isTotallyUnimodular; Matroid.r10_regular; Matroid.r10_eRank,Manuscript/main.tex def:r10; 252 canonical minors,PROOF_BUDGET.md depth-6 continuation
 N174,EXTERNAL_UNCITED_STANDARD,KERNEL_PROVED,,Matroid.IsGraphic.minor; Matroid.graphic_contractEdge_eq_contract,Labeled graph contraction and N026; local proof,PROOF_BUDGET.md depth-6 continuation
-N175,EXTERNAL_UNCITED_STANDARD,UNRESOLVED,,,Depth 7 after evidenced N174 to N175 edge; no depth-7 proof attempted,PROOF_BUDGET.md depth-6 continuation
+N175,EXTERNAL_UNCITED_STANDARD,KERNEL_PROVED,,Matroid.IsCographic.minor,Duality of labeled graphic minors; N174,PROOF_BUDGET.md depth-7 pass
 N207,MANUSCRIPT_PROVED,KERNEL_PROVED,,Matroid.DoubleStar.target_mem_graphic_closure_iff; Matroid.DoubleStar.minimal_accepting_iff; Matroid.DoubleStar.support_ncard,Manuscript/main.tex sec:r10-pointed; local graph proof,PROOF_BUDGET.md depth-6 continuation
+N018,MANUSCRIPT_DEFINITION,KERNEL_PROVED,,Matroid.IsHyperplaneCocircuit; isHyperplaneCocircuit_iff,Manuscript/main.tex def:hyperplane-cocircuit,PROOF_BUDGET.md depth-7 pass
+N034,MANUSCRIPT_DEFINITION,KERNEL_PROVED,,Matroid.IsModularCut,Manuscript/main.tex def:modular-cut,PROOF_BUDGET.md depth-7 pass
+N106,MANUSCRIPT_PROVED,KERNEL_PROVED,,Matroid.positiveSpanningSupport_eq_circuitSupport,Manuscript/main.tex prop:positive-support-circuits,PROOF_BUDGET.md depth-7 pass
+N144,MANUSCRIPT_PROVED,KERNEL_PROVED,,Matroid.contractedPort_isLoop; contractedPort_ratio_eq_top,Manuscript/main.tex prop:seymour-two-sum-input-minors; N030 and N214,PROOF_BUDGET.md depth-7 pass
+N149,EXTERNAL_UNCITED_STANDARD,KERNEL_PROVED,,Matroid.regularTwoSum_ground_ncard,Manuscript/main.tex def:regular-matroid-sums; N065,PROOF_BUDGET.md depth-7 pass
+N162,MANUSCRIPT_PROVED,KERNEL_PROVED,,Matroid.weightedTriangle_a_pos,Manuscript/main.tex following prop:regular-triangle-identity,PROOF_BUDGET.md depth-7 pass
+N163,MANUSCRIPT_PROVED,KERNEL_PROVED,,Matroid.weightedTriangle_c_pos,Manuscript/main.tex following prop:regular-triangle-identity,PROOF_BUDGET.md depth-7 pass
+N244,MANUSCRIPT_PROVED,KERNEL_PROVED,,Matroid.positiveRelation_fundCircuit; Matroid.positiveRelation_fundCircuit_isCircuit,Manuscript/main.tex prop:relation-fundamental-circuits; N243,PROOF_BUDGET.md depth-7 pass
+N055,EXTERNAL_CITED,UNRESOLVED,,,Manuscript/main.tex `prop:regular-basic-properties`,PROOF_BUDGET.md depth-7 pass
+N059,MANUSCRIPT_PROVED,UNRESOLVED,,,Manuscript/main.tex `thm:regular-quotient-form`,PROOF_BUDGET.md depth-7 pass
+N068,EXTERNAL_CITED,UNRESOLVED,,,Manuscript/main.tex —,PROOF_BUDGET.md depth-7 pass
+N118,EXTERNAL_CITED,UNRESOLVED,,,Manuscript/main.tex —,PROOF_BUDGET.md depth-7 pass
+N138,EXTERNAL_CITED,UNRESOLVED,,partial: Matroid.regularTwoSum_indep_of_bases_first_port,Manuscript/main.tex —,PROOF_BUDGET.md depth-7 pass
+N146,EXTERNAL_CITED,UNRESOLVED,,,Manuscript/main.tex —,PROOF_BUDGET.md depth-7 pass
+N152,EXTERNAL_UNCITED_STANDARD,UNRESOLVED,,,Manuscript/main.tex —,PROOF_BUDGET.md depth-7 pass
+N161,MANUSCRIPT_PROVED,UNRESOLVED,,,Manuscript/main.tex `prop:regular-triangle-identity`,PROOF_BUDGET.md depth-7 pass
+N169,CERTIFICATE_DERIVED,UNRESOLVED,,,Manuscript/main.tex —,PROOF_BUDGET.md depth-7 pass
+N170,CERTIFICATE_DERIVED,KERNEL_PROVED,,Matroid.r10_circuit_card_ne_three,Manuscript/main.tex app:r10-atlas; N053 field transfer; N070 exact matrix,PROOF_BUDGET.md depth-7 pass
+N172,EXTERNAL_CITED,UNRESOLVED,,,Manuscript/main.tex `prop:r10-proper-minors`,PROOF_BUDGET.md depth-7 pass
+N173,EXTERNAL_CITED,UNRESOLVED,,,Manuscript/main.tex `prop:r10-proper-minors`,PROOF_BUDGET.md depth-7 pass
+N182,CERTIFICATE_DERIVED,UNRESOLVED,,,Manuscript/main.tex `prop:r10-basis-polynomials`,PROOF_BUDGET.md depth-7 pass
+N185,CERTIFICATE_DERIVED,UNRESOLVED,,,Manuscript/main.tex `prop:r10-symmetry`,PROOF_BUDGET.md depth-7 pass
+N186,EXTERNAL_CITED,UNRESOLVED,,,Manuscript/main.tex `prop:r10-symmetry`,PROOF_BUDGET.md depth-7 pass
+N193,MANUSCRIPT_PROVED,UNRESOLVED,,,Manuscript/main.tex —,PROOF_BUDGET.md depth-7 pass
+N194,MANUSCRIPT_PROVED,UNRESOLVED,,,Manuscript/main.tex —,PROOF_BUDGET.md depth-7 pass
+N195,CERTIFICATE_DERIVED,UNRESOLVED,,,Manuscript/main.tex `lem:r10-minimal-positive`,PROOF_BUDGET.md depth-7 pass
+N204,EXTERNAL_CITED,UNRESOLVED,,,Manuscript/main.tex —,PROOF_BUDGET.md depth-7 pass
+N225,EXTERNAL_CITED,UNRESOLVED,,,Manuscript/main.tex —,PROOF_BUDGET.md depth-7 pass
+N238,CERTIFICATE_DERIVED,UNRESOLVED,,,Manuscript/main.tex —,PROOF_BUDGET.md depth-7 pass
+N239,CERTIFICATE_DERIVED,UNRESOLVED,,,Manuscript/main.tex —,PROOF_BUDGET.md depth-7 pass
+N255,PROVENANCE_UNRESOLVED,UNRESOLVED,,,Manuscript/main.tex —,PROOF_BUDGET.md depth-7 pass
+N267,MANUSCRIPT_PROVED,UNRESOLVED,,,Manuscript/main.tex `eq:k4-five-sums`,PROOF_BUDGET.md depth-7 pass

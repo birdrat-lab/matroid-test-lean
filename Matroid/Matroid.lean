@@ -42,3 +42,12 @@ import Matroid.R10Certificate
 import Matroid.GraphicMinors
 import Matroid.RegularTUConverse
 import Matroid.TwoSumCycles
+import Matroid.FlatsAndCocircuits
+import Matroid.PositiveCircuitSupport
+import Matroid.ContractedPort
+import Matroid.TwoSumCardinality
+import Matroid.CographicMinors
+import Matroid.TriangleClassPositivity
+import Matroid.RelationFundamentalCircuit
+import Matroid.R10CircuitParity
+import Matroid.TwoSumBasis

@@ -16,6 +16,16 @@ def IsCircuitUnion {α : Type*} (M : Matroid α) (X : Set α) : Prop :=
     (∀ C ∈ Cs, ∀ D ∈ Cs, C ≠ D → Disjoint C D) ∧
     X = ⋃₀ (Cs : Set (Set α))
 
+/-- A single circuit is a manuscript cycle. -/
+theorem IsCircuit.isCircuitUnion {α : Type*} {M : Matroid α}
+    {C : Set α} (hC : M.IsCircuit C) : M.IsCircuitUnion C := by
+  refine ⟨{C}, ?_, ?_, ?_⟩
+  · simpa using hC
+  · intro D hD F hF hne
+    simp only [Finset.mem_singleton] at hD hF
+    exact False.elim (hne (hD.trans hF.symm))
+  · simp
+
 /-- Every element of a manuscript cycle lies in the matroid ground set. -/
 theorem IsCircuitUnion.subset_ground {α : Type*} {M : Matroid α}
     {X : Set α} (hX : M.IsCircuitUnion X) : X ⊆ M.E := by
@@ -23,6 +33,19 @@ theorem IsCircuitUnion.subset_ground {α : Type*} {M : Matroid α}
   intro x hx
   obtain ⟨C, hC, hxC⟩ := Set.mem_sUnion.mp hx
   exact (hCs C (by simpa using hC)).subset_ground hxC
+
+/-- A manuscript cycle contained in an independent set is empty. -/
+theorem IsCircuitUnion.eq_empty_of_subset_indep {α : Type*} {M : Matroid α}
+    {X I : Set α} (hX : M.IsCircuitUnion X) (hI : M.Indep I)
+    (hXI : X ⊆ I) : X = ∅ := by
+  obtain ⟨Cs, hCs, _, rfl⟩ := hX
+  by_cases h : Cs = ∅
+  · simp [h]
+  · obtain ⟨C, hC⟩ := Finset.nonempty_iff_ne_empty.mpr h
+    have hCI : C ⊆ I := by
+      intro x hx
+      exact hXI (Set.mem_sUnion.mpr ⟨C, by simpa using hC, hx⟩)
+    exact False.elim ((hCs C hC).not_indep (hI.subset hCI))
 
 universe u w
 
@@ -124,6 +147,15 @@ private theorem binary_circuit_sum_eq_zero {α V : Type*}
     ext i
     simpa only [Set.Finite.mem_toFinset, Finset.mem_coe] using (Set.ext_iff.mp hsEq i)
   simpa only [hsfin] using hsum
+
+/-- A circuit in a binary representation has zero sum of its indexed
+columns. The ground finset keeps the original element labels. -/
+theorem Represents.binaryCircuit_sum_zero {α V : Type*}
+    [AddCommGroup V] [Module (ZMod 2) V]
+    {M : Matroid α} (φ : α → V) (hRep : M.Represents (K := ZMod 2) φ)
+    {C : Set α} (hC : M.IsCircuit C) [M.Finite] :
+    ∑ i ∈ (M.ground_finite.subset hC.subset_ground).toFinset, φ i = 0 :=
+  binary_circuit_sum_eq_zero φ hRep hC
 
 private theorem circuitUnion_union_circuit {α : Type*} {M : Matroid α}
     {C Y : Set α} (hC : M.IsCircuit C) (hY : M.IsCircuitUnion Y)
