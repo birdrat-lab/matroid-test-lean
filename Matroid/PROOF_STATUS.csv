@@ -29,9 +29,9 @@ N247,MANUSCRIPT_PROVED,KERNEL_PROVED,,Matroid.freeRelation_positive_closure_of_e
 N248,MANUSCRIPT_PROVED,KERNEL_PROVED,,Matroid.freeRelation_negative_nonclosure,Manuscript/main.tex thm:quotient-normal-form-correct negative matroid implication,PROOF_BUDGET.md depth-6 pass
 N257,EXTERNAL_UNCITED_STANDARD,KERNEL_PROVED,,Matroid.uniformOn_one_regular,Manuscript/main.tex prop:grover-program-value; N053,PROOF_BUDGET.md depth-6 pass
 N266,MANUSCRIPT_DEFINITION,KERNEL_PROVED,,Matroid.weightedTrianglePhi; Matroid.weightedTriangleSignature; Matroid.weightedTrianglePhi_eq_zero_of_not_five,Manuscript/main.tex eq:seymour-three-sum-phi and eq:seymour-three-sum-five,PROOF_BUDGET.md depth-6 pass
-N052,EXTERNAL_CITED,UNRESOLVED,,,Oxley Introduction to Matroid Theory Lemma 4.4; Tutte 1958,PROOF_BUDGET.md depth-6 pass
-N065,MANUSCRIPT_DEFINITION,UNRESOLVED,,,Manuscript/main.tex def:regular-matroid-sums; Seymour 1980,PROOF_BUDGET.md depth-6 pass
-N070,MANUSCRIPT_DEFINITION,UNRESOLVED,,Matroid.r10_eRank (partial),Manuscript/main.tex def:r10; finite TU certificate open,PROOF_BUDGET.md depth-6 pass
-N174,EXTERNAL_UNCITED_STANDARD,UNRESOLVED,,,Manuscript/main.tex prop:r10-proper-minors proof; labeled multigraph minor bridge open,PROOF_BUDGET.md depth-6 pass
-N175,EXTERNAL_UNCITED_STANDARD,UNRESOLVED,,,Manuscript/main.tex prop:r10-proper-minors proof; dependent on N174 graph minor bridge,PROOF_BUDGET.md depth-6 pass
-N207,MANUSCRIPT_PROVED,UNRESOLVED,,,Manuscript/main.tex sec:r10-pointed six-path H; graphic target reachability open,PROOF_BUDGET.md depth-6 pass
+N052,EXTERNAL_CITED,CITED_ASSUMPTION,Matroid.External.regular_ground_exists_realTU,Matroid.Regular.hasLabeledRealTU; Matroid.HasLabeledRealTU.regular,Oxley Briefly What Is a Matroid Definition 4.3 and Lemma 4.4; Tutte 1958,PROOF_BUDGET.md depth-6 continuation
+N065,MANUSCRIPT_DEFINITION,KERNEL_PROVED,,Matroid.regularTwoSum_ground; Matroid.regularTwoSum_isCircuitUnion_iff,Manuscript/main.tex def:regular-matroid-sums; local binary quotient proof,PROOF_BUDGET.md depth-6 continuation
+N070,MANUSCRIPT_DEFINITION,KERNEL_PROVED,,Matroid.r10IntegerMatrix_isTotallyUnimodular; Matroid.r10_regular; Matroid.r10_eRank,Manuscript/main.tex def:r10; 252 canonical minors,PROOF_BUDGET.md depth-6 continuation
+N174,EXTERNAL_UNCITED_STANDARD,KERNEL_PROVED,,Matroid.IsGraphic.minor; Matroid.graphic_contractEdge_eq_contract,Labeled graph contraction and N026; local proof,PROOF_BUDGET.md depth-6 continuation
+N175,EXTERNAL_UNCITED_STANDARD,UNRESOLVED,,,Depth 7 after evidenced N174 to N175 edge; no depth-7 proof attempted,PROOF_BUDGET.md depth-6 continuation
+N207,MANUSCRIPT_PROVED,KERNEL_PROVED,,Matroid.DoubleStar.target_mem_graphic_closure_iff; Matroid.DoubleStar.minimal_accepting_iff; Matroid.DoubleStar.support_ncard,Manuscript/main.tex sec:r10-pointed; local graph proof,PROOF_BUDGET.md depth-6 continuation

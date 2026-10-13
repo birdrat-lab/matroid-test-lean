@@ -5,6 +5,11 @@ import Matroid.Depth6TriangleWeights
 import Matroid.Depth6UniformRegular
 import Matroid.R10
 import Matroid.OneSumWeights
+import Matroid.DoubleStar
+import Matroid.R10Certificate
+import Matroid.GraphicMinors
+import Matroid.RegularTUConverse
+import Matroid.TwoSumCycles
 
 /-! Reproducible depth-six axiom audit. Any `sorryAx` invalidates a
 kernel-proved classification. Ordinary foundational axioms are listed by Lean. -/
@@ -50,3 +55,70 @@ kernel-proved classification. Ordinary foundational axioms are listed by Lean. -
 #print axioms Matroid.oneRowOnesReal_linearIndependent_iff
 #print axioms Matroid.uniformOn_one_eq_oneRowVectorMatroid
 #print axioms Matroid.uniformOn_one_regular
+
+#print axioms Matroid.DoubleStar.Query
+#print axioms Matroid.DoubleStar.Vertex
+#print axioms Matroid.DoubleStar.Edge
+#print axioms Matroid.DoubleStar.ends
+#print axioms Matroid.DoubleStar.graph
+#print axioms Matroid.DoubleStar.edgeSet_eq_univ
+#print axioms Matroid.DoubleStar.query_label_count
+#print axioms Matroid.DoubleStar.graph_edge_count
+#print axioms Matroid.DoubleStar.availableEdges
+#print axioms Matroid.DoubleStar.target_not_available
+#print axioms Matroid.DoubleStar.row_available_iff
+#print axioms Matroid.DoubleStar.col_available_iff
+#print axioms Matroid.DoubleStar.rowQueries
+#print axioms Matroid.DoubleStar.colQueries
+#print axioms Matroid.DoubleStar.reachableOn_iff_full_row_col
+#print axioms Matroid.DoubleStar.target_mem_graphic_closure_iff
+#print axioms Matroid.DoubleStar.support
+#print axioms Matroid.DoubleStar.Accepts
+#print axioms Matroid.DoubleStar.target_mem_graphic_closure_iff_accepts
+#print axioms Matroid.DoubleStar.support_minimal
+#print axioms Matroid.DoubleStar.minimal_accepting_iff
+#print axioms Matroid.DoubleStar.support_injective
+#print axioms Matroid.DoubleStar.support_ncard
+
+#print axioms Matroid.r10NonbasisBlock
+#print axioms Matroid.r10NonbasisBlock_isTotallyUnimodular
+#print axioms Matroid.r10IntegerMatrix_reindexed_eq
+#print axioms Matroid.r10IntegerMatrix_isTotallyUnimodular
+#print axioms Matroid.r10Matrix_isTotallyUnimodular
+#print axioms Matroid.r10_regular
+
+#print axioms Graph.identifyVertices
+#print axioms Graph.contractVertex_eq_iff
+#print axioms Graph.contractVertex_endpoints_eq
+#print axioms Graph.contractEdge
+#print axioms Graph.contractEdge_edgeSet
+#print axioms Graph.reachableOn_contractEdge_iff
+#print axioms Matroid.graphic_deleteEdges_eq_delete
+#print axioms Matroid.graphic_contractEdge_eq_contract
+#print axioms Matroid.IsGraphic
+#print axioms Matroid.isGraphic_graphic
+#print axioms Matroid.IsGraphic.delete
+#print axioms Matroid.IsGraphic.contractElem
+#print axioms Matroid.IsGraphic.contract
+#print axioms Matroid.IsGraphic.minor
+
+#print axioms Matroid.HasLabeledRealTU
+#print axioms Matroid.HasLabeledRealTU.regular
+#print axioms Matroid.Regular.exists_real_representation
+#print axioms Matroid.RepresentableOver.exists_labeled_matrix
+#print axioms Matroid.Regular.exists_labeled_real_matrix
+#print axioms Matroid.Regular.exists_labeled_binary_ternary_matrices
+#print axioms Matroid.External.regular_ground_exists_realTU
+#print axioms Matroid.Regular.hasLabeledRealTU
+#print axioms Matroid.TwoSumCycle
+#print axioms Matroid.twoSumCycle_empty
+#print axioms Matroid.TwoSumCycle.subset_symmDiff_ground
+#print axioms Matroid.TwoSumCycle.symmDiff
+#print axioms Matroid.binaryTwoSumCandidate
+#print axioms Matroid.binaryTwoSumCandidate_ground
+#print axioms Matroid.TwoSumCycle.candidate_isCircuitUnion
+#print axioms Matroid.TwoSumCycle.of_candidate_isCircuitUnion
+#print axioms Matroid.exists_twoSum_of_regular
+#print axioms Matroid.regularTwoSum
+#print axioms Matroid.regularTwoSum_ground
+#print axioms Matroid.regularTwoSum_isCircuitUnion_iff

@@ -2,7 +2,7 @@
 
 Computed mechanically from `Matroid/LEDGER.md` and `Matroid/DEPENDENCY_EDGES.csv`. Active scopes are `CORE_MATROID` and `MATROID_INTERFACE`; depth is the longest direct-prerequisite chain. `Matroid/DEPTHS.csv` contains the row-level calculation.
 
-**Current status (2026-10-11): The active Matroid formalization is kernel-certified through topological depth 5.** The corrected depth-6 layer has 17/23 complete, including the previously complete N081; six remain unresolved. Of the 22 frozen open depth-6 targets, 16 were proved in this pass. The active total is 85/197 complete. Both unconditional and citation-relative certified depths are 5; no admission was added. Earlier sections are historical pass snapshots.
+**Current status (2026-10-12): 89/197 active nodes are kernel-proved; depths 0–5 remain kernel-certified.** The corrected depth-6 layer has 21/22 kernel-proved; N052 is citation-relative through one narrowly sourced external premise. Thus citation-relative depth is 6 and kernel-certified depth is 5. The evidenced N174→N175 edge moves N175 to depth 7, outside this pass. Earlier sections are historical pass snapshots.
 
 ## Prior depth-1 baseline
 
@@ -369,3 +369,18 @@ The corrected layer consists of N081 (previously complete) and the 22 rows audit
 | N207 | The six-path graph and its target-reachability calculation have not been formalized. | Define its 18 response edges and target edge, apply N264, and prove the row/column and nine-minimal-support equivalences. |
 
 Recomputed active counts by depth are 0: 2/2, 1: 9/9, 2: 19/19, 3: 8/8, 4: 6/6, 5: 24/24, 6: 17/23, where each pair is complete/total. Overall, 85/197 active nodes are kernel-complete. The minimum unresolved depth is 6. Both unconditional kernel-certified depth and citation-relative completed depth are 5. This pass stopped at the depth-6 frontier.
+
+## Depth-6 continuation checkpoint — 2026-10-12
+
+The entry `lake build` and `git diff --check` passed. The direct edge N174→N175 was added because the stated cographic-minor route dualizes N174's graphic-minor theorem. A longest-path DAG recomputation moves only N175 from depth 6 to 7; no depth-7 mathematical work was done.
+
+| ID | Depth | Direct active prerequisites | Current trust | Exact result / remaining work |
+| --- | ---: | --- | --- | --- |
+| N207 | 6 | N061, N264 | `KERNEL_PROVED` | `DoubleStar.target_mem_graphic_closure_iff`, `minimal_accepting_iff`: exact 19 graph edges, nine shared query labels, nine minimal supports of size five. |
+| N070 | 6 | N043, N044, N051, N053 | `KERNEL_PROVED` | 252 canonical minors of the nonbasis block; `r10IntegerMatrix_isTotallyUnimodular`, `r10_regular`. |
+| N174 | 6 | N026, N061 | `KERNEL_PROVED` | Labeled graph deletion/contraction and `IsGraphic.minor`, including loops and parallel edges. |
+| N065 | 6 | N021, N022, N063, N256 | `KERNEL_PROVED` | `regularTwoSum_ground` and `regularTwoSum_isCircuitUnion_iff` under all properness hypotheses. N068 regularity preservation remains a separate depth-7 requirement. |
+| N052 | 6 | N051, N053 | `CITED_ASSUMPTION` | `External.regular_ground_exists_realTU` (Oxley Lemma 4.4) is the sole admission; `Regular.hasLabeledRealTU` proves ambient-label transport but is conditional. A local proof of the TU sign normalization would remove `sorryAx`. |
+| N175 | 7 | N026, N062, N174 | `UNRESOLVED`, outside this pass | Cographic minor closure is now a depth-7 task by the evidenced direct edge. |
+
+The active total is **89/197 kernel-complete**. At depth 6, **21/22** nodes are kernel-complete and **22/22** are complete relative to the cited Tutte premise. All earlier certified depths remain complete. The minimum kernel-unresolved depth is 6; the minimum citation-relative unresolved depth is 7. `PROOF_STATUS.csv` and `DEPTH6_AUDIT.md` give the per-target trust and signature audit.

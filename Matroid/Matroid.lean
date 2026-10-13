@@ -37,3 +37,8 @@ import Matroid.Depth6Quotient
 import Matroid.Depth6Support
 import Matroid.Depth6TriangleWeights
 import Matroid.Depth6UniformRegular
+import Matroid.DoubleStar
+import Matroid.R10Certificate
+import Matroid.GraphicMinors
+import Matroid.RegularTUConverse
+import Matroid.TwoSumCycles
