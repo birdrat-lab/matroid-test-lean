@@ -2,9 +2,18 @@
 
 Computed mechanically from `Matroid/LEDGER.md` and `Matroid/DEPENDENCY_EDGES.csv`. Active scopes are `CORE_MATROID` and `MATROID_INTERFACE`; depth is the longest direct-prerequisite chain. `Matroid/DEPTHS.csv` contains the row-level calculation.
 
-**Current status (2026-10-13): 99/197 active nodes are kernel-proved; depths 0–5 remain kernel-certified.** At depth 6, 21/22 are kernel-proved and N052 is a cited external premise, so citation-relative certification reaches depth 6 and unconditional kernel certification reaches depth 5. The evidenced N068→N218 edge gives 449 active edges, moves N218 to depth 8, and leaves 33 depth-7 requirements. Ten depth-7 rows have new kernel proofs; 23 remain unresolved. No depth-8 proof was attempted. Earlier sections below are historical pass snapshots.
+**Current status (2026-10-19): 99/197 active nodes are kernel-proved, two are directly cited assumptions (N052, N138), and one is a conditional local proof (N139).** The strict scheduler counts 102 available nodes, 95 unresolved nodes, 449 direct active edges, and 40 eligible unresolved nodes. Depths 0–5 remain kernel-certified; depth 6 is complete relative to N052, while N138 at depth 7 and N139 at depth 8 are available only relative to the independently sourced N138 basis premise. Structural depths are audit metadata, not an execution order. The fresh recommendation is **N107 → N066** in `NEXT_BATCH.md`; it has not been started.
 
-## Corrected depth-7 frontier
+## Completed short batch: N138 → N139
+
+| ID | Direct prerequisites | Result | Trust |
+| --- | --- | --- | --- |
+| N138 | N002, N065 | `External.regularTwoSum_isBase_iff` matches Oxley, *Matroid Theory* (2nd ed.), Proposition 7.1.13(ii), the 2-sum definition, and Proposition 7.1.20 on original labels. The earlier first-port independence proof remains kernel-checked. | `CITED_ASSUMPTION` |
+| N139 | N122, N138 | `weightedBasesIn_twoSum`, `weightedBasesOut_twoSum`, `weightedBasisRatio_twoSum`: both basis-sum equations, finite positive `P₀/P₁`, extended ratio, nonzero-mass and loop/coloop conventions. | `CONDITIONAL_PROOF` via N138 only |
+
+`TwoSumAxiomAudit.lean` records the precise transitive `sorryAx`. Target-level and full builds passed. The graph gained no edge and no depth changed. N140, N141, N150, N153, N154, N212, N213, and N215 became eligible only after the trust-status updates; the scheduler now reports 40 eligible unresolved nodes.
+
+## Historical corrected depth-7 frontier (2026-10-13)
 
 The completed rows are N018, N034, N106, N144, N149, N162, N163, N170, N175, and N244. Their exact declarations and source correspondence are in `DEPTH7_AUDIT.md`. The remaining requirements are:
 

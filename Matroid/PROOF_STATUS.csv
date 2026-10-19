@@ -47,7 +47,8 @@ N055,EXTERNAL_CITED,UNRESOLVED,,,Manuscript/main.tex `prop:regular-basic-propert
 N059,MANUSCRIPT_PROVED,UNRESOLVED,,,Manuscript/main.tex `thm:regular-quotient-form`,PROOF_BUDGET.md depth-7 pass
 N068,EXTERNAL_CITED,UNRESOLVED,,,Manuscript/main.tex —,PROOF_BUDGET.md depth-7 pass
 N118,EXTERNAL_CITED,UNRESOLVED,,,Manuscript/main.tex —,PROOF_BUDGET.md depth-7 pass
-N138,EXTERNAL_CITED,UNRESOLVED,,partial: Matroid.regularTwoSum_indep_of_bases_first_port,Manuscript/main.tex —,PROOF_BUDGET.md depth-7 pass
+N138,EXTERNAL_CITED,CITED_ASSUMPTION,Matroid.External.regularTwoSum_isBase_iff,Matroid.External.regularTwoSum_isBase_iff; partial kernel proof Matroid.regularTwoSum_indep_of_bases_first_port,Oxley Matroid Theory 2nd ed Proposition 7.1.13(ii) plus 2-sum definition p. 260 and Proposition 7.1.20; exact labeled specialization in SOURCES.md,PROOF_BUDGET.md N138 continuation
+N139,MANUSCRIPT_PROVED,CONDITIONAL_PROOF,Matroid.External.regularTwoSum_isBase_iff,Matroid.weightedBasesIn_twoSum; Matroid.weightedBasesOut_twoSum; Matroid.weightedBasisRatio_twoSum,Manuscript/main.tex thm:seymour-two-sum; exact assumptions and ratio conventions in SOURCES.md,PROOF_BUDGET.md N139
 N146,EXTERNAL_CITED,UNRESOLVED,,,Manuscript/main.tex —,PROOF_BUDGET.md depth-7 pass
 N152,EXTERNAL_UNCITED_STANDARD,UNRESOLVED,,,Manuscript/main.tex —,PROOF_BUDGET.md depth-7 pass
 N161,MANUSCRIPT_PROVED,UNRESOLVED,,,Manuscript/main.tex `prop:regular-triangle-identity`,PROOF_BUDGET.md depth-7 pass

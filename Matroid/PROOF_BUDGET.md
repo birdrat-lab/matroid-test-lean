@@ -113,3 +113,14 @@ Per-target start/end times and token deltas were not observed reliably; all are 
 | N255 | R10 connectedness; provenance unresolved | Manuscript-role audit and circuit-oracle plan; 0 proof groups | Establish a precise source-matched connectedness/common-circuit claim for N070. | UNRESOLVED / PROVENANCE_UNRESOLVED |
 
 The N182 scratch attempts are recorded as failed routes, not as a proof artifact. The external N068, N055, and N118 nodes have not exhausted two focused proof routes or obtained checked source/hypothesis matches, so no admission is authorized. Historical unknown time and token entries above remain unknown.
+
+## Dependency-aware N138 → N139 batch — 2026-10-19
+
+Per-node elapsed time and token counts are unavailable and remain `UNKNOWN`. The counts below are observed substantive edit/check groups in this batch, not retroactive estimates of earlier work. The original N138 abstract independence route above remains in place.
+
+| ID | Manuscript/source and route | Observed edit/check groups | Checked artifact and residual goal | Decision |
+| --- | --- | ---: | --- | --- |
+| N138 | Unlabeled basis step in `thm:seymour-two-sum`; Oxley, *Matroid Theory* (2nd ed.), Proposition 7.1.13(ii), 2-sum definition p. 260, Proposition 7.1.20. Exact hypotheses and labels checked before admission; pinned mathlib 2-sum/connection search was empty. | 2: source/signature audit and isolated premise; local pair-uniqueness proof and check | `External.regularTwoSum_isBase_iff` is the precise cited premise; `regularTwoSum_basisPair_unique` is kernel-proved; earlier `regularTwoSum_indep_of_bases_first_port` preserved. No remaining N138 statement obligation relative to the cited source. | `CITED_ASSUMPTION`; one new `sorryAx` |
+| N139 | Manuscript `thm:seymour-two-sum`: finite basis-pair bijection, target partition, product splitting, port substitution, positivity, and extended ratio. | At least 6: bijection/uniqueness check; product/xor sum check; sigma-sector bilinear check; port-update check; positivity/factorization check; ratio/boundary/axiom check. | `weightedBasesIn_twoSum`, `weightedBasesOut_twoSum`, `weightedBasisRatio_twoSum`, `twoSumEffectiveWeight_pos`, `weightedBasisSums_twoSum_nonzero`, and loop/coloop ratio corollaries. No remaining local proof goal. | `CONDITIONAL_PROOF`; only transitive N138 premise |
+
+`lake env lean Matroid/TwoSumWeights.lean`, `lake build Matroid.TwoSumAxiomAudit`, and full `lake build` all passed. The audit prints `sorryAx` for the N138 cited theorem and the N139 factorization/ratio descendants, and no `sorryAx` for basis-pair uniqueness, `P₀/P₁` positivity, or non-simultaneous target mass. No additional citation or admission was introduced for N139. The residual-cost overrides for completed N138/N139 have blank scores; their historical effort is recorded here, and no remaining proof cost is scheduled for this batch.

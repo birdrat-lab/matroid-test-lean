@@ -51,3 +51,4 @@ import Matroid.TriangleClassPositivity
 import Matroid.RelationFundamentalCircuit
 import Matroid.R10CircuitParity
 import Matroid.TwoSumBasis
+import Matroid.TwoSumWeights
