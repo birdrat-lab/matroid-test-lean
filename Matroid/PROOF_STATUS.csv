@@ -31,6 +31,7 @@ N257,EXTERNAL_UNCITED_STANDARD,KERNEL_PROVED,,Matroid.uniformOn_one_regular,Manu
 N266,MANUSCRIPT_DEFINITION,KERNEL_PROVED,,Matroid.weightedTrianglePhi; Matroid.weightedTriangleSignature; Matroid.weightedTrianglePhi_eq_zero_of_not_five,Manuscript/main.tex eq:seymour-three-sum-phi and eq:seymour-three-sum-five,PROOF_BUDGET.md depth-6 pass
 N052,EXTERNAL_CITED,CITED_ASSUMPTION,Matroid.External.regular_ground_exists_realTU,Matroid.Regular.hasLabeledRealTU; Matroid.HasLabeledRealTU.regular,Oxley Briefly What Is a Matroid Definition 4.3 and Lemma 4.4; Tutte 1958,PROOF_BUDGET.md depth-6 continuation
 N065,MANUSCRIPT_DEFINITION,KERNEL_PROVED,,Matroid.regularTwoSum_ground; Matroid.regularTwoSum_isCircuitUnion_iff,Manuscript/main.tex def:regular-matroid-sums; local binary quotient proof,PROOF_BUDGET.md depth-6 continuation
+N066,MANUSCRIPT_DEFINITION,UNRESOLVED,,Matroid.ThreeSumCycle; Matroid.binaryThreeSumCandidate,Manuscript/main.tex def:regular-matroid-sums; partial candidate only,PROOF_BUDGET.md N066 scheduled batch
 N070,MANUSCRIPT_DEFINITION,KERNEL_PROVED,,Matroid.r10IntegerMatrix_isTotallyUnimodular; Matroid.r10_regular; Matroid.r10_eRank,Manuscript/main.tex def:r10; 252 canonical minors,PROOF_BUDGET.md depth-6 continuation
 N174,EXTERNAL_UNCITED_STANDARD,KERNEL_PROVED,,Matroid.IsGraphic.minor; Matroid.graphic_contractEdge_eq_contract,Labeled graph contraction and N026; local proof,PROOF_BUDGET.md depth-6 continuation
 N175,EXTERNAL_UNCITED_STANDARD,KERNEL_PROVED,,Matroid.IsCographic.minor,Duality of labeled graphic minors; N174,PROOF_BUDGET.md depth-7 pass
@@ -43,7 +44,7 @@ N149,EXTERNAL_UNCITED_STANDARD,KERNEL_PROVED,,Matroid.regularTwoSum_ground_ncard
 N162,MANUSCRIPT_PROVED,KERNEL_PROVED,,Matroid.weightedTriangle_a_pos,Manuscript/main.tex following prop:regular-triangle-identity,PROOF_BUDGET.md depth-7 pass
 N163,MANUSCRIPT_PROVED,KERNEL_PROVED,,Matroid.weightedTriangle_c_pos,Manuscript/main.tex following prop:regular-triangle-identity,PROOF_BUDGET.md depth-7 pass
 N244,MANUSCRIPT_PROVED,KERNEL_PROVED,,Matroid.positiveRelation_fundCircuit; Matroid.positiveRelation_fundCircuit_isCircuit,Manuscript/main.tex prop:relation-fundamental-circuits; N243,PROOF_BUDGET.md depth-7 pass
-N055,EXTERNAL_CITED,UNRESOLVED,,,Manuscript/main.tex `prop:regular-basic-properties`,PROOF_BUDGET.md depth-7 pass
+N055,EXTERNAL_CITED,CITED_ASSUMPTION,Matroid.External.binary_real_projective_uniqueness; Matroid.External.regular_ground_exists_realTU,Matroid.Regular.real_representations_projectivelyEquivalent; Matroid.Regular.exists_tu_projectivelyEquivalent,Oxley Matroid Theory 2nd ed Proposition 6.6.5 printed p. 209 and Proposition 6.3.12 printed p. 178; N052 for fixed TU,PROOF_BUDGET.md N055 scheduled batch
 N059,MANUSCRIPT_PROVED,UNRESOLVED,,,Manuscript/main.tex `thm:regular-quotient-form`,PROOF_BUDGET.md depth-7 pass
 N068,EXTERNAL_CITED,UNRESOLVED,,,Manuscript/main.tex —,PROOF_BUDGET.md depth-7 pass
 N118,EXTERNAL_CITED,UNRESOLVED,,,Manuscript/main.tex —,PROOF_BUDGET.md depth-7 pass

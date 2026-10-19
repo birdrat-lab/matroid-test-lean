@@ -2,7 +2,16 @@
 
 Computed mechanically from `Matroid/LEDGER.md` and `Matroid/DEPENDENCY_EDGES.csv`. Active scopes are `CORE_MATROID` and `MATROID_INTERFACE`; depth is the longest direct-prerequisite chain. `Matroid/DEPTHS.csv` contains the row-level calculation.
 
-**Current status (2026-10-19): 99/197 active nodes are kernel-proved, two are directly cited assumptions (N052, N138), and one is a conditional local proof (N139).** The strict scheduler counts 102 available nodes, 95 unresolved nodes, 449 direct active edges, and 40 eligible unresolved nodes. Depths 0–5 remain kernel-certified; depth 6 is complete relative to N052, while N138 at depth 7 and N139 at depth 8 are available only relative to the independently sourced N138 basis premise. Structural depths are audit metadata, not an execution order. The fresh recommendation is **N107 → N066** in `NEXT_BATCH.md`; it has not been started.
+**Current status (2026-10-19): 99/197 active nodes are kernel-proved, three are directly cited assumptions (N052, N055, N138), and one is a conditional local proof (N139).** The strict scheduler counts 103 available nodes, 94 unresolved nodes, 450 direct active edges, and 39 eligible unresolved nodes. N055's fixed-TU conclusion depends on N052 as well as its own cited uniqueness theorem. N066 remains unresolved after partial construction work. N107 now has the genuine N032 cocircuit-separation prerequisite; its structural depth is 9 and N110's is 10. Structural depths are audit metadata, not an execution order. The fresh recommendation is **N146 → N186** in `NEXT_BATCH.md`; it has not been started.
+
+## Scheduler-directed short batch: N066 → N055
+
+| ID | Direct prerequisites | Result | Trust |
+| --- | --- | --- | --- |
+| N066 | N015, N018, N063, N256 | Checked `ThreeSumCycle` family, empty/ground/closure lemmas, and a binary quotient matroid candidate with the correct ground. The two-way cycle correspondence and proper 3-sum existence remain open. Residual cost 4.0→6.0. | `UNRESOLVED` |
+| N055 | N047, N051, N052 | `External.binary_real_projective_uniqueness` matches Oxley Proposition 6.6.5; `Regular.real_representations_projectivelyEquivalent` specializes it, and `Regular.exists_tu_projectivelyEquivalent` adds the N052 TU representation. | `CITED_ASSUMPTION`; TU conclusion depends on N052 and N055 |
+
+The initial N107→N066 proposal was invalid because N107's defining minimum needs the N032 separation theorem; the missing N032→N107 edge was added and all depths recomputed before proof work. Focused and full Lean builds passed. `CurrentBatchAxiomAudit.lean` exposes `sorryAx` on the N055 citation and its dependents, and none on N066's partial lemmas. N055 adds one conditionally available requirement; N116 becomes eligible. The scheduler now selects N146→N186 (score 4.660), with N147/N188 only predicted to become eligible after that future batch.
 
 ## Completed short batch: N138 → N139
 

@@ -1,13 +1,13 @@
 id,residual_cost,confidence,reason
 N138,,high,Completed as source-verified cited premise; no remaining proof cost is scheduled; historical abstract independence proof retained
 N068,2.3,low,External cited in ledger; cost only of exact citation/hypothesis correspondence and isolated interface
-N055,2.0,low,Externally cited uniqueness; exact theorem and conventions must first be checked
+N055,,high,Completed via Oxley 2011 Proposition 6.6.5 with an isolated cited premise; N052 supplies the fixed labeled TU realization
 N118,2.0,low,Externally cited signed TU circuit dependence; target normalization matters
 N146,2.3,low,Externally cited circuit gluing; source correspondence remains unverified
 N152,2.0,low,Short abstract relabeling candidate; no completed Lean construction
 N161,4.0,low,Manuscript triangle five-sum proof remains; substantial matroid/Plucker argument
 N059,4.0,low,Manuscript quotient theorem requires two directions and disjoint labeled construction
-N066,4.0,low,Three-sum construction requires significant matroid existence/closure infrastructure
+N066,6.0,medium,Checked matching-triangle cycle family and binary quotient candidate; remaining two-way cycle correspondence needs a finite triangle-span quotient kernel theorem and proper-triangle hypotheses
 N182,3.5,medium,Earlier kernel decide attempts exhausted limits; shared finite checker likely needed
 N185,4.0,low,Finite automorphism completeness certificate not just generator exhibition
 N204,3.2,low,External cited but precise statement design and target/glue distinction remain open

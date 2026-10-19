@@ -4,44 +4,44 @@ _Generated proposal; not a mathematical certification or an authorization to adm
 
 ## Snapshot
 
-- Active nodes: **197**; active edges: **449**.
-- Available: **102** (including **2** directly cited assumptions); unresolved: **95**.
-- Eligible unresolved nodes: **40**; structural depths are **not** scheduling restrictions.
+- Active nodes: **197**; active edges: **450**.
+- Available: **103** (including **3** directly cited assumptions); unresolved: **94**.
+- Eligible unresolved nodes: **39**; structural depths are **not** scheduling restrictions.
 - Proposed batch size: **2**; cost estimates are ordinal proxies, **not token/time forecasts**.
 - Rules: exact manuscript correspondence, matroid-first proof search, cited external premise only after exact-source validation.
 
 ## Recommended batch
 
-**Sequence:** N107 → N066
+**Sequence:** N146 → N186
 
-Score **5.682** (heuristic); sum of residual-cost scores **6.0**; **5** additional nodes become eligible after the batch.
+Score **4.660** (heuristic); sum of residual-cost scores **4.7**; **2** additional nodes become eligible after the batch.
 
 | Task | Depth | Provenance | Est. residual cost | Evidence | Immediate descendants |
 |---|---:|---|---:|---|---:|
-| N107 — Negative target support | 8 | MANUSCRIPT_DEFINITION | 2.0 | heuristic; low | 1 |
-| N066 — Regular three-sum construction | 8 | MANUSCRIPT_DEFINITION | 4.0 | Three-sum construction requires significant matroid existence/closure infrastructure | 4 |
+| N146 — Two-sum target-circuit gluing | 7 | EXTERNAL_CITED | 2.3 | Externally cited circuit gluing; source correspondence remains unverified | 2 |
+| N186 — R10 element transitivity | 7 | EXTERNAL_CITED | 2.4 | External R10 automorphism transitivity needs exact source and indexed action correspondence | 3 |
 
-**Newly eligible after batch:** N069, N071, N110, N159, N179.
+**Newly eligible after batch:** N147, N188.
 
 ## Alternative ranked batches
 
 | Rank | Dependency-valid sequence | Score | Cost score | Newly eligible |
 |---:|---|---:|---:|---:|
-| 1 | N107 → N066 | 5.682 | 6.0 | 5 |
-| 2 | N107 → N055 | 5.550 | 4.0 | 2 |
-| 3 | N107 → N146 | 5.454 | 4.3 | 2 |
-| 4 | N107 → N186 | 5.330 | 4.4 | 2 |
-| 5 | N066 → N055 | 5.215 | 6.0 | 5 |
-| 6 | N066 → N146 | 5.165 | 6.3 | 5 |
-| 7 | N066 → N186 | 5.084 | 6.4 | 5 |
-| 8 | N107 → N068 | 5.078 | 4.3 | 2 |
+| 1 | N146 → N186 | 4.660 | 4.7 | 2 |
+| 2 | N186 → N185 | 4.488 | 6.4 | 4 |
+| 3 | N146 → N161 | 4.447 | 6.3 | 2 |
+| 4 | N186 → N161 | 4.378 | 6.4 | 2 |
+| 5 | N186 → N068 | 4.316 | 4.7 | 2 |
+| 6 | N146 → N059 | 4.278 | 6.3 | 2 |
+| 7 | N146 → N068 | 4.250 | 4.6 | 2 |
+| 8 | N146 → N032 | 4.220 | 5.62 | 2 |
 
 ## Highest-leverage currently eligible tasks
 
 | ID | Name | Depth | Unresolved descendants | Residual cost score | Provenance |
 |---|---|---:|---:|---:|---|
 | N068 | Two-sum preserves regularity | 7 | 14 | 2.3 | EXTERNAL_CITED |
-| N066 | Regular three-sum construction | 8 | 10 | 4.0 | MANUSCRIPT_DEFINITION |
+| N066 | Regular three-sum construction | 8 | 10 | 6.0 | MANUSCRIPT_DEFINITION |
 | N186 | R10 element transitivity | 7 | 8 | 2.4 | EXTERNAL_CITED |
 | N146 | Two-sum target-circuit gluing | 7 | 6 | 2.3 | EXTERNAL_CITED |
 | N185 | R10 automorphism order | 7 | 6 | 4.0 | CERTIFICATE_DERIVED |
@@ -56,10 +56,10 @@ Score **5.682** (heuristic); sum of residual-cost scores **6.0**; **5** addition
 | N182 | R10 total basis count | 7 | 3 | 3.5 | CERTIFICATE_DERIVED |
 | N195 | Pointed R10 target circuits | 7 | 3 | 3.0 | CERTIFICATE_DERIVED |
 | N267 | Weighted K4 triangle signature | 7 | 3 | 3.0 | MANUSCRIPT_PROVED |
+| N032 | Cocircuit separating closure | 8 | 2 | 3.32 | MANUSCRIPT_PROVED |
 | N152 | Recover parent across a two-element circuit | 7 | 2 | 2.0 | EXTERNAL_UNCITED_STANDARD |
 | N154 | Regular effective-weight monotonicity | 9 | 2 | 3.2 | EXTERNAL_UNCITED_STANDARD |
 | N019 | Cocircuit basis hitting | 8 | 1 | 2.2 | EXTERNAL_UNCITED_STANDARD |
-| N035 | Generated modular cut | 8 | 1 | 2.2 | EXTERNAL_UNCITED_STANDARD |
 
 ## Operating constraints
 
