@@ -1,7 +1,8 @@
 {
   "active": 197,
-  "available": 117,
+  "available": 121,
   "cited_premises": [
+    "N037",
     "N052",
     "N055",
     "N068",
@@ -13,8 +14,9 @@
   ],
   "eligible": [
     "N019",
-    "N035",
-    "N037",
+    "N038",
+    "N039",
+    "N040",
     "N059",
     "N066",
     "N110",
@@ -38,9 +40,8 @@
     "N188",
     "N193",
     "N194",
-    "N196",
     "N197",
-    "N200",
+    "N201",
     "N205",
     "N206",
     "N212",
@@ -64,8 +65,8 @@
         "N066",
         "N159"
       ],
-      "score": 3.7287,
-      "estimated_cost": 7.9,
+      "score": 4.0912,
+      "estimated_cost": 7.2,
       "completed_value": 6.2,
       "unlock_value": 22.2,
       "future_value": 10.57,
@@ -80,32 +81,32 @@
     {
       "sequence": [
         "N066",
-        "N196"
+        "N226"
       ],
-      "score": 3.6773,
-      "estimated_cost": 8.5,
-      "completed_value": 9.0,
-      "unlock_value": 20.4,
-      "future_value": 18.57,
+      "score": 3.8357,
+      "estimated_cost": 9.8,
+      "completed_value": 12.5,
+      "unlock_value": 23.9,
+      "future_value": 11.9,
       "new_eligible": [
         "N069",
         "N071",
         "N159",
         "N179",
-        "N201"
+        "N228"
       ],
-      "remaining_descendants": 8
+      "remaining_descendants": 6
     },
     {
       "sequence": [
         "N066",
-        "N267"
+        "N153"
       ],
-      "score": 3.5361,
-      "estimated_cost": 8.5,
+      "score": 3.7936,
+      "estimated_cost": 7.8,
       "completed_value": 12.5,
       "unlock_value": 15.9,
-      "future_value": 16.57,
+      "future_value": 11.9,
       "new_eligible": [
         "N069",
         "N071",
@@ -117,47 +118,46 @@
     {
       "sequence": [
         "N066",
-        "N226"
+        "N193"
       ],
-      "score": 3.5282,
-      "estimated_cost": 8.5,
+      "score": 3.7936,
+      "estimated_cost": 7.8,
       "completed_value": 12.5,
       "unlock_value": 15.9,
-      "future_value": 15.9,
+      "future_value": 11.9,
       "new_eligible": [
         "N069",
         "N071",
         "N159",
         "N179"
       ],
-      "remaining_descendants": 7
+      "remaining_descendants": 6
     },
     {
       "sequence": [
-        "N185",
-        "N187"
+        "N066",
+        "N194"
       ],
-      "score": 3.5,
-      "estimated_cost": 9.0,
-      "completed_value": 9.0,
-      "unlock_value": 22.5,
-      "future_value": 0,
+      "score": 3.7936,
+      "estimated_cost": 7.8,
+      "completed_value": 12.5,
+      "unlock_value": 15.9,
+      "future_value": 11.9,
       "new_eligible": [
-        "N189",
-        "N190",
-        "N191",
-        "N192",
-        "N240"
+        "N069",
+        "N071",
+        "N159",
+        "N179"
       ],
-      "remaining_descendants": 0
+      "remaining_descendants": 6
     },
     {
       "sequence": [
         "N066",
         "N185"
       ],
-      "score": 3.4817,
-      "estimated_cost": 11.5,
+      "score": 3.7774,
+      "estimated_cost": 10.6,
       "completed_value": 9.0,
       "unlock_value": 29.4,
       "future_value": 16.4,
@@ -175,38 +175,40 @@
     {
       "sequence": [
         "N066",
-        "N153"
+        "N133"
       ],
-      "score": 3.4812,
-      "estimated_cost": 8.5,
-      "completed_value": 12.5,
-      "unlock_value": 15.9,
-      "future_value": 11.9,
+      "score": 3.751,
+      "estimated_cost": 7.0,
+      "completed_value": 7.0,
+      "unlock_value": 17.6,
+      "future_value": 16.57,
       "new_eligible": [
         "N069",
         "N071",
+        "N148",
         "N159",
         "N179"
       ],
-      "remaining_descendants": 6
+      "remaining_descendants": 8
     },
     {
       "sequence": [
         "N066",
-        "N193"
+        "N182"
       ],
-      "score": 3.4812,
-      "estimated_cost": 8.5,
-      "completed_value": 12.5,
-      "unlock_value": 15.9,
-      "future_value": 11.9,
+      "score": 3.7277,
+      "estimated_cost": 8.3,
+      "completed_value": 9.0,
+      "unlock_value": 20.4,
+      "future_value": 15.4,
       "new_eligible": [
         "N069",
         "N071",
         "N159",
-        "N179"
+        "N179",
+        "N183"
       ],
-      "remaining_descendants": 6
+      "remaining_descendants": 8
     }
   ]
 }

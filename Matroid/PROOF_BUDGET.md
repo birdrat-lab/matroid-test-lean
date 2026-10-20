@@ -247,3 +247,39 @@ With N152 and N066 deferred only for this run, strict scheduling selected N172�
 `lake build Matroid.R10Minors Matroid.FiveBatchAxiomAudit` passed (1919 focused jobs). The tracked audit prints `sorryAx` for N172 and N173, precisely through their isolated external premises; `K33.cycleMatroid_ground` prints only ordinary Lean axioms. No new direct edge or depth change arose. Records were updated before reranking.
 
 Final checks: full `lake build` passed (9183 jobs; shared check, not a per-node time estimate), eight scheduler unit tests passed, and `git diff --check` passed. The tracked five-batch axiom audit has `sorryAx` only where an explicitly recorded cited premise is transitive. The strict scheduler with N152/N066 run-locally deferred selected N185→N187; clearing both deferrals and regenerating `NEXT_BATCH.md` and JSON selected N066→N159 (score 3.729). All ordinal costs and reasons reflect remaining work; per-node elapsed time/tokens remain `UNKNOWN`.
+
+## Next five-batch invocation, batch 1 — 2026-10-19
+
+The strict scheduler selected N066→N159, score 3.7287. N066 received three substantive Lean edit/check groups: quotient zero/matched-triangle correction, surviving-side restriction, and binary sum after triangle deletion. All three new lemmas compile without `sorryAx`; focused `Matroid.ThreeSum` build passed (1619 jobs). The remaining two-way quotient-cycle equivalence and construction theorem still need finite matched-trace transport, so N066 is `UNRESOLVED` and the factual ordinal residual estimate is 4.8 (formerly 5.5), medium confidence. This prior documented blocker and current substantive attempt justify deferral for the remainder of this invocation. N159 depends directly on N066 and was not eligible at execution time. Per-node elapsed time and tokens are `UNKNOWN`; no time estimate was inferred from build duration. The next scheduler rerun uses `--defer-node N066` only for this invocation.
+
+## Next five-batch invocation, batch 2 — 2026-10-19
+
+The strict rerun with N066 deferred selected N185→N187, score 3.500. N185 received two substantive edit/check groups: exact manuscript/certificate audit and checked full-base plus finite-subset automorphism criteria. `lake build Matroid.R10Automorphism` passed (1895 jobs), and the tracked axiom audit shows no `sorryAx` on the new bridges. The referenced ancillary enumeration is absent; neither a computable basis predicate bridge nor an exhaustive 720-permutation certificate has been supplied. N185 remains `UNRESOLVED`, with evidence-based remaining cost 5.8 (formerly 6.0), medium confidence, and is run-locally deferred. N187 directly requires N185 and was not attempted. Per-node elapsed time and tokens are `UNKNOWN`. The next scheduler rerun uses `--defer-node N066 --defer-node N185`.
+
+## Next five-batch invocation, batch 3 — 2026-10-19
+
+The strict rerun selected N226→N200, score 3.417. N226 received three substantive groups: exact recursive source/hypothesis audit, generic cycle extensionality, and exact proper-stage target-circuit bridge. The latter is conditional only on the already cited N146 premise; its 5^h induction and attainment remain open. The existing N146 Lean signature is narrower than Oxley's general statement and would require regularity of each intermediate stage; a general proper-stage circuit lemma or a checked N219 regularity transport is still needed. N226 remains `UNRESOLVED`, with factual remaining ordinal cost 5.0 (formerly heuristic 3.0), medium confidence, and is run-locally deferred. N200 received two groups: exact manuscript family/label audit and a finite `decide` certificate of candidate injectivity and all nine label incidences. It is `KERNEL_PROVED`; no remaining cost. `lake build Matroid.R10CircuitIncidence Matroid.RecursiveCircuitBounds Matroid.NextFiveBatchAxiomAudit` passed (1909 jobs), with ordinary axioms on N200 and the generic bridges, and `sorryAx` only on N226's N146-dependent interface. Per-node elapsed time/tokens are `UNKNOWN`. No DAG edge changed; the next scheduler run also defers N226 only for this invocation.
+
+## Next five-batch invocation, batch 4 — 2026-10-19
+
+The selected sequence was N037→N035. Per-node elapsed time and tokens are `UNKNOWN`.
+
+| ID | Observed route and edit/check groups | Result and remaining cost |
+| --- | --- | --- |
+| N037 | Two groups: manuscript/Lean signature and exact Oxley Lemma 7.2.2 plus Theorem 7.2.3 audit; isolated forward and inverse premises with public wrappers and focused build | `CITED_ASSUMPTION`; no remaining scheduled N037 cost. The cited source covers the fixed fresh label, uniqueness, loop and coloop cuts. `sorryAx` is explicit. |
+| N035 | Two groups: modular-cut definition and mathlib flat-intersection API; nonempty intersection proof, full cut, least generated cut, focused build | `KERNEL_PROVED`; no remaining cost. Nonempty-family qualification corrects the false literal empty-intersection case. |
+
+The focused `lake build Matroid.GeneratedModularCut Matroid.ModularCutExtension Matroid.NextFiveBatchAxiomAudit` passed (1917 jobs). No direct edge changed. The next strict scheduler run retains N066/N185/N226 as run-local deferrals only.
+
+## Next five-batch invocation, batch 5 — 2026-10-19
+
+The strict rerun selected N196→N267. Per-node elapsed time and tokens are `UNKNOWN`.
+
+| ID | Observed route and edit/check groups | Result and remaining cost |
+| --- | --- | --- |
+| N196 | Four groups: manuscript maximal-negative family and N195 interface audit; decidable target-span and fifteen-candidate predicates; exhaustive 1024-subset certificate; actual R10 closure and arbitrary-superset maximality bridge | `KERNEL_PROVED`; no remaining cost. Focused build and axiom audit passed. |
+| N267 | Two groups: exact K4 opposite-spoke indexing and graphic construction; N266 signature instantiation with three independent symbolic spoke weights | `UNRESOLVED`; 3.0→4.5 residual score, medium confidence. The finite graphic independence/spanning/closure table and five polynomial equalities are open. No admission. |
+
+The focused `lake build Matroid.R10MaxNegative Matroid.K4Triangle Matroid.NextFiveBatchAxiomAudit` passed (1929 jobs). No direct edge changed. Run-local deferrals N066/N185/N226/N267 are cleared after this five-batch invocation.
+
+Final shared checks: full `lake build` passed (9192 jobs); eight scheduler unit tests passed; `git diff --check` passed. A strict rerun after batch 5 with all four run-local deferrals selected N161→N153, and the final clean strict rerun selected N066→N159. The latter is the reproducible next-invocation recommendation, not an extra sixth batch. Per-node time and token measurements remain `UNKNOWN`.

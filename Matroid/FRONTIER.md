@@ -458,3 +458,7 @@ The entry `lake build` and `git diff --check` passed. The direct edge N174→N17
 | N175 | 7 | N026, N062, N174 | `UNRESOLVED`, outside this pass | Cographic minor closure is now a depth-7 task by the evidenced direct edge. |
 
 The active total is **89/197 kernel-complete**. At depth 6, **21/22** nodes are kernel-complete and **22/22** are complete relative to the cited Tutte premise. All earlier certified depths remain complete. The minimum kernel-unresolved depth is 6; the minimum citation-relative unresolved depth is 7. `PROOF_STATUS.csv` and `DEPTH6_AUDIT.md` give the per-target trust and signature audit.
+
+## Current scheduler frontier — 2026-10-19 five-batch closeout
+
+The current strict scheduler recomputes **197 active nodes**, **452 direct active edges**, **121 available** (including **9 directly cited assumptions**), **76 unresolved**, and **43 eligible unresolved**. Structural depths remain audit metadata; no edge or depth changed in these five batches. N200, N035, and N196 are newly kernel proved; N037 is source-verified and cited. N066, N185, N226, and N267 retain their unresolved statuses and documented partial Lean work. Full `lake build` passed (9192 jobs), eight scheduler tests passed, and the tracked axiom audit distinguishes ordinary axioms from the N037 and inherited N146 `sorryAx` premises. The clean, no-deferral recommendation in `NEXT_BATCH.md` is **N066→N159**, score **4.091**; N159 remains blocked until N066 is actually completed. The older depth snapshots above remain historical, not current execution orders.

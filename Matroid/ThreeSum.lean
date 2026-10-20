@@ -77,6 +77,43 @@ theorem triangle_pair_mem_span_iff_exists_subset_sum {α V W : Type*}
   · rintro ⟨s, rfl⟩
     exact triangle_pair_sum_mem_span T φM φN s
 
+/-- The quotient relation in the binary three-sum candidate is exactly a
+finite matched triangle correction. This retains all original edge labels
+and is the algebraic step in the cycle correspondence. -/
+theorem triangle_quotient_sum_eq_zero_iff {α V W : Type*}
+    [AddCommGroup V] [Module (ZMod 2) V]
+    [AddCommGroup W] [Module (ZMod 2) W]
+    (E F T : Set α) [Fintype T]
+    [DecidablePred (· ∈ E)] [DecidablePred (· ∈ F)]
+    (φM : α → V) (φN : α → W) (s : Finset α) :
+    let U : Submodule (ZMod 2) (V × W) :=
+      Submodule.span (ZMod 2)
+        (Set.range (fun t : T => (φM t.1, φN t.1)))
+    (∑ e ∈ s, Submodule.Quotient.mk (p := U)
+      (if e ∈ E then φM e else 0, if e ∈ F then φN e else 0)) = 0 ↔
+      ∃ t : Finset T,
+        (∑ e ∈ s.filter (· ∈ E), φM e,
+         ∑ e ∈ s.filter (· ∈ F), φN e) =
+          ∑ x ∈ t, (φM x.1, φN x.1) := by
+  classical
+  intro U
+  change (∑ e ∈ s, (Submodule.mkQ U)
+    (if e ∈ E then φM e else 0,
+     if e ∈ F then φN e else 0)) = 0 ↔ _
+  rw [← map_sum, Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero]
+  have hsum : (∑ e ∈ s,
+      (if e ∈ E then φM e else 0,
+       if e ∈ F then φN e else 0)) =
+      (∑ e ∈ s.filter (· ∈ E), φM e,
+       ∑ e ∈ s.filter (· ∈ F), φN e) := by
+    induction s using Finset.induction_on with
+    | empty => rfl
+    | @insert e s he ih =>
+        by_cases hE : e ∈ E <;> by_cases hF : e ∈ F <;>
+          simp [Finset.sum_insert, he, ih, Finset.filter_insert, hE, hF]
+  rw [hsum]
+  exact triangle_pair_mem_span_iff_exists_subset_sum T φM φN _
+
 theorem threeSumCycle_empty {α : Type*} (M N : Matroid α) (T : Set α) :
     ThreeSumCycle M N T ∅ := by
   refine ⟨∅, ∅, ?_, ?_, ?_, ?_⟩
@@ -112,6 +149,51 @@ theorem ThreeSumCycle.subset_symmDiff_ground {α : Type*}
       exact ⟨hxM, hDE hxD⟩
     have hxCT : x ∈ C ∩ T := htrace.symm ▸ (show x ∈ D ∩ T from ⟨hxD, hxT⟩)
     exact hxC hxCT.1
+
+/-- On each surviving side, a matched pair's symmetric difference is
+the corresponding input cycle with the whole common triangle removed. -/
+theorem threeSumCycle_side_restrict {α : Type*}
+    {M N : Matroid α} {T C D : Set α}
+    (hC : C ⊆ M.E) (hD : D ⊆ N.E)
+    (hinter : M.E ∩ N.E = T) (htrace : C ∩ T = D ∩ T) :
+    (_root_.symmDiff C D) ∩ M.E = C \ T ∧
+      (_root_.symmDiff C D) ∩ N.E = D \ T := by
+  constructor <;> ext x
+  · have hEF : (x ∈ M.E ∧ x ∈ N.E) ↔ x ∈ T := by
+      simpa only [Set.mem_inter_iff] using Set.ext_iff.mp hinter x
+    have hCD : (x ∈ C ∧ x ∈ T) ↔ (x ∈ D ∧ x ∈ T) := by
+      simpa only [Set.mem_inter_iff] using Set.ext_iff.mp htrace x
+    simp only [Set.mem_inter_iff, Set.mem_symmDiff, Set.mem_sdiff]
+    have hcE : x ∈ C → x ∈ M.E := fun hx => hC hx
+    have hdF : x ∈ D → x ∈ N.E := fun hx => hD hx
+    tauto
+  · have hEF : (x ∈ M.E ∧ x ∈ N.E) ↔ x ∈ T := by
+      simpa only [Set.mem_inter_iff] using Set.ext_iff.mp hinter x
+    have hCD : (x ∈ C ∧ x ∈ T) ↔ (x ∈ D ∧ x ∈ T) := by
+      simpa only [Set.mem_inter_iff] using Set.ext_iff.mp htrace x
+    simp only [Set.mem_inter_iff, Set.mem_symmDiff, Set.mem_sdiff]
+    have hcE : x ∈ C → x ∈ M.E := fun hx => hC hx
+    have hdF : x ∈ D → x ∈ N.E := fun hx => hD hx
+    tauto
+
+/-- A binary cycle has the same column sum on a finite retained part as
+on the removed triangle trace. -/
+theorem binary_sum_sdiff_eq_sum_inter {α V : Type*}
+    [DecidableEq α]
+    [AddCommGroup V] [Module (ZMod 2) V]
+    (φ : α → V) (s t : Finset α)
+    (hzero : ∑ e ∈ s, φ e = 0) :
+    ∑ e ∈ s \ t, φ e = ∑ e ∈ s ∩ t, φ e := by
+  classical
+  have hsplit := Finset.sum_inter_add_sum_sdiff s t φ
+  rw [hzero] at hsplit
+  have hneg : -(∑ e ∈ s ∩ t, φ e) = ∑ e ∈ s ∩ t, φ e := by
+    have htwo : (2 : ZMod 2) = 0 := by decide
+    have hz : (2 : ZMod 2) • (∑ e ∈ s ∩ t, φ e) = 0 := by simp [htwo]
+    exact (neg_eq_iff_add_eq_zero).2 (by simpa only [two_smul] using hz)
+  have hsplit' : (∑ e ∈ s \ t, φ e) + (∑ e ∈ s ∩ t, φ e) = 0 := by
+    simpa only [add_comm] using hsplit
+  exact (eq_neg_of_add_eq_zero_left hsplit').trans hneg
 
 /-- Binary cycle addition preserves the matching trace condition. -/
 theorem ThreeSumCycle.symmDiff {α : Type u}

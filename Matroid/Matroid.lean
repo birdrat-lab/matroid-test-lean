@@ -43,6 +43,8 @@ import Matroid.GraphicMinors
 import Matroid.RegularTUConverse
 import Matroid.TwoSumCycles
 import Matroid.FlatsAndCocircuits
+import Matroid.GeneratedModularCut
+import Matroid.ModularCutExtension
 import Matroid.PositiveCircuitSupport
 import Matroid.ContractedPort
 import Matroid.TwoSumCardinality
@@ -53,6 +55,11 @@ import Matroid.R10CircuitParity
 import Matroid.R10Connected
 import Matroid.K33
 import Matroid.R10Minors
+import Matroid.CycleExtensionality
+import Matroid.RecursiveCircuitBounds
+import Matroid.R10CircuitIncidence
+import Matroid.R10MaxNegative
+import Matroid.K4Triangle
 import Matroid.R10TargetCircuits
 import Matroid.TwoSumProper
 import Matroid.RecursiveR10

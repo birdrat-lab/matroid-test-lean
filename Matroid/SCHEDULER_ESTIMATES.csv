@@ -7,17 +7,22 @@ N146,,high,Source-verified Oxley Proposition 7.1.20 admitted narrowly; no remain
 N152,4.5,medium,Exact child-cycle and two-sum cycle-relabel formulas now checked; full matroid relabeling still needs generic mapEquiv circuit-union transport and an extensionality bridge
 N161,6.0,medium,Polynomial final step proved but no formal Cauchy-Binet coefficient bridge from five closure-class sums to determinant of the triangle update; manuscript-local identity cannot be admitted
 N059,6.0,medium,"Standard-form kernel equation now checked; still requires faithful disjoint-label extension, free deletion, quotient-to-contraction isomorphism, and the regular converse"
-N066,5.5,medium,Full proper-triangle specification and finite F2 paired-span subset-sum kernel now checked; remaining two-way quotient-cycle correspondence is still substantial
+N066,4.8,medium,"Checked quotient zero iff matched finite triangle correction, side restriction, and binary trace sum; still needs two-way cycle transport and matroid existence on exact ground"
 N182,3.5,medium,Earlier kernel decide attempts exhausted limits; shared finite checker likely needed
-N185,6.0,medium,Manuscript ancillary R10 atlas verifier is absent; exact 10-label automorphism count target compiles but exhaustive completeness certificate and matroid-preservation checker remain to be built
+N185,5.8,medium,Exact matroid and finite-subset basis-preservation criteria now checked; no 720-element exhaustive certificate or ancillary verifier is present
 N204,,high,"Completed manuscript-local parallel target construction with a fresh label, exact proper glue relation and N065 existence bridge; no external citation applies"
 N139,,high,Completed local factorization and extended ratio conditional on N138; no remaining proof cost is scheduled
 N172,,high,"Completed as source-verified Oxley Lemma 6.6.9 deletion premise; exact K3,3 graph and labeled binary-to-real bridge checked"
 N173,,high,"Completed as source-verified Oxley Lemma 6.6.9 contraction premise; exact K3,3 bond dual and labeled binary-to-real bridge checked"
 N186,,high,Source-verified Oxley Lemma 6.6.9 proof admitted on binary A10 with admission-free exact-label bridge to r10
-N037,3.0,low,External modular cut classification requires actual source theorem matching exact extension semantics
+N037,,high,Oxley Lemma 7.2.2 and Theorem 7.2.3 matched exact labeled finite extension; cited premises isolated; no remaining N037 proof cost
+N035,,high,Kernel proof of nonempty modular-cut intersections and least generated cut for flats completed
 N255,,high,Completed by fifteen finite binary four-circuit certificates and a general minimality proof; historical source audit did not find an exact standalone external connectedness theorem
 N218,,high,Completed as the manuscript recursive pointed-stage predicate with exact N065 proper-two-sum bridge; stage existence and preservation are distinct later requirements
 N195,,high,Completed by finite binary target-circuit enumeration and exact manuscript K33 matching/double-star label bridge
 N147,,high,Completed local closure substitution conditional only on previously source-verified N146 circuit premise
 N150,,high,Completed rank-add-one proof conditional only on previously source-verified N138 basis premise
+N226,5.0,medium,Cycle extensionality and exact proper-stage circuit bridge checked; full recursive leaf-count bound and attainment induction still require regularity/finite transport through arbitrary recorded stages
+N200,,high,Completed by exact nine-circuit injectivity and per-label finite incidence certificate; no remaining proof cost
+N196,,high,Completed by exhaustive finite span certificate and exact maximality bridge; no remaining cost
+N267,4.5,medium,Exact K4 graphic object and N266 signature now defined; remaining finite graphic independence spanning and closure table plus five weighted polynomial equalities
