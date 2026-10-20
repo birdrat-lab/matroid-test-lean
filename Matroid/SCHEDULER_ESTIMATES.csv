@@ -1,18 +1,23 @@
 id,residual_cost,confidence,reason
 N138,,high,Completed as source-verified cited premise; no remaining proof cost is scheduled; historical abstract independence proof retained
-N068,2.3,low,External cited in ledger; cost only of exact citation/hypothesis correspondence and isolated interface
+N068,,high,Completed as source-verified Oxley Corollary 7.1.26 regularity premise; no remaining N068 obligation is scheduled
 N055,,high,Completed via Oxley 2011 Proposition 6.6.5 with an isolated cited premise; N052 supplies the fixed labeled TU realization
 N118,2.0,low,Externally cited signed TU circuit dependence; target normalization matters
-N146,2.3,low,Externally cited circuit gluing; source correspondence remains unverified
-N152,2.0,low,Short abstract relabeling candidate; no completed Lean construction
-N161,4.0,low,Manuscript triangle five-sum proof remains; substantial matroid/Plucker argument
-N059,4.0,low,Manuscript quotient theorem requires two directions and disjoint labeled construction
-N066,6.0,medium,Checked matching-triangle cycle family and binary quotient candidate; remaining two-way cycle correspondence needs a finite triangle-span quotient kernel theorem and proper-triangle hypotheses
+N146,,high,Source-verified Oxley Proposition 7.1.20 admitted narrowly; no remaining N146 obligation is scheduled
+N152,4.5,medium,Exact child-cycle and two-sum cycle-relabel formulas now checked; full matroid relabeling still needs generic mapEquiv circuit-union transport and an extensionality bridge
+N161,6.0,medium,Polynomial final step proved but no formal Cauchy-Binet coefficient bridge from five closure-class sums to determinant of the triangle update; manuscript-local identity cannot be admitted
+N059,6.0,medium,"Standard-form kernel equation now checked; still requires faithful disjoint-label extension, free deletion, quotient-to-contraction isomorphism, and the regular converse"
+N066,5.5,medium,Full proper-triangle specification and finite F2 paired-span subset-sum kernel now checked; remaining two-way quotient-cycle correspondence is still substantial
 N182,3.5,medium,Earlier kernel decide attempts exhausted limits; shared finite checker likely needed
-N185,4.0,low,Finite automorphism completeness certificate not just generator exhibition
-N204,3.2,low,External cited but precise statement design and target/glue distinction remain open
+N185,6.0,medium,Manuscript ancillary R10 atlas verifier is absent; exact 10-label automorphism count target compiles but exhaustive completeness certificate and matroid-preservation checker remain to be built
+N204,,high,"Completed manuscript-local parallel target construction with a fresh label, exact proper glue relation and N065 existence bridge; no external citation applies"
 N139,,high,Completed local factorization and extended ratio conditional on N138; no remaining proof cost is scheduled
-N172,2.8,low,External R10 deletion identity requires exact labeled K33 isomorphism and verified source
-N173,2.8,low,External R10 contraction identity requires exact labeled dual K33 isomorphism and verified source
-N186,2.4,low,External R10 automorphism transitivity needs exact source and indexed action correspondence
+N172,,high,"Completed as source-verified Oxley Lemma 6.6.9 deletion premise; exact K3,3 graph and labeled binary-to-real bridge checked"
+N173,,high,"Completed as source-verified Oxley Lemma 6.6.9 contraction premise; exact K3,3 bond dual and labeled binary-to-real bridge checked"
+N186,,high,Source-verified Oxley Lemma 6.6.9 proof admitted on binary A10 with admission-free exact-label bridge to r10
 N037,3.0,low,External modular cut classification requires actual source theorem matching exact extension semantics
+N255,,high,Completed by fifteen finite binary four-circuit certificates and a general minimality proof; historical source audit did not find an exact standalone external connectedness theorem
+N218,,high,Completed as the manuscript recursive pointed-stage predicate with exact N065 proper-two-sum bridge; stage existence and preservation are distinct later requirements
+N195,,high,Completed by finite binary target-circuit enumeration and exact manuscript K33 matching/double-star label bridge
+N147,,high,Completed local closure substitution conditional only on previously source-verified N146 circuit premise
+N150,,high,Completed rank-add-one proof conditional only on previously source-verified N138 basis premise

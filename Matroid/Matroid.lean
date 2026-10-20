@@ -50,5 +50,16 @@ import Matroid.CographicMinors
 import Matroid.TriangleClassPositivity
 import Matroid.RelationFundamentalCircuit
 import Matroid.R10CircuitParity
+import Matroid.R10Connected
+import Matroid.K33
+import Matroid.R10Minors
+import Matroid.R10TargetCircuits
+import Matroid.TwoSumProper
+import Matroid.RecursiveR10
+import Matroid.ParallelTarget
+import Matroid.TwoSumTargetClosure
+import Matroid.MapCircuitUnion
+import Matroid.TwoElementCircuit
+import Matroid.TwoSumRank
 import Matroid.TwoSumBasis
 import Matroid.TwoSumWeights

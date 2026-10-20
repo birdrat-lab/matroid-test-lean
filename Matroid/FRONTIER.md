@@ -2,7 +2,31 @@
 
 Computed mechanically from `Matroid/LEDGER.md` and `Matroid/DEPENDENCY_EDGES.csv`. Active scopes are `CORE_MATROID` and `MATROID_INTERFACE`; depth is the longest direct-prerequisite chain. `Matroid/DEPTHS.csv` contains the row-level calculation.
 
-**Current status (2026-10-19): 99/197 active nodes are kernel-proved, three are directly cited assumptions (N052, N055, N138), and one is a conditional local proof (N139).** The strict scheduler counts 103 available nodes, 94 unresolved nodes, 450 direct active edges, and 39 eligible unresolved nodes. N055's fixed-TU conclusion depends on N052 as well as its own cited uniqueness theorem. N066 remains unresolved after partial construction work. N107 now has the genuine N032 cocircuit-separation prerequisite; its structural depth is 9 and N110's is 10. Structural depths are audit metadata, not an execution order. The fresh recommendation is **N146 → N186** in `NEXT_BATCH.md`; it has not been started.
+**Current status (2026-10-19): 106/197 active nodes are kernel-proved; eight are directly cited assumptions (N052, N055, N068, N138, N146, N172, N173, N186); three have completed local conditional proofs (N139, N147, N150).** The clean strict scheduler counts 117 available, 80 unresolved, 452 direct active edges, and 43 eligible unresolved nodes. Structural depths are audit metadata, not an execution order. The next recommendation is **N066 → N159**, score 3.729, with no run-local deferrals in `NEXT_BATCH.md`.
+
+## Current five-batch run
+
+| Batch | Scheduler selection | Outcome |
+| --- | --- | --- |
+| 1 | N255 → N218 | Both `KERNEL_PROVED`: finite R10 common-circuit certificate and exact recursive-stage specification. |
+| 2 | N195 → N147 | N195 `KERNEL_PROVED` by finite target-circuit certificate; N147 `CONDITIONAL_PROOF` via N146. |
+| 3 | N152 → N150 | N152 partial cycle/relabeling lemmas checked, full isomorphism unresolved and rescheduled; N150 `CONDITIONAL_PROOF` via N138. |
+| 4 | N204 → N066 | N204 source provenance corrected and its construction `KERNEL_PROVED`; N066 proper three-sum specification/span lemma checked, cycle correspondence unresolved and rescheduled. |
+| 5 | N172 → N173 | Both exact Oxley Lemma 6.6.9 statements source-verified as isolated `CITED_ASSUMPTION` premises, with checked real-R10 and labeled K3,3 bridges. |
+
+The full `lake build` passed (9183 jobs), the tracked `FiveBatchAxiomAudit` printed `sorryAx` only for expected citation-relative declarations, all eight scheduler tests passed, and `git diff --check` passed. N152 and N066 were deferred only for this invocation. The final clean scheduler restored them to eligibility and selected N066→N159. The attempt details and source comparisons are in `PROOF_BUDGET.md`, `FORMALIZATION_LOG.md`, and `SOURCES.md`.
+
+## Automated five-batch run
+
+| Batch | Scheduler selection | Outcome |
+| --- | --- | --- |
+| 1 | N146 → N186 | Both exact Oxley results source-verified and isolated as `CITED_ASSUMPTION`; local labeled bridges checked. |
+| 2 | N185 → N187 | N185 remains unresolved because the finite automorphism completeness certificate and referenced ancillary verifier are absent; dependent N187 was not attempted. |
+| 3 | N161 → N068 | N161's final algebra checked, determinant coefficient bridge unresolved; N068 source-verified as `CITED_ASSUMPTION`. |
+| 4 | N059 → N032 | N059 kernel-block equation checked, quotient extension unresolved; N032 `KERNEL_PROVED`. The provisional N218→N195 proposal was corrected by adding the genuine N255→N218 edge before this selection. |
+| 5 | N107 → N263 | Both `KERNEL_PROVED`, including the manuscript's hyperplane-complement cocircuit interface. Added N032→N263 and recomputed all affected depths before proof work. |
+
+The full `lake build`, tracked `MultiBatchAxiomAudit`, eight scheduler tests, and clean strict scheduler regeneration passed. N185, N161, and N059 have factual residual estimates and remain eligible at the next invocation. The source matches and attempt details are in `SOURCES.md`, `PROOF_BUDGET.md`, and `FORMALIZATION_LOG.md`. Sections below retain earlier historical frontiers.
 
 ## Scheduler-directed short batch: N066 → N055
 

@@ -17,6 +17,66 @@ def ThreeSumCycle {α : Type*} (M N : Matroid α)
   ∃ C D : Set α, M.IsCircuitUnion C ∧ N.IsCircuitUnion D ∧
     C ∩ T = D ∩ T ∧ X = symmDiff C D
 
+/-- The exact properness and cycle specification in the manuscript's
+three-sum case. Existence of a matroid satisfying it remains N066's
+substantive open obligation. -/
+def IsProperThreeSum {α : Type*} (M N P : Matroid α)
+    (T : Set α) : Prop :=
+  M.E ∩ N.E = T ∧ T.ncard = 3 ∧
+  M.IsCircuit T ∧ N.IsCircuit T ∧
+  (∀ K : Set α, M.IsCocircuit K → ¬ K ⊆ T) ∧
+  (∀ K : Set α, N.IsCocircuit K → ¬ K ⊆ T) ∧
+  7 ≤ M.E.ncard ∧ 7 ≤ N.E.ncard ∧
+  P.E = symmDiff M.E N.E ∧
+  ∀ X : Set α, P.IsCircuitUnion X ↔ ThreeSumCycle M N T X
+
+/-- Every selected subset of the common triangle yields an element of the
+paired-column span used by the binary quotient candidate. -/
+theorem triangle_pair_sum_mem_span {α V W : Type*}
+    [AddCommGroup V] [Module (ZMod 2) V]
+    [AddCommGroup W] [Module (ZMod 2) W]
+    (T : Set α) (φM : α → V) (φN : α → W)
+    (s : Finset T) :
+    (∑ t ∈ s, (φM t.1, φN t.1)) ∈
+      Submodule.span (ZMod 2)
+        (Set.range (fun t : T => (φM t.1, φN t.1))) := by
+  apply Submodule.sum_mem
+  intro t ht
+  apply Submodule.subset_span
+  exact ⟨t, rfl⟩
+
+/-- Over `F₂`, every member of the finite paired-triangle span is a sum
+of a subset of its indexed generators. This is the finite kernel step
+needed to recover a matching triangle trace from the quotient. -/
+theorem triangle_pair_mem_span_iff_exists_subset_sum {α V W : Type*}
+    [AddCommGroup V] [Module (ZMod 2) V]
+    [AddCommGroup W] [Module (ZMod 2) W]
+    (T : Set α) [Fintype T] (φM : α → V) (φN : α → W)
+    (z : V × W) :
+    z ∈ Submodule.span (ZMod 2)
+      (Set.range (fun t : T => (φM t.1, φN t.1))) ↔
+      ∃ s : Finset T, z = ∑ t ∈ s, (φM t.1, φN t.1) := by
+  classical
+  let v : T → V × W := fun t => (φM t.1, φN t.1)
+  constructor
+  · intro hz
+    obtain ⟨c, hc⟩ :=
+      (Submodule.mem_span_range_iff_exists_fun (ZMod 2)).mp hz
+    let s : Finset T := Finset.univ.filter (fun t => c t = 1)
+    refine ⟨s, ?_⟩
+    rw [← hc]
+    simp only [s, Finset.sum_filter]
+    apply Finset.sum_congr rfl
+    intro t ht
+    by_cases hct : c t = 1
+    · simp [hct]
+    · have hz : c t = 0 := by
+        have h01 : ∀ a : ZMod 2, a = 0 ∨ a = 1 := by decide
+        exact (h01 (c t)).resolve_right hct
+      simp [hz]
+  · rintro ⟨s, rfl⟩
+    exact triangle_pair_sum_mem_span T φM φN s
+
 theorem threeSumCycle_empty {α : Type*} (M N : Matroid α) (T : Set α) :
     ThreeSumCycle M N T ∅ := by
   refine ⟨∅, ∅, ?_, ?_, ?_, ?_⟩

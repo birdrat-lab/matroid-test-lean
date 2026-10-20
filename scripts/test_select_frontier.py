@@ -57,6 +57,27 @@ class SchedulerRepositoryTests(unittest.TestCase):
                     available.add(nid)
                 self.assertGreater(metrics['score'], 0)
 
+    def test_run_local_defer_excludes_node_without_completing_it(self):
+        p = self.planner
+        first = p.rank_batch(size=2, beam_width=40, top=1)
+        self.assertTrue(first)
+        blocked = first[0][0][0]
+        self.assertIn(blocked, p.remaining)
+        filtered = p.rank_batch(size=2, beam_width=40, top=5, deferred={blocked})
+        self.assertTrue(filtered)
+        for seq, metrics in filtered:
+            self.assertNotIn(blocked, seq)
+            available = set(p.ready)
+            for nid in seq:
+                self.assertTrue(p.preds[nid] <= available)
+                available.add(nid)
+        self.assertIn(blocked, p.remaining)
+        self.assertIn(blocked, p.eligible(p.ready))
+
+    def test_run_local_defer_validates_node_ids(self):
+        with self.assertRaisesRegex(ValueError, "Unknown deferred node"):
+            self.planner.rank_batch(size=2, deferred={"N9999"})
+
     def test_word_count_is_only_attached_to_located_proofs(self):
         p = self.planner
         self.assertIn('N139', p.word_counts)

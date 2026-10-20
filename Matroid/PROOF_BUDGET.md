@@ -135,3 +135,115 @@ The entry scheduler scored this sequence 5.215 with residual-cost sum 6.0 after 
 | N055 | `prop:regular-basic-properties`; Oxley 2011 Proposition 6.6.5 and Proposition 6.3.12, with explicit rank-zero discussion | 2: exact source/signature/mathlib audit; isolated citation and local TU specialization with Lean check | `External.binary_real_projective_uniqueness` cited; `Regular.real_representations_projectivelyEquivalent` and `Regular.exists_tu_projectivelyEquivalent` compiled. No residual N055 obligation relative to the verified external theorem. | `CITED_ASSUMPTION`; residual cost cleared. The fixed-TU conclusion also inherits previously cited N052. |
 
 The focused `Matroid.ThreeSum`, `Matroid.External.ProjectiveUniqueness`, `Matroid.ProjectiveUniqueness`, and `Matroid.CurrentBatchAxiomAudit` builds and full `lake build` passed. The full build took 10.44 seconds of observed command wall time; it is **not** charged to either theorem individually. The N066 helpers print only `propext`, `Classical.choice`, and `Quot.sound`. The N055 premise and descendants print `sorryAx`; the TU descendant relies on both the new N055 premise and earlier N052. No N066 construction theorem was admitted or marked available.
+
+## Five-batch invocation, batch 1 — 2026-10-19
+
+| ID | Route and observed edit/check groups | Result and remaining cost |
+| --- | --- | --- |
+| N146 | One source/signature/mathlib audit, one isolated-citation and target-specialization Lean check | `External.regularTwoSum_isCircuit_iff` cited; `regularTwoSum_targetCircuit_iff` local proof. `CITED_ASSUMPTION`, no scheduled residual cost. Per-node time/tokens `UNKNOWN`. |
+| N186 | One source/signature/mathlib audit, one binary-to-real bridge and isolated-citation Lean check | `r10_eq_binary` kernel-proved; `External.binaryR10_element_transitive` cited; `r10_element_transitive` local transport. `CITED_ASSUMPTION`, no scheduled residual cost. Per-node time/tokens `UNKNOWN`. |
+
+Focused builds and `MultiBatchAxiomAudit` passed. New `sorryAx` appears only through the two isolated external premises and their local descendants; the binary bridge is axiom clean. The ledger retains historical unresolved attempts above as chronology.
+
+## Five-batch invocation, batch 2 — 2026-10-19
+
+| ID | Route and observed edit/check groups | Result and remaining cost |
+| --- | --- | --- |
+| N185 | Two groups: manuscript/provenance and ancillary-file audit; exact indexed automorphism type and identity proof with focused Lean check | `R10Automorphism.lean` compiles and states the exact finite cardinality target. The claimed `anc/r10_atlas/` verifier is absent, so no exhaustive preservation/completeness certificate is available. `UNRESOLVED`; remaining ordinal cost 4.0→6.0 (medium confidence), based on the missing checker and 10-label enumeration bridge, not to manipulate selection. Time/tokens `UNKNOWN`. Deferred only for this invocation. |
+| N187 | Recorded prerequisite N185 remains unresolved; no theorem attempt is valid yet. | `UNRESOLVED`; residual cost unchanged at 3.0. |
+
+The selected N185→N187 sequence cannot complete because N187 directly requires N185. No group-order result was admitted or marked available.
+
+## Five-batch invocation, batch 3 — 2026-10-19
+
+| ID | Route and observed edit/check groups | Result and remaining cost |
+| --- | --- | --- |
+| N161 | Two groups: exact five-class determinant proof audit; algebraic coefficient consequence and focused Lean check | `triangle_identity_of_det_coefficients` is kernel-proved. The bridge from N266's closure-class sums to coefficients of the positive-definite determinant, including Cauchy–Binet and triangle column normalization, is absent. N161 remains `UNRESOLVED`, 4.0→6.0 residual score (medium confidence), deferred for this invocation only. Time/tokens `UNKNOWN`. |
+| N068 | Two groups: exact Oxley Corollary 7.1.26 and N065 hypothesis check; isolated premise and focused Lean check | `External.regularTwoSum_regular` compiles, `CITED_ASSUMPTION`; no scheduled residual cost. Time/tokens `UNKNOWN`. |
+
+The selected order was N161→N068. N068 is independently eligible despite the N161 stall. No new direct dependency was needed.
+
+
+## Five-batch invocation, batch 4 — 2026-10-19
+
+The provisional N218→N195 recommendation was rejected before proof work: the manuscript's recursive proper gluing requires base R10 connectedness N255, absent from N218's direct edges. Added N255→N218 and recomputed all active depths; none changed because both N255 and existing N068 have depth 7. The strict rerun selected N059→N032 (score 3.930, residual sum 7.32).
+
+| ID | Route and observed edit/check groups | Result and remaining cost |
+| --- | --- | --- |
+| N059 | Two groups: exact theorem and TU construction API audit; checked standard-form kernel-block multiplication | `standardForm_mul_kernelBlock` is kernel-proved. Existing N056/N057 cover pivot and TU augmentation, but no faithful disjoint-label free-extension object or proof that its contraction is the original matroid has been built. The regular converse also needs labeled transport. `UNRESOLVED`; 4.0→6.0 residual score (medium confidence), deferred only this invocation. Time/tokens `UNKNOWN`. |
+| N032 | Two groups: manuscript/hypothesis and mathlib API audit; basis-extension proof and focused Lean check | `cocircuit_separates_closure` is kernel-proved for `A⊆E` and `e∈E` explicit. The manuscript's ambient-ground convention implies the latter; without it the statement is false. No residual cost. Time/tokens `UNKNOWN`. |
+
+N032's conclusion uses mathlib's `IsCocircuit`, whose definition is a dual circuit and mathematically equivalent to complement of a hyperplane. The project's N018 predicate records that same complement convention. A tracked axiom print checks the new theorem.
+
+
+## Five-batch invocation, batch 5 — 2026-10-19
+
+The strict scheduler selected N107→N263 (score 4.790, residual sum 4.2). The N263 proof route needs the separator N032 directly; added N032→N263 before implementation and recalculated all depths. N263 and descendants N196/N201/N227/N229 moved up one depth. Strict validation then retained N107→N263.
+
+| ID | Route and observed edit/check groups | Result and remaining cost |
+| --- | --- | --- |
+| N107 | Two groups: exact finite pointed support convention and nonempty minimum; Lean definition/spec and N018 cocircuit-interface bridge | `negativeTargetSupport` minimizes `|D|−1` over manuscript hyperplane-complement cocircuits avoiding `A`. `negativeTargetSupport_spec` uses N032 to prove attainment. `KERNEL_PROVED`; no residual cost. Time/tokens `UNKNOWN`. |
+| N263 | Three groups: mathlib minimal-nonspanning cocircuit API audit; maximal-flat proof; manuscript N018 cocircuit conclusion and focused build | `maximal_nonspanning_isHyperplane` proves hyperplane, mathlib cocircuit, and target membership; `maximal_nonspanning_isHyperplaneCocircuit` proves the manuscript cocircuit predicate. `KERNEL_PROVED`; no residual cost. Time/tokens `UNKNOWN`. |
+
+The bridge `IsCocircuit.isHyperplaneCocircuit` and N032's manuscript-predicate corollary are kernel-proved. The five selected batches are complete as an invocation checkpoint; N185, N161, and N059 remain unresolved.
+
+## Five-batch invocation closeout — 2026-10-19
+
+Full `lake build` passed (9171 jobs; command wall time 10.21 seconds, shared check rather than a per-node cost). The tracked `MultiBatchAxiomAudit` printed `sorryAx` on precisely the three new source-verified external premises N146/N186/N068 and their expected local descendants; all new N032/N107/N263 declarations and all three partial-proof lemmas printed only ordinary Lean axioms. Eight scheduler tests passed. The strict scheduler with run-local deferrals was rerun after batch 5; it proposed N255→N218. All deferrals were then cleared and the clean strict scheduler again proposed N255→N218. No unresolved result was marked available.
+
+## Current five-batch invocation, batch 1 — 2026-10-19
+
+The clean strict scheduler selected N255→N218 (score 3.782; residual sum 5.5). Both direct prerequisite sets were confirmed in the current DAG. Per-node elapsed time and tokens are `UNKNOWN`.
+
+| ID | Observed route and substantive Lean edit/check groups | Result and residual estimate |
+| --- | --- | --- |
+| N255 | Four groups: exact manuscript/source and binary representation audit; five then fifteen checked four-column dependencies; proof that R10 has no 1- or 2-element circuit combined with N170's no-triangle theorem; circuit-union minimality and all-pair coverage. | `r10_common_circuit` is `KERNEL_PROVED`; no remaining scheduled cost. The provenance was resolved as `CERTIFICATE_DERIVED` from the exact displayed matrix, without admitting an unsourced external theorem. |
+| N218 | Two groups: exact prose and N065/N068/N255 interface audit; indexed recursive-stage predicate, nine disjoint children/ports and sequential proper 2-sums; bridge from the N065 constructor. | `RecursiveR10` and `isProperTwoSum_regularTwoSum` are `KERNEL_PROVED` as the manuscript construction specification; no remaining definition cost. Existence, connectedness, regularity and numerical closure properties remain separate later ledger tasks. |
+
+Focused `lake build Matroid.R10Connected Matroid.RecursiveR10` and `FiveBatchAxiomAudit.lean` passed. The audit printed only ordinary Lean axioms for all N255/N218 declarations. No DAG edge changed.
+
+## Current five-batch invocation, batch 2 — 2026-10-19
+
+The strict rerun selected N195→N147 (score 5.624; residual sum 6.0). They were independently eligible: N195 uses N070/N081, and N147 uses N007/N146. Per-node time and tokens remain `UNKNOWN`.
+
+| ID | Observed route and substantive Lean edit/check groups | Result and residual estimate |
+| --- | --- | --- |
+| N195 | Five groups: exact source edge-label audit; six four-target and nine six-target binary dependencies; proof that every six-set is a circuit; finite exhaustive target-circuit certificate; graph-label perfect-matching/double-star bridge and N081 closure equivalence. | `r10_minimalTargetSpanning_iff` is `KERNEL_PROVED`; no remaining scheduled cost. The finite `decide` proofs used scoped 16,384 recursion depth and 10,000,000 heartbeat limits but completed in the focused check. |
+| N147 | Three groups: statement/hypothesis audit; surviving-ground lemma; full two-direction closure-circuit proof from N146. | `regularTwoSum_target_mem_closure_iff` is `CONDITIONAL_PROOF` on the already verified N146 premise; no remaining local proof cost. No new admission. |
+
+Focused builds for `Matroid.R10TargetCircuits` and `Matroid.TwoSumTargetClosure` passed. The tracked audit printed only ordinary Lean axioms for N195, and `sorryAx` for N147 only through N146. No DAG edge changed.
+
+## Current five-batch invocation, batch 3 — 2026-10-19
+
+Strict scheduling selected N152→N150 (score 5.064; residual sum 4.2). They are independent. Per-node time and tokens remain `UNKNOWN`.
+
+| ID | Observed route and substantive Lean edit/check groups | Result and residual estimate |
+| --- | --- | --- |
+| N152 | Four groups: exact manuscript reduction/relabel audit; two-element child's unique cycle family; N065 cycle-level port replacement; generic `mapEquiv` circuit bridge. | `UNRESOLVED`, run-locally deferred. The final equivalence between disjoint circuit unions of a matroid and its relabeling, followed by equality of the two matroids, is still required. Residual score 2.0→4.5 (medium confidence) reflects this checked missing bridge, not sunk work. |
+| N150 | Two groups: N138 source/hypothesis interface audit; finite basis-cardinality proof and focused check. | `regularTwoSum_eRank_add_one` is `CONDITIONAL_PROOF` on N138's previously cited basis correspondence; no remaining local cost. |
+
+Focused builds and the tracked axiom print passed. N152's partial lemmas have no `sorryAx`; N150 inherits `sorryAx` only from N138. No new direct edge. The next scheduler run uses `--defer-node N152` for this invocation only.
+
+## Current five-batch invocation, batch 4 — 2026-10-19
+
+The strict scheduler with N152 temporarily deferred selected N204→N066 (score 3.792; residual sum 9.2). They are independently eligible. Per-node elapsed time and tokens remain `UNKNOWN`.
+
+| ID | Observed route and substantive Lean edit/check groups | Result and residual estimate |
+| --- | --- | --- |
+| N204 | Four groups: exact uncited manuscript-prose audit and provenance correction; fresh-label comap construction; proof the old/new targets form a circuit for a nonloop; finite extension and N065 proper-sum existence/retained-target bridge. | `parallelTargetCopy`, `IsParallelTargetConstruction`, and `exists_parallelTargetConstruction` are `KERNEL_PROVED`; no remaining definition cost. The former `EXTERNAL_CITED` metadata was corrected to `MANUSCRIPT_DEFINITION` without an admission. N205/N206 remain separate. |
+| N066 | Two new groups in addition to earlier quotient work: complete proper three-sum specification; finite binary paired-triangle span membership iff indexed subset sum. | `UNRESOLVED`, run-locally deferred. The two directions of the quotient candidate's exact cycle correspondence remain; the 6.0→5.5 remaining-cost update reflects the checked subset-sum bridge while retaining a substantial proof obligation. No external premise can discharge this manuscript construction. |
+
+Focused `lake build Matroid.ParallelTarget Matroid.ThreeSum` and the tracked axiom audit passed. All new N204 and N066 helper declarations show only ordinary Lean axioms. The next scheduler run retains `--defer-node N152 --defer-node N066` for this invocation.
+
+## Current five-batch invocation, batch 5 — 2026-10-19
+
+With N152 and N066 deferred only for this run, strict scheduling selected N172→N173 (score 3.512; residual sum 5.6). N172's direct prerequisites N024/N061/N070 and N173's N025/N062/N070 were available. The manuscript's `prop:r10-proper-minors` cites Oxley Lemma 6.6.9 for both single-element identities. The exact printed lemma and its `A10` proof were inspected before either external premise was introduced; the statement, ten-element labels, K3,3 graph, and dual correspond as recorded in `SOURCES.md`. Per-node elapsed time and tokens are `UNKNOWN`.
+
+| ID | Observed route and substantive Lean edit/check groups | Result and residual estimate |
+| --- | --- | --- |
+| N172 | Three groups: exact Oxley lemma and `A10` source comparison; nine-edge K3,3 graph and labeled graphic matroid; isolated binary deletion premise plus admission-free real-R10 wrapper and focused build. | `CITED_ASSUMPTION` via `External.binaryR10_delete_isK33`. The narrow source-verified premise is complete; no remaining scheduled cost. |
+| N173 | Two groups: source dual-contraction comparison; K3,3 bond matroid and original-label embedding premise; real-R10 wrapper and focused build. | `CITED_ASSUMPTION` via `External.binaryR10_contract_isK33Dual`. The narrow source-verified premise is complete; no remaining scheduled cost. |
+
+`lake build Matroid.R10Minors Matroid.FiveBatchAxiomAudit` passed (1919 focused jobs). The tracked audit prints `sorryAx` for N172 and N173, precisely through their isolated external premises; `K33.cycleMatroid_ground` prints only ordinary Lean axioms. No new direct edge or depth change arose. Records were updated before reranking.
+
+Final checks: full `lake build` passed (9183 jobs; shared check, not a per-node time estimate), eight scheduler unit tests passed, and `git diff --check` passed. The tracked five-batch axiom audit has `sorryAx` only where an explicitly recorded cited premise is transitive. The strict scheduler with N152/N066 run-locally deferred selected N185→N187; clearing both deferrals and regenerating `NEXT_BATCH.md` and JSON selected N066→N159 (score 3.729). All ordinal costs and reasons reflect remaining work; per-node elapsed time/tokens remain `UNKNOWN`.

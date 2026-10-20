@@ -10,7 +10,9 @@ python3 scripts/select_frontier.py --strict --word-counts \
   --write Matroid/NEXT_BATCH.md --json Matroid/NEXT_BATCH.json
 ```
 
-The default batch size is two; explore alternatives with `--batch-size 3 --top 12`. Under `--strict`, any recorded depth/status mismatch is a blocking error: repair the canonical records, don't edit the scheduler to silence it. Do **not** mechanically mark suggested nodes completed. Re-run after every small proof pass and any dependency-edge correction. Keep generated `NEXT_BATCH` reports as snapshots of what the program recommended, not binding instructions or independent mathematical conclusions.
+The default **individual batch** size is two; explore alternatives with `--batch-size 3 --top 12`. Root `AGENTS.md` directs Codex to execute **five consecutive batches per run**, automatically reranking after each. Thus the scheduler chooses task sequences, while the Codex invocation executes a bounded multi-batch loop. Under `--strict`, any recorded depth/status mismatch is a blocking error: repair the canonical records, don't edit the scheduler to silence it. Do **not** mechanically mark suggested nodes completed. Re-run after every small proof pass and any dependency-edge correction. Keep generated `NEXT_BATCH` reports as snapshots of what the program recommended, not independent mathematical conclusions.
+
+If a selected task has received a documented serious attempt during the **current Codex invocation** and remains stalled, pass `--defer-node N###` (repeatable) for subsequent rerankings in that invocation. It temporarily excludes the node from selection but does **not** alter canonical status, eligibility, direct edges, or future invocations. At the end of the run regenerate the reports **without** `--defer-node` so the next invocation starts with the full frontier. This option is not permission to skip difficult tasks before attempting them.
 
 ## Objective and assumptions
 

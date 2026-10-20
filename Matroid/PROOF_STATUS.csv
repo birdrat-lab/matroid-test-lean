@@ -31,7 +31,7 @@ N257,EXTERNAL_UNCITED_STANDARD,KERNEL_PROVED,,Matroid.uniformOn_one_regular,Manu
 N266,MANUSCRIPT_DEFINITION,KERNEL_PROVED,,Matroid.weightedTrianglePhi; Matroid.weightedTriangleSignature; Matroid.weightedTrianglePhi_eq_zero_of_not_five,Manuscript/main.tex eq:seymour-three-sum-phi and eq:seymour-three-sum-five,PROOF_BUDGET.md depth-6 pass
 N052,EXTERNAL_CITED,CITED_ASSUMPTION,Matroid.External.regular_ground_exists_realTU,Matroid.Regular.hasLabeledRealTU; Matroid.HasLabeledRealTU.regular,Oxley Briefly What Is a Matroid Definition 4.3 and Lemma 4.4; Tutte 1958,PROOF_BUDGET.md depth-6 continuation
 N065,MANUSCRIPT_DEFINITION,KERNEL_PROVED,,Matroid.regularTwoSum_ground; Matroid.regularTwoSum_isCircuitUnion_iff,Manuscript/main.tex def:regular-matroid-sums; local binary quotient proof,PROOF_BUDGET.md depth-6 continuation
-N066,MANUSCRIPT_DEFINITION,UNRESOLVED,,Matroid.ThreeSumCycle; Matroid.binaryThreeSumCandidate,Manuscript/main.tex def:regular-matroid-sums; partial candidate only,PROOF_BUDGET.md N066 scheduled batch
+N066,MANUSCRIPT_DEFINITION,UNRESOLVED,,Matroid.ThreeSumCycle; Matroid.IsProperThreeSum; Matroid.binaryThreeSumCandidate; Matroid.triangle_pair_mem_span_iff_exists_subset_sum (partial only),Manuscript/main.tex def:regular-matroid-sums proper common triangle; candidate cycle equivalence remains open,PROOF_BUDGET.md current five-batch 4
 N070,MANUSCRIPT_DEFINITION,KERNEL_PROVED,,Matroid.r10IntegerMatrix_isTotallyUnimodular; Matroid.r10_regular; Matroid.r10_eRank,Manuscript/main.tex def:r10; 252 canonical minors,PROOF_BUDGET.md depth-6 continuation
 N174,EXTERNAL_UNCITED_STANDARD,KERNEL_PROVED,,Matroid.IsGraphic.minor; Matroid.graphic_contractEdge_eq_contract,Labeled graph contraction and N026; local proof,PROOF_BUDGET.md depth-6 continuation
 N175,EXTERNAL_UNCITED_STANDARD,KERNEL_PROVED,,Matroid.IsCographic.minor,Duality of labeled graphic minors; N174,PROOF_BUDGET.md depth-7 pass
@@ -45,27 +45,33 @@ N162,MANUSCRIPT_PROVED,KERNEL_PROVED,,Matroid.weightedTriangle_a_pos,Manuscript/
 N163,MANUSCRIPT_PROVED,KERNEL_PROVED,,Matroid.weightedTriangle_c_pos,Manuscript/main.tex following prop:regular-triangle-identity,PROOF_BUDGET.md depth-7 pass
 N244,MANUSCRIPT_PROVED,KERNEL_PROVED,,Matroid.positiveRelation_fundCircuit; Matroid.positiveRelation_fundCircuit_isCircuit,Manuscript/main.tex prop:relation-fundamental-circuits; N243,PROOF_BUDGET.md depth-7 pass
 N055,EXTERNAL_CITED,CITED_ASSUMPTION,Matroid.External.binary_real_projective_uniqueness; Matroid.External.regular_ground_exists_realTU,Matroid.Regular.real_representations_projectivelyEquivalent; Matroid.Regular.exists_tu_projectivelyEquivalent,Oxley Matroid Theory 2nd ed Proposition 6.6.5 printed p. 209 and Proposition 6.3.12 printed p. 178; N052 for fixed TU,PROOF_BUDGET.md N055 scheduled batch
-N059,MANUSCRIPT_PROVED,UNRESOLVED,,,Manuscript/main.tex `thm:regular-quotient-form`,PROOF_BUDGET.md depth-7 pass
-N068,EXTERNAL_CITED,UNRESOLVED,,,Manuscript/main.tex —,PROOF_BUDGET.md depth-7 pass
+N059,MANUSCRIPT_PROVED,UNRESOLVED,,Matroid.standardForm_mul_kernelBlock (partial only),Manuscript/main.tex thm:regular-quotient-form,PROOF_BUDGET.md multi-batch 4
+N068,EXTERNAL_CITED,CITED_ASSUMPTION,Matroid.External.regularTwoSum_regular,Matroid.External.regularTwoSum_regular,Oxley Matroid Theory 2nd ed Corollary 7.1.26 printed p. 263; exact labeled specialization in SOURCES.md,PROOF_BUDGET.md multi-batch 3
 N118,EXTERNAL_CITED,UNRESOLVED,,,Manuscript/main.tex —,PROOF_BUDGET.md depth-7 pass
 N138,EXTERNAL_CITED,CITED_ASSUMPTION,Matroid.External.regularTwoSum_isBase_iff,Matroid.External.regularTwoSum_isBase_iff; partial kernel proof Matroid.regularTwoSum_indep_of_bases_first_port,Oxley Matroid Theory 2nd ed Proposition 7.1.13(ii) plus 2-sum definition p. 260 and Proposition 7.1.20; exact labeled specialization in SOURCES.md,PROOF_BUDGET.md N138 continuation
 N139,MANUSCRIPT_PROVED,CONDITIONAL_PROOF,Matroid.External.regularTwoSum_isBase_iff,Matroid.weightedBasesIn_twoSum; Matroid.weightedBasesOut_twoSum; Matroid.weightedBasisRatio_twoSum,Manuscript/main.tex thm:seymour-two-sum; exact assumptions and ratio conventions in SOURCES.md,PROOF_BUDGET.md N139
-N146,EXTERNAL_CITED,UNRESOLVED,,,Manuscript/main.tex —,PROOF_BUDGET.md depth-7 pass
-N152,EXTERNAL_UNCITED_STANDARD,UNRESOLVED,,,Manuscript/main.tex —,PROOF_BUDGET.md depth-7 pass
+N146,EXTERNAL_CITED,CITED_ASSUMPTION,Matroid.External.regularTwoSum_isCircuit_iff,Matroid.regularTwoSum_targetCircuit_iff,Oxley Matroid Theory 2nd ed Proposition 7.1.20 printed p. 260; exact source match in SOURCES.md,PROOF_BUDGET.md multi-batch 1
+N152,EXTERNAL_UNCITED_STANDARD,UNRESOLVED,,Matroid.isCircuitUnion_iff_empty_or_pair; Matroid.regularTwoSum_cycle_iff_relabelPort; Matroid.mapEquiv_isCircuit_iff (partial only),Manuscript/main.tex prop:recursive-r10-closure two-element circuit relabeling; full matroid isomorphism remains open,PROOF_BUDGET.md current five-batch 3
 N161,MANUSCRIPT_PROVED,UNRESOLVED,,,Manuscript/main.tex `prop:regular-triangle-identity`,PROOF_BUDGET.md depth-7 pass
 N169,CERTIFICATE_DERIVED,UNRESOLVED,,,Manuscript/main.tex —,PROOF_BUDGET.md depth-7 pass
 N170,CERTIFICATE_DERIVED,KERNEL_PROVED,,Matroid.r10_circuit_card_ne_three,Manuscript/main.tex app:r10-atlas; N053 field transfer; N070 exact matrix,PROOF_BUDGET.md depth-7 pass
-N172,EXTERNAL_CITED,UNRESOLVED,,,Manuscript/main.tex `prop:r10-proper-minors`,PROOF_BUDGET.md depth-7 pass
-N173,EXTERNAL_CITED,UNRESOLVED,,,Manuscript/main.tex `prop:r10-proper-minors`,PROOF_BUDGET.md depth-7 pass
+N172,EXTERNAL_CITED,CITED_ASSUMPTION,Matroid.External.binaryR10_delete_isK33,Matroid.r10_delete_isK33,"Oxley Matroid Theory 2nd ed Lemma 6.6.9 printed p. 210; exact binary A10 and K3,3 comparison in SOURCES.md",PROOF_BUDGET.md current five-batch 5
+N173,EXTERNAL_CITED,CITED_ASSUMPTION,Matroid.External.binaryR10_contract_isK33Dual,Matroid.r10_contract_isK33Dual,"Oxley Matroid Theory 2nd ed Lemma 6.6.9 printed p. 210; exact binary A10 and K3,3 dual comparison in SOURCES.md",PROOF_BUDGET.md current five-batch 5
 N182,CERTIFICATE_DERIVED,UNRESOLVED,,,Manuscript/main.tex `prop:r10-basis-polynomials`,PROOF_BUDGET.md depth-7 pass
 N185,CERTIFICATE_DERIVED,UNRESOLVED,,,Manuscript/main.tex `prop:r10-symmetry`,PROOF_BUDGET.md depth-7 pass
-N186,EXTERNAL_CITED,UNRESOLVED,,,Manuscript/main.tex `prop:r10-symmetry`,PROOF_BUDGET.md depth-7 pass
+N186,EXTERNAL_CITED,CITED_ASSUMPTION,Matroid.External.binaryR10_element_transitive,Matroid.r10_element_transitive,Oxley Matroid Theory 2nd ed proof of Lemma 6.6.9 printed p. 210; binary-to-real bridge r10_eq_binary,PROOF_BUDGET.md multi-batch 1
 N193,MANUSCRIPT_PROVED,UNRESOLVED,,,Manuscript/main.tex —,PROOF_BUDGET.md depth-7 pass
 N194,MANUSCRIPT_PROVED,UNRESOLVED,,,Manuscript/main.tex —,PROOF_BUDGET.md depth-7 pass
-N195,CERTIFICATE_DERIVED,UNRESOLVED,,,Manuscript/main.tex `lem:r10-minimal-positive`,PROOF_BUDGET.md depth-7 pass
-N204,EXTERNAL_CITED,UNRESOLVED,,,Manuscript/main.tex —,PROOF_BUDGET.md depth-7 pass
+N195,CERTIFICATE_DERIVED,KERNEL_PROVED,,Matroid.r10_targetCircuit_iff; Matroid.r10_minimalTargetSpanning_iff,Manuscript/main.tex lem:r10-minimal-positive six perfect matchings and nine row-column double stars under exact displayed edge table,PROOF_BUDGET.md current five-batch 2
+N204,MANUSCRIPT_DEFINITION,KERNEL_PROVED,,Matroid.parallelTargetCopy; Matroid.IsParallelTargetConstruction; Matroid.exists_parallelTargetConstruction; Matroid.IsParallelTargetConstruction.new_target_mem_ground,Manuscript/main.tex sec:r10-pointed second regular program prose; no external theorem is cited for construction,PROOF_BUDGET.md current five-batch 4
 N225,EXTERNAL_CITED,UNRESOLVED,,,Manuscript/main.tex —,PROOF_BUDGET.md depth-7 pass
 N238,CERTIFICATE_DERIVED,UNRESOLVED,,,Manuscript/main.tex —,PROOF_BUDGET.md depth-7 pass
 N239,CERTIFICATE_DERIVED,UNRESOLVED,,,Manuscript/main.tex —,PROOF_BUDGET.md depth-7 pass
-N255,PROVENANCE_UNRESOLVED,UNRESOLVED,,,Manuscript/main.tex —,PROOF_BUDGET.md depth-7 pass
+N255,CERTIFICATE_DERIVED,KERNEL_PROVED,,Matroid.r10CircuitCandidate_isCircuit; Matroid.r10_common_circuit,Manuscript/main.tex lem:r10-targeted-query-matroid and prop:recursive-r10-closure; exact R10 binary matrix certificate,PROOF_BUDGET.md current five-batch 1
 N267,MANUSCRIPT_PROVED,UNRESOLVED,,,Manuscript/main.tex `eq:k4-five-sums`,PROOF_BUDGET.md depth-7 pass
+N032,MANUSCRIPT_PROVED,KERNEL_PROVED,,Matroid.cocircuit_separates_closure; Matroid.cocircuit_separates_closure_manuscript,Manuscript/main.tex prop:cocircuit-separates-closure with implicit ground membership explicit; manuscript N018 cocircuit predicate bridged,PROOF_BUDGET.md multi-batch 4
+N107,MANUSCRIPT_DEFINITION,KERNEL_PROVED,,Matroid.negativeTargetSupport; Matroid.negativeTargetSupport_spec,Manuscript/main.tex def:negative-support; pointed finite-matroid interface,PROOF_BUDGET.md multi-batch 5
+N263,EXTERNAL_UNCITED_STANDARD,KERNEL_PROVED,,Matroid.maximal_nonspanning_isHyperplane; Matroid.maximal_nonspanning_isHyperplaneCocircuit,Manuscript/main.tex lem:r10-boundary-inputs maximal-negative step; short proof from N032,PROOF_BUDGET.md multi-batch 5
+N150,EXTERNAL_UNCITED_STANDARD,CONDITIONAL_PROOF,Matroid.External.regularTwoSum_isBase_iff,Matroid.regularTwoSum_eRank_add_one,Manuscript/main.tex prop:recursive-r10-closure rank recurrence; exact finite proper labeled two-sum; N138 basis premise,PROOF_BUDGET.md current five-batch 3
+N218,MANUSCRIPT_DEFINITION,KERNEL_PROVED,,Matroid.RecursiveR10; Matroid.isProperTwoSum_regularTwoSum,Manuscript/main.tex prop:recursive-r10-closure recursive nine-attachment construction specification,PROOF_BUDGET.md current five-batch 1
+N147,MANUSCRIPT_PROVED,CONDITIONAL_PROOF,Matroid.External.regularTwoSum_isCircuit_iff,Matroid.regularTwoSum_target_mem_closure_iff,Manuscript/main.tex prop:recursive-r10-closure target substitution sentence; finite proper regular two-sum and explicit availability/target hypotheses,PROOF_BUDGET.md current five-batch 2

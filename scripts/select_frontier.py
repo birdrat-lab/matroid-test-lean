@@ -282,15 +282,19 @@ class Planner:
                     new_eligible=sorted(new_eligible),
                     remaining_descendants=len(dist))
 
-    def rank_batch(self, size=3, beam_width=100, top=8):
+    def rank_batch(self, size=3, beam_width=100, top=8, deferred=None):
         if size < 1 or beam_width < 1:
             raise ValueError("size and beam width must be positive")
+        deferred = set(deferred or ())
+        unknown = deferred - set(self.nodes)
+        if unknown:
+            raise ValueError(f"Unknown deferred node(s): {sorted(unknown)}")
         states = [()]
         for _ in range(size):
             generated = {}
             for seq in states:
                 available = self.ready | set(seq)
-                for nid in self.eligible(available):
+                for nid in self.eligible(available) - deferred:
                     s2 = seq + (nid,)
                     key = frozenset(s2)
                     if key not in generated:
@@ -301,8 +305,9 @@ class Planner:
             states = ranked[:beam_width]
         return [(seq, self.batch_metrics(seq)) for seq in states[:top]]
 
-    def report(self, ranks, size):
+    def report(self, ranks, size, deferred=None):
         eligible = sorted(self.eligible(self.ready))
+        deferred = set(deferred or ())
         proof_counts = defaultdict(int)
         for nid in self.nodes:
             n = self.nodes[nid]
@@ -316,6 +321,8 @@ class Planner:
                  f"- Eligible unresolved nodes: **{len(eligible)}**; structural depths are **not** scheduling restrictions.",
                  f"- Proposed batch size: **{size}**; cost estimates are ordinal proxies, **not token/time forecasts**.",
                  "- Rules: exact manuscript correspondence, matroid-first proof search, cited external premise only after exact-source validation.", ""]
+        if deferred:
+            lines += [f"- Run-local deferred unresolved nodes: **{', '.join(sorted(deferred))}** (remain unresolved and eligible in the canonical DAG).", ""]
         if self.warnings:
             lines += ["## Metadata warnings — review before editing", ""]
             lines += [f"- {x}" for x in self.warnings]
@@ -340,7 +347,7 @@ class Planner:
                 lines.append("**Newly eligible after batch:** " + ", ".join(m["new_eligible"]) + ".")
                 lines.append("")
         else:
-            lines.append("No eligible tasks available; investigate missing/incorrect dependencies.")
+            lines.append("No selectable tasks remain after run-local deferrals; review blockers or end the run. No proof statuses were changed.")
             lines.append("")
         lines += ["## Alternative ranked batches", "",
                   "| Rank | Dependency-valid sequence | Score | Cost score | Newly eligible |",
@@ -370,6 +377,8 @@ def main(argv=None):
     parser.add_argument("--batch-size", type=int, default=2)
     parser.add_argument("--beam-width", type=int, default=120)
     parser.add_argument("--top", type=int, default=8)
+    parser.add_argument("--defer-node", action="append", default=[], metavar="N###",
+                        help="skip this unresolved node in the current scheduling invocation; may repeat; does not change proof status")
     parser.add_argument("--word-counts", action="store_true", help="use conservative proof-env approximate lexical token count")
     parser.add_argument("--write", type=Path, help="write Markdown report (otherwise stdout)")
     parser.add_argument("--json", type=Path, help="also write machine-readable status and candidate batch metrics")
@@ -381,8 +390,12 @@ def main(argv=None):
     if args.strict and planner.warnings:
         for w in planner.warnings: print("INCONSISTENCY:",w,file=sys.stderr)
         return 2
-    ranks = planner.rank_batch(args.batch_size, args.beam_width,args.top)
-    report=planner.report(ranks,args.batch_size)
+    try:
+        ranks = planner.rank_batch(args.batch_size, args.beam_width, args.top, deferred=args.defer_node)
+    except ValueError as e:
+        print(f"INVALID DEFERRAL: {e}", file=sys.stderr)
+        return 2
+    report = planner.report(ranks, args.batch_size, deferred=args.defer_node)
     if args.write:
         dst=args.write if args.write.is_absolute() else root/args.write
         dst.parent.mkdir(parents=True,exist_ok=True)
@@ -397,6 +410,7 @@ def main(argv=None):
             "active":len(planner.nodes),"available":len(planner.ready),
             "cited_premises":sorted(planner.cited),"eligible":sorted(planner.eligible(planner.ready)),
             "warnings":planner.warnings,
+            "run_deferred":sorted(set(args.defer_node)),
             "candidates":[{"sequence":list(seq),**m} for seq,m in ranks]
         }
         dst.write_text(json.dumps(payload,indent=2)+"\n",encoding="utf-8")
