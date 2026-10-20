@@ -4,8 +4,10 @@
 Run: python3 -m unittest discover -s scripts -p 'test_select_frontier.py'
 """
 import unittest
+import csv
+import tempfile
 from pathlib import Path
-from select_frontier import Planner
+from select_frontier import Planner, ATTEMPT_FIELDS, load_attempts
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -86,6 +88,142 @@ class SchedulerRepositoryTests(unittest.TestCase):
 
     def test_no_snapshot_warnings(self):
         self.assertFalse(self.planner.warnings, self.planner.warnings)
+
+
+class PersistentAttemptFixtureTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        (self.root / 'Matroid').mkdir()
+        (self.root / 'Manuscript').mkdir()
+        (self.root / 'Manuscript/main.tex').write_text('')
+        rows = [
+            ('N001', 0, 'COMPLETE', 'KERNEL_PROVED'),
+            ('N002', 1, 'PENDING', 'UNRESOLVED'),
+            ('N003', 2, 'PENDING', 'UNRESOLVED'),
+            ('N004', 1, 'PENDING', 'UNRESOLVED'),
+        ]
+        ledger = ['| id | group | name | requirement | at | x | scope | provenance | y | status | z |']
+        for nid, _, status, _ in rows:
+            ledger.append(f'| {nid} | test | {nid} | fixture | `fixture:{nid}` | - | CORE_MATROID | MANUSCRIPT_PROVED | - | {status} | - |')
+        (self.root / 'Matroid/LEDGER.md').write_text('\n'.join(ledger) + '\n')
+        self.csv('DEPTHS.csv', ['id', 'name', 'depth', 'scope', 'status'],
+                 [[nid, nid, depth, 'CORE_MATROID', status] for nid, depth, status, _ in rows])
+        self.csv('PROOF_STATUS.csv', ['id', 'trust_status', 'proof_declaration'],
+                 [[nid, proof, ''] for nid, _, _, proof in rows])
+        self.csv('DEPENDENCY_EDGES.csv', ['source_id', 'target_id'],
+                 [['N001', 'N002'], ['N002', 'N003'], ['N001', 'N004']])
+        self.csv('SCHEDULER_ESTIMATES.csv', ['id', 'residual_cost', 'confidence', 'reason'], [])
+        self.attempts = []
+        self.write_attempts()
+
+    def csv(self, name, fields, rows):
+        with (self.root / 'Matroid' / name).open('w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow(fields)
+            writer.writerows(rows)
+
+    def write_attempts(self):
+        with (self.root / 'Matroid/SCHEDULER_ATTEMPTS.csv').open('w', newline='') as f:
+            writer = csv.DictWriter(f, fieldnames=ATTEMPT_FIELDS)
+            writer.writeheader()
+            writer.writerows(self.attempts)
+
+    def add(self, batch, node='N002', outcome='SUPPORT_ONLY', blocker='MISSING_CORE',
+            kind='ATTEMPT', delta='helper'):
+        self.attempts.append(dict(event_id=len(self.attempts)+1, batch_index=batch,
+            node_id=node, event_kind=kind, outcome=outcome, blocker_key=blocker,
+            blocker_evidence='fixture core goal persists', proof_delta=delta,
+            edit_check_groups='0' if kind == 'WAKE' else '1',
+            log_reference=f'fixture batch {batch}'))
+        self.write_attempts()
+
+    def planner(self):
+        return Planner(self.root, self.root / 'Matroid/SCHEDULER_ESTIMATES.csv', False)
+
+    def test_same_blocker_persists_across_restart_and_preserves_math(self):
+        self.add(1)
+        self.add(2)
+        first = self.planner()
+        second = self.planner()
+        for p in (first, second):
+            self.assertEqual(p.cooldowns['N002'].retry_after_batch, 8)
+            self.assertIn('N002', p.eligible(p.ready))
+            self.assertIn('N002', p.remaining)
+            self.assertEqual(p.nodes['N002'].proof_status, 'UNRESOLVED')
+            for seq, _ in p.rank_batch(size=2):
+                self.assertNotIn('N002', seq)
+                ready = set(p.ready)
+                for node in seq:
+                    self.assertTrue(p.preds[node] <= ready)
+                    ready.add(node)
+        self.assertNotIn('N003', first.eligible(first.ready))
+
+    def test_support_only_counts_but_core_progress_resets(self):
+        self.add(1)
+        self.add(2, outcome='CORE_PROGRESS', delta='core goal proved')
+        self.add(3)
+        self.assertFalse(self.planner().cooldowns)
+        self.add(4, outcome='NO_PROGRESS')
+        self.assertEqual(self.planner().cooldowns['N002'].retry_after_batch, 10)
+
+    def test_batch_expiry_and_escalating_windows(self):
+        self.add(1)
+        self.add(2)
+        for batch in range(3, 8):
+            self.add(batch, node='N004', outcome='CORE_PROGRESS', delta='other goal')
+        p = self.planner()
+        self.assertEqual(p.last_batch_index, 7)
+        self.assertNotIn('N002', p.cooldowns)
+        self.assertIn('N002', p.expired_cooldowns)
+        self.add(8, outcome='NO_PROGRESS')
+        self.assertEqual(self.planner().cooldowns['N002'].retry_after_batch, 19)
+        for batch in range(9, 19):
+            self.add(batch, node='N004', outcome='CORE_PROGRESS', delta='other goal')
+        self.assertNotIn('N002', self.planner().cooldowns)
+        self.add(19, outcome='NO_PROGRESS')
+        self.assertEqual(self.planner().cooldowns['N002'].retry_after_batch, 35)
+
+    def test_evidence_wake_preserves_history(self):
+        self.add(1)
+        self.add(2)
+        self.add(2, kind='WAKE', outcome='BLOCKER_REMOVED', delta='N001.new_core_route')
+        p = self.planner()
+        self.assertFalse(p.cooldowns)
+        self.assertEqual(len(p.wakes), 1)
+        self.assertIn('N002', p.eligible(p.ready))
+        self.add(3, outcome='NO_PROGRESS')
+        self.assertEqual(self.planner().cooldowns['N002'].retry_after_batch, 14)
+
+    def test_all_cooled_fallback_and_run_local_stop(self):
+        self.add(1)
+        self.add(1, node='N004')
+        self.add(2)
+        self.add(2, node='N004')
+        p = self.planner()
+        ranked = p.rank_batch(size=2)
+        self.assertEqual(len(ranked), 1)
+        self.assertEqual(ranked[0][0], ('N002',))
+        self.assertIn('cooldown_fallback', ranked[0][1])
+        self.assertEqual(p.rank_batch(size=2, deferred={'N002', 'N004'}), [])
+
+    def test_malformed_and_contradictory_events(self):
+        self.add(1)
+        self.attempts[0]['edit_check_groups'] = 'fabricated'
+        self.write_attempts()
+        with self.assertRaisesRegex(ValueError, 'edit/check'):
+            load_attempts(self.root / 'Matroid/SCHEDULER_ATTEMPTS.csv')
+        self.attempts[0]['edit_check_groups'] = '1'
+        self.add(1, kind='WAKE', outcome='BLOCKER_REMOVED', delta='N001.unrelated')
+        with self.assertRaisesRegex(ValueError, 'Contradictory WAKE'):
+            self.planner()
+
+    def test_missing_batch_index_rejected(self):
+        self.add(1)
+        self.add(3, node='N004')
+        with self.assertRaisesRegex(ValueError, 'Missing attempted batch'):
+            self.planner()
 
 
 if __name__ == '__main__':

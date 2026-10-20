@@ -18,8 +18,7 @@ def ThreeSumCycle {α : Type*} (M N : Matroid α)
     C ∩ T = D ∩ T ∧ X = symmDiff C D
 
 /-- The exact properness and cycle specification in the manuscript's
-three-sum case. Existence of a matroid satisfying it remains N066's
-substantive open obligation. -/
+three-sum case. `exists_properThreeSum` constructs a witness. -/
 def IsProperThreeSum {α : Type*} (M N P : Matroid α)
     (T : Set α) : Prop :=
   M.E ∩ N.E = T ∧ T.ncard = 3 ∧
@@ -304,7 +303,8 @@ theorem ThreeSumCycle.symmDiff {α : Type u}
 
 /-- Binary quotient candidate for the three-sum. The quotient identifies
 the two copies of each triangle column; proving that its cycles are exactly
-`ThreeSumCycle` is the remaining matroid-existence obligation. -/
+`ThreeSumCycle` is identified with this candidate's cycle family in
+`ThreeSumExistence`. -/
 noncomputable def binaryThreeSumCandidate {α V W : Type*}
     [AddCommGroup V] [Module (ZMod 2) V]
     [AddCommGroup W] [Module (ZMod 2) W]

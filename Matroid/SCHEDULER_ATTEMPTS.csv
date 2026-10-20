@@ -1,0 +1,55 @@
+event_id,batch_index,node_id,event_kind,outcome,blocker_key,blocker_evidence,proof_delta,edit_check_groups,log_reference
+1,1,N146,ATTEMPT,CLOSED,,,regularTwoSum_targetCircuit_iff,UNKNOWN,FORMALIZATION_LOG.md prior invocation batch 1
+2,1,N186,ATTEMPT,CLOSED,,,r10_element_transitive,UNKNOWN,FORMALIZATION_LOG.md prior invocation batch 1
+3,2,N185,ATTEMPT,SUPPORT_ONLY,R10_AUTOMORPHISM_720_CERT,Ancillary verifier absent and exact 720 enumeration unproved,IsR10Automorphism and r10AutomorphismCount,2,FORMALIZATION_LOG.md prior invocation batch 2
+4,3,N161,ATTEMPT,SUPPORT_ONLY,TRIANGLE_TU_COEFFICIENT_BRIDGE,Five weighted closure class sums not identified with TU determinant coefficients,triangle_identity_of_det_coefficients,1,FORMALIZATION_LOG.md prior invocation batch 3
+5,3,N068,ATTEMPT,CLOSED,,,regularTwoSum_regular,UNKNOWN,FORMALIZATION_LOG.md prior invocation batch 3
+6,4,N059,ATTEMPT,SUPPORT_ONLY,FREE_QUOTIENT_LABEL_BRIDGE,Disjoint label extension and quotient contraction isomorphism unproved,standardForm_mul_kernelBlock,UNKNOWN,FORMALIZATION_LOG.md prior invocation batch 4
+7,4,N032,ATTEMPT,CLOSED,,,cocircuit_separates_closure,UNKNOWN,FORMALIZATION_LOG.md prior invocation batch 4
+8,5,N107,ATTEMPT,CLOSED,,,negativeTargetSupport_spec,UNKNOWN,FORMALIZATION_LOG.md prior invocation batch 5
+9,5,N263,ATTEMPT,CLOSED,,,maximal_nonspanning_isHyperplane,UNKNOWN,FORMALIZATION_LOG.md prior invocation batch 5
+10,6,N255,ATTEMPT,CLOSED,,,r10_common_circuit,UNKNOWN,FORMALIZATION_LOG.md current scheduler invocation batch 1
+11,6,N218,ATTEMPT,CLOSED,,,RecursiveR10 and isProperTwoSum_regularTwoSum,UNKNOWN,FORMALIZATION_LOG.md current scheduler invocation batch 1
+12,7,N195,ATTEMPT,CLOSED,,,r10_minimalTargetSpanning_iff,UNKNOWN,FORMALIZATION_LOG.md current scheduler invocation batch 2
+13,7,N147,ATTEMPT,CLOSED,,,regularTwoSum_target_mem_closure_iff,UNKNOWN,FORMALIZATION_LOG.md current scheduler invocation batch 2
+14,8,N152,ATTEMPT,SUPPORT_ONLY,TWO_SUM_RELABEL_CYCLE_TRANSPORT,MapEquiv finite disjoint circuit union transport and extensionality missing,regularTwoSum_cycle_iff_relabelPort and mapEquiv_isCircuit_iff,UNKNOWN,FORMALIZATION_LOG.md current scheduler invocation batch 3
+15,8,N150,ATTEMPT,CLOSED,,,regularTwoSum_eRank_add_one,UNKNOWN,FORMALIZATION_LOG.md current scheduler invocation batch 3
+16,9,N204,ATTEMPT,CLOSED,,,exists_parallelTargetConstruction,UNKNOWN,FORMALIZATION_LOG.md current scheduler invocation batch 4
+17,9,N066,ATTEMPT,SUPPORT_ONLY,THREE_SUM_QUOTIENT_CYCLE_EQUIV,Two way quotient candidate cycle correspondence remains unproved,IsProperThreeSum and triangle_pair_mem_span_iff_exists_subset_sum,UNKNOWN,FORMALIZATION_LOG.md current scheduler invocation batch 4
+18,10,N172,ATTEMPT,CLOSED,,,r10_delete_isK33,UNKNOWN,FORMALIZATION_LOG.md current scheduler invocation batch 5
+19,10,N173,ATTEMPT,CLOSED,,,r10_contract_isK33Dual,UNKNOWN,FORMALIZATION_LOG.md current scheduler invocation batch 5
+20,11,N066,ATTEMPT,SUPPORT_ONLY,THREE_SUM_QUOTIENT_CYCLE_EQUIV,Finite quotient correction proved but two way cycle transport remains unproved,triangle_quotient_sum_eq_zero_iff and threeSumCycle_side_restrict,3,FORMALIZATION_LOG.md next invocation batch 1
+21,12,N185,ATTEMPT,SUPPORT_ONLY,R10_AUTOMORPHISM_720_CERT,Finite subset basis preservation proved but 720 enumeration remains unproved,isR10Automorphism_iff_finset_bases,2,FORMALIZATION_LOG.md next invocation batch 2
+22,13,N226,ATTEMPT,SUPPORT_ONLY,RECURSIVE_CIRCUIT_INDUCTION,One stage circuit route exists but full nine attachment induction and attainment missing,IsProperTwoSum.targetCircuit_iff,3,FORMALIZATION_LOG.md next invocation batch 3
+23,13,N200,ATTEMPT,CLOSED,,,r10_targetSixCircuit_incidence,UNKNOWN,FORMALIZATION_LOG.md next invocation batch 3
+24,14,N037,ATTEMPT,CLOSED,,,extension_modularCut,UNKNOWN,FORMALIZATION_LOG.md next invocation batch 4
+25,14,N035,ATTEMPT,CLOSED,,,generatedModularCut_least,UNKNOWN,FORMALIZATION_LOG.md next invocation batch 4
+26,15,N196,ATTEMPT,CLOSED,,,r10_maximal_negative_iff,UNKNOWN,FORMALIZATION_LOG.md next invocation batch 5
+27,15,N267,ATTEMPT,SUPPORT_ONLY,K4_FIVE_SIGNATURE_TABLE,Exact graphic object defined but eight subset closure table and five polynomial equalities missing,K4Triangle.signature,UNKNOWN,FORMALIZATION_LOG.md next invocation batch 5
+28,16,N066,ATTEMPT,SUPPORT_ONLY,THREE_SUM_QUOTIENT_CYCLE_EQUIV,Common trace normal form proved but quotient matroid full cycle equivalence remains unproved,threeSumCycle_iff_common_trace and binary_sum_union_eq_zero_iff,3,FORMALIZATION_LOG.md automated invocation batch 1
+29,17,N185,ATTEMPT,SUPPORT_ONLY,R10_AUTOMORPHISM_720_CERT,Decidable matroid automorphism test proved but exhaustive count remains unproved,isR10Automorphism_iff_cert,UNKNOWN,FORMALIZATION_LOG.md automated invocation batch 2
+30,18,N226,ATTEMPT,SUPPORT_ONLY,RECURSIVE_CIRCUIT_INDUCTION,One stage cardinal bound proved but arbitrary stage induction and attainment missing,IsProperTwoSum.targetCircuit_ncard_le,1,FORMALIZATION_LOG.md automated invocation batch 3
+31,18,N161,ATTEMPT,SUPPORT_ONLY,TRIANGLE_TU_COEFFICIENT_BRIDGE,Rank two polynomial extraction proved but actual TU class coefficient identity missing,triangle_identity_of_rank_two_polynomial,1,FORMALIZATION_LOG.md automated invocation batch 3
+32,19,N133,ATTEMPT,CLOSED,,,isHyperplaneCocircuit_iff_dual_isCircuit,UNKNOWN,FORMALIZATION_LOG.md automated invocation batch 4
+33,19,N148,ATTEMPT,CLOSED,,,regularTwoSum_targetCocircuit_iff,UNKNOWN,FORMALIZATION_LOG.md automated invocation batch 4
+34,20,N227,ATTEMPT,SUPPORT_ONLY,RECURSIVE_COCIRCUIT_INDUCTION,One stage cocircuit bound proved but arbitrary stage induction and attainment missing,IsProperTwoSum.targetCocircuit_ncard_le,2,FORMALIZATION_LOG.md automated invocation batch 5
+35,20,N201,ATTEMPT,CLOSED,,,r10_targetSixCocircuit_iff and r10_targetSixCocircuit_incidence,UNKNOWN,FORMALIZATION_LOG.md automated invocation batch 5
+36,21,N227,ATTEMPT,NO_PROGRESS,RECURSIVE_COCIRCUIT_INDUCTION,Checked stage route gives 5+9l without active-port support invariant so cannot prove 5l,Source and one-stage Lean interface checked; full induction and attainment remain,1,Matroid/FORMALIZATION_LOG.md persistent invocation batch 21
+37,21,N153,ATTEMPT,CLOSED,,,weightedBasesIn_scaleNonPortWeight and weightedBasesOut_scaleNonPortWeight and twoSumEffectiveWeight_scale_of_not_isLoop,4,Matroid/FORMALIZATION_LOG.md persistent invocation batch 21
+38,22,N182,ATTEMPT,CLOSED,,,mem_r10BasisFamilyCert_iff and r10_basis_count kernel decide,3,Matroid/FORMALIZATION_LOG.md persistent invocation batch 22
+39,22,N193,ATTEMPT,CLOSED,,,r10PointedL_eq_gram and r10_weightedBasesOut_eq_det_pointedL,4,Matroid/FORMALIZATION_LOG.md persistent invocation batch 22
+40,23,N183,ATTEMPT,CLOSED,,,r10_pointed_basis_in_count and r10_pointed_basis_out_count,2,Matroid/FORMALIZATION_LOG.md persistent invocation batch 23
+41,23,N194,ATTEMPT,SUPPORT_ONLY,PROJECTED_R10_CONTRACTION_BASIS_BRIDGE,Projected Gram cofactor proved but four-row projected bases not yet matched to target-containing R10 bases,r10PointedL_principalCofactor_eq_projectedGram,3,Matroid/FORMALIZATION_LOG.md persistent invocation batch 23
+42,24,N184,ATTEMPT,CLOSED,,,r10PointedOutSupport_card and r10PointedInSupport_card and degree theorems,2,Matroid/FORMALIZATION_LOG.md persistent invocation batch 24
+43,24,N226,ATTEMPT,SUPPORT_ONLY,RECURSIVE_CIRCUIT_INDUCTION,Depth one bound and sharp witness proved but arbitrary nine attachment induction and attainment remain,r10_targetCircuit_le_five_nonTarget and r10_targetCircuit_exists_five_nonTarget,3,Matroid/FORMALIZATION_LOG.md persistent invocation batch 24
+44,25,N161,ATTEMPT,SUPPORT_ONLY,TRIANGLE_TU_COEFFICIENT_BRIDGE,All-triangle class matched to nontriangle bases but four TU determinant class coefficients remain,weightedTrianglePhi_all_eq_nonTriangleBases,2,Matroid/FORMALIZATION_LOG.md persistent invocation batch 25
+45,25,N059,ATTEMPT,SUPPORT_ONLY,FREE_QUOTIENT_LABEL_BRIDGE,Kernel-block map is exact but disjoint-label extension and identity-on-E contraction remain,standardForm_kernelBlock_injective and standardForm_kernelBlock_surjOn_kernel,2,Matroid/FORMALIZATION_LOG.md persistent invocation batch 25
+46,26,N188,ATTEMPT,CLOSED,,,r10_pointed_basis_polynomials_equivariant,4,Matroid/FORMALIZATION_LOG.md following invocation batch 26
+47,26,N152,ATTEMPT,CLOSED,,,mapEquiv_isCircuitUnion_iff and twoSumWithPair_eq_mapEquiv_swap,5,Matroid/FORMALIZATION_LOG.md following invocation batch 26
+48,27,N066,ATTEMPT,CLOSED,,,candidate_isCircuitUnion and of_candidate_isCircuitUnion and exists_properThreeSum,5,Matroid/FORMALIZATION_LOG.md following invocation batch 27
+49,27,N159,ATTEMPT,SUPPORT_ONLY,THREE_SUM_CLASS_TRANSLATION,Published deletion-contraction basis formula isolated but closure-class equivalence remains unproved,External.properThreeSum_isBase_iff source-verified isolated premise,2,Matroid/FORMALIZATION_LOG.md following invocation batch 27
+50,28,N071,ATTEMPT,CLOSED,,,SeymourDecomposition IsOneSum and IsR10Copy,3,Matroid/FORMALIZATION_LOG.md following invocation batch 28
+51,28,N179,ATTEMPT,CLOSED,,,IsR10Copy.circuit_card_ne_three and not_properThreeSum_left/right,3,Matroid/FORMALIZATION_LOG.md following invocation batch 28
+52,29,N185,ATTEMPT,SUPPORT_ONLY,R10_AUTOMORPHISM_720_CERT,Four-dependency count checked but direct five-set bridge timed out at one million heartbeats and 720 automorphism count remains absent,r10FourDependencyCert_count,2,Matroid/FORMALIZATION_LOG.md following invocation batch 29
+53,30,N227,ATTEMPT,SUPPORT_ONLY,RECURSIVE_COCIRCUIT_INDUCTION,Five active root ports and their 5l union bound checked but nine-stage cocircuit support transport and attainment remain,r10TargetSixCocircuit_nonTarget_card and r10TargetSixCocircuit_activePort_bound,2,Matroid/FORMALIZATION_LOG.md following invocation batch 30
+54,30,N154,ATTEMPT,CLOSED,,,External.regular_rayleigh_pair and regularEffectiveWeight_mono_of_positive,4,Matroid/FORMALIZATION_LOG.md following invocation batch 30

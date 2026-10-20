@@ -1,0 +1,35 @@
+import Matroid.EffectiveWeightHomogeneity
+import Matroid.R10BasisCount
+import Matroid.R10PointedSupports
+import Matroid.R10PointedDeterminant
+import Matroid.RecursiveCircuitBounds
+import Matroid.RecursiveCocircuitBounds
+import Matroid.TriangleIdentityAlgebra
+import Matroid.RegularFreeQuotientPartial
+
+/-! Reproducible transitive axiom checks for the persistent-cooldown
+five-batch invocation. Partial declarations are audited separately from
+completed manuscript requirements. -/
+
+#print axioms Matroid.weightedBasesIn_scaleNonPortWeight
+#print axioms Matroid.weightedBasesOut_scaleNonPortWeight
+#print axioms Matroid.twoSumEffectiveWeight_scale_of_not_isLoop
+#print axioms Matroid.mem_r10BasisFamilyCert_iff
+#print axioms Matroid.r10_basis_count
+#print axioms Matroid.r10_weightedBasesOut_eq_det_pointedL
+#print axioms Matroid.r10_pointed_basis_in_count
+#print axioms Matroid.r10_pointed_basis_out_count
+#print axioms Matroid.r10PointedOutSupport_card
+#print axioms Matroid.r10PointedInSupport_card
+#print axioms Matroid.r10PointedOutSupport_degree
+#print axioms Matroid.r10PointedInSupport_degree
+#print axioms Matroid.r10_weightedBasesOut_eq_support_sum
+#print axioms Matroid.r10_weightedBasesIn_eq_support_sum
+#print axioms Matroid.r10PointedL_principalCofactor_eq_projectedGram
+#print axioms Matroid.r10_targetCircuit_le_five_nonTarget
+#print axioms Matroid.r10_targetCircuit_exists_five_nonTarget
+#print axioms Matroid.IsProperTwoSum.targetCircuit_ncard_le
+#print axioms Matroid.IsProperTwoSum.targetCocircuit_ncard_le
+#print axioms Matroid.weightedTrianglePhi_all_eq_nonTriangleBases
+#print axioms Matroid.standardForm_kernelBlock_injective
+#print axioms Matroid.standardForm_kernelBlock_surjOn_kernel

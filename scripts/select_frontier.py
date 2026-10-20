@@ -22,6 +22,13 @@ import sys
 
 ACTIVE_SCOPES = {"CORE_MATROID", "MATROID_INTERFACE"}
 AVAILABLE_TRUST = {"KERNEL_PROVED", "CITED_ASSUMPTION", "CONDITIONAL_PROOF"}
+UNSUCCESSFUL_OUTCOMES = {"SUPPORT_ONLY", "NO_PROGRESS"}
+ATTEMPT_OUTCOMES = UNSUCCESSFUL_OUTCOMES | {"CLOSED", "CORE_PROGRESS", "INVALID_INTERFACE"}
+ATTEMPT_FIELDS = (
+    "event_id", "batch_index", "node_id", "event_kind", "outcome",
+    "blocker_key", "blocker_evidence", "proof_delta", "edit_check_groups",
+    "log_reference",
+)
 PROVENANCE_VALUE = {
     "MANUSCRIPT_PROVED": 8.0,
     "MANUSCRIPT_DEFINITION": 4.5,
@@ -55,6 +62,41 @@ class Node:
     at_label: str
     proof_status: str
     proof_decl: str
+
+
+@dataclass(frozen=True)
+class AttemptEvent:
+    event_id: int
+    batch_index: int
+    node_id: str
+    event_kind: str
+    outcome: str
+    blocker_key: str
+    blocker_evidence: str
+    proof_delta: str
+    edit_check_groups: str
+    log_reference: str
+
+
+@dataclass(frozen=True)
+class Cooldown:
+    node_id: str
+    blocker_key: str
+    blocker_evidence: str
+    last_attempt_batch: int
+    retry_after_batch: int
+    level: int
+    log_reference: str
+
+    def as_dict(self):
+        return {
+            "node_id": self.node_id, "blocker_key": self.blocker_key,
+            "blocker_evidence": self.blocker_evidence,
+            "last_attempt_batch": self.last_attempt_batch,
+            "retry_after_batch": self.retry_after_batch,
+            "cooldown_batches": min(5 * self.level, 15),
+            "log_reference": self.log_reference,
+        }
 
 
 def csv_rows(path: Path):
@@ -139,8 +181,116 @@ def load_overrides(path: Path):
     return result
 
 
+def load_attempts(path: Path) -> list[AttemptEvent]:
+    """Read an append-only, ordered event stream; reject ambiguous histories."""
+    if not path.exists():
+        return []
+    with path.open(encoding="utf-8-sig", newline="") as f:
+        reader = csv.DictReader(f)
+        if tuple(reader.fieldnames or ()) != ATTEMPT_FIELDS:
+            raise ValueError(f"Malformed attempt header in {path}")
+        rows = list(reader)
+    events = []
+    last_id = last_batch = 0
+    seen_attempts = set()
+    for line, row in enumerate(rows, 2):
+        if None in row or any(value is None for value in row.values()):
+            raise ValueError(f"Malformed attempt row {line}")
+        try:
+            event_id = int(row["event_id"])
+            batch_index = int(row["batch_index"])
+        except ValueError as exc:
+            raise ValueError(f"Noninteger attempt event/batch at row {line}") from exc
+        if event_id <= last_id or batch_index < 1 or batch_index < last_batch:
+            raise ValueError(f"Nonmonotone attempt event/batch at row {line}")
+        last_id = event_id
+        kind, outcome = row["event_kind"], row["outcome"]
+        if kind not in {"ATTEMPT", "WAKE"}:
+            raise ValueError(f"Invalid attempt event kind at row {line}")
+        groups = row["edit_check_groups"]
+        if groups != "UNKNOWN" and not groups.isdecimal():
+            raise ValueError(f"Invalid edit/check groups at row {line}")
+        if not row["node_id"] or not row["log_reference"]:
+            raise ValueError(f"Missing attempt node or evidence link at row {line}")
+        if kind == "ATTEMPT":
+            if outcome not in ATTEMPT_OUTCOMES:
+                raise ValueError(f"Invalid attempt outcome at row {line}")
+            if batch_index > last_batch + 1:
+                raise ValueError(f"Missing attempted batch index before row {line}")
+            key = (batch_index, row["node_id"])
+            if key in seen_attempts:
+                raise ValueError(f"Duplicate node attempt in batch at row {line}")
+            seen_attempts.add(key)
+            if outcome != "CLOSED" and not all(
+                row[k] for k in ("blocker_key", "blocker_evidence", "proof_delta")
+            ):
+                raise ValueError(f"Unresolved attempt lacks blocker evidence at row {line}")
+            last_batch = batch_index
+        else:
+            if outcome != "BLOCKER_REMOVED" or groups != "0":
+                raise ValueError(f"Invalid WAKE outcome or groups at row {line}")
+            if batch_index != last_batch or not all(
+                row[k] for k in ("blocker_key", "blocker_evidence", "proof_delta")
+            ) or row["proof_delta"] in {"UNKNOWN", row["node_id"]}:
+                raise ValueError(f"WAKE lacks independent change evidence at row {line}")
+        events.append(AttemptEvent(event_id, batch_index, row["node_id"], kind,
+                                   outcome, row["blocker_key"], row["blocker_evidence"],
+                                   row["proof_delta"], groups, row["log_reference"]))
+    return events
+
+
+def derive_cooldowns(events: list[AttemptEvent]):
+    """Derive cooldowns from events, never from mutable status or cost fields.
+
+    A trigger at batch b with duration d cools batches b+1,...,b+d;
+    `retry_after_batch` is b+d+1. Same-blocker failed retries escalate
+    from five to ten to at most fifteen subsequent batches.
+    """
+    state = defaultdict(lambda: {"key": "", "streak": 0, "level": 0,
+                                 "cooldown": None, "last_event": None})
+    wakes = []
+    batch_index = 0
+    for e in events:
+        st = state[e.node_id]
+        if e.event_kind == "WAKE":
+            cd = st["cooldown"]
+            if (cd is None or cd.blocker_key != e.blocker_key or
+                    e.batch_index + 1 >= cd.retry_after_batch):
+                raise ValueError(f"Contradictory WAKE event {e.event_id}")
+            st["cooldown"] = None
+            wakes.append(e)
+        else:
+            batch_index = max(batch_index, e.batch_index)
+            if e.outcome in {"CLOSED", "CORE_PROGRESS", "INVALID_INTERFACE"}:
+                st["key"] = e.blocker_key if e.outcome == "INVALID_INTERFACE" else ""
+                st["streak"] = 0
+                st["level"] = 0
+                st["cooldown"] = None
+            else:
+                if e.blocker_key != st["key"]:
+                    st["key"] = e.blocker_key
+                    st["streak"] = 0
+                    st["level"] = 0
+                    st["cooldown"] = None
+                st["streak"] += 1
+                if st["level"] or st["streak"] >= 2:
+                    st["level"] = min(st["level"] + 1, 3)
+                    duration = 5 * st["level"]
+                    st["cooldown"] = Cooldown(
+                        e.node_id, e.blocker_key, e.blocker_evidence,
+                        e.batch_index, e.batch_index + duration + 1,
+                        st["level"], e.log_reference)
+        st["last_event"] = e
+    all_cooldowns = {nid: st["cooldown"] for nid, st in state.items()
+                     if st["cooldown"] is not None}
+    active = {nid: cd for nid, cd in all_cooldowns.items()
+              if batch_index + 1 < cd.retry_after_batch}
+    return batch_index, active, all_cooldowns, wakes, state
+
+
 class Planner:
-    def __init__(self, root: Path, overrides: Path, word_counts: bool):
+    def __init__(self, root: Path, overrides: Path, word_counts: bool,
+                 attempts: Path | None = None):
         self.root = root
         ledger = parse_ledger(root / "Matroid/LEDGER.md")
         depth_rows = csv_rows(root / "Matroid/DEPTHS.csv")
@@ -195,6 +345,25 @@ class Planner:
         self.ready -= {nid for nid, n in self.nodes.items() if n.proof_status == "UNRESOLVED"}
         self.cited = {nid for nid, n in self.nodes.items() if n.proof_status == "CITED_ASSUMPTION"}
         self.remaining = set(self.nodes) - self.ready
+        self.events = load_attempts(attempts or root / "Matroid/SCHEDULER_ATTEMPTS.csv")
+        unknown_events = {e.node_id for e in self.events} - set(self.nodes)
+        if unknown_events:
+            raise ValueError(f"Attempt history has unknown active nodes: {sorted(unknown_events)}")
+        (self.last_batch_index, active, self.all_cooldowns,
+         self.wakes, history) = derive_cooldowns(self.events)
+        self.cooldowns = {nid: cd for nid, cd in active.items() if nid in self.remaining}
+        self.expired_cooldowns = {
+            nid: cd for nid, cd in self.all_cooldowns.items()
+            if nid in self.remaining and nid not in self.cooldowns
+        }
+        for nid, state in history.items():
+            event = state["last_event"]
+            if event.event_kind != "ATTEMPT":
+                continue
+            if event.outcome == "CLOSED" and nid not in self.ready:
+                self.warnings.append(f"{nid}: CLOSED attempt contradicts unresolved proof status")
+            if event.outcome != "CLOSED" and nid in self.ready:
+                self.warnings.append(f"{nid}: unresolved last attempt contradicts available proof status")
         self.overrides = load_overrides(overrides)
         for nid in self.overrides:
             if nid not in self.nodes:
@@ -289,25 +458,42 @@ class Planner:
         unknown = deferred - set(self.nodes)
         if unknown:
             raise ValueError(f"Unknown deferred node(s): {sorted(unknown)}")
+        excluded = deferred | set(self.cooldowns)
         states = [()]
         for _ in range(size):
             generated = {}
             for seq in states:
                 available = self.ready | set(seq)
-                for nid in self.eligible(available) - deferred:
+                for nid in self.eligible(available) - excluded:
                     s2 = seq + (nid,)
                     key = frozenset(s2)
                     if key not in generated:
                         generated[key] = s2
             if not generated:
+                if states == [()]:
+                    states = []
                 break
             ranked = sorted(generated.values(), key=lambda seq: (-self.batch_metrics(seq)["score"], seq))
             states = ranked[:beam_width]
-        return [(seq, self.batch_metrics(seq)) for seq in states[:top]]
+        if states:
+            return [(seq, self.batch_metrics(seq)) for seq in states[:top]]
+        # A controlled one-node retry is allowed only if cooldown alone
+        # excludes every otherwise selectable mathematical task.
+        candidates = self.eligible(self.ready) - deferred
+        if candidates and candidates <= set(self.cooldowns):
+            nid = min(candidates, key=lambda n: (self.cooldowns[n].retry_after_batch, n))
+            metrics = self.batch_metrics((nid,))
+            metrics["cooldown_fallback"] = {
+                "reason": "all nondeferred mathematically eligible tasks are cooling",
+                **self.cooldowns[nid].as_dict(),
+            }
+            return [((nid,), metrics)]
+        return []
 
     def report(self, ranks, size, deferred=None):
         eligible = sorted(self.eligible(self.ready))
         deferred = set(deferred or ())
+        selectable = sorted(set(eligible) - set(self.cooldowns) - deferred)
         proof_counts = defaultdict(int)
         for nid in self.nodes:
             n = self.nodes[nid]
@@ -319,10 +505,31 @@ class Planner:
                  f"- Active nodes: **{len(self.nodes)}**; active edges: **{sum(map(len, self.preds.values()))}**.",
                  f"- Available: **{len(self.ready)}** (including **{len(self.cited)}** directly cited assumptions); unresolved: **{len(self.remaining)}**.",
                  f"- Eligible unresolved nodes: **{len(eligible)}**; structural depths are **not** scheduling restrictions.",
+                 f"- Ordinarily selectable now: **{len(selectable)}**; next attempted batch index: **{self.last_batch_index + 1}**.",
                  f"- Proposed batch size: **{size}**; cost estimates are ordinal proxies, **not token/time forecasts**.",
                  "- Rules: exact manuscript correspondence, matroid-first proof search, cited external premise only after exact-source validation.", ""]
         if deferred:
             lines += [f"- Run-local deferred unresolved nodes: **{', '.join(sorted(deferred))}** (remain unresolved and eligible in the canonical DAG).", ""]
+        lines += ["## Persistent cooldowns", ""]
+        if self.cooldowns:
+            lines += ["| Node | Blocker | Last attempt | Retry after batch | Evidence |",
+                      "|---|---|---:|---:|---|"]
+            for nid, cd in sorted(self.cooldowns.items()):
+                lines.append(f"| {nid} | {cd.blocker_key} | {cd.last_attempt_batch} | "
+                             f"{cd.retry_after_batch} | {cd.log_reference} — {cd.blocker_evidence} |")
+        else:
+            lines.append("No active persistent cooldowns.")
+        if self.expired_cooldowns:
+            lines.append("")
+            lines.append("Expired cooldowns, now selectable when prerequisites permit: " +
+                         ", ".join(f"{nid} (retry batch {cd.retry_after_batch})"
+                                   for nid, cd in sorted(self.expired_cooldowns.items())) + ".")
+        if self.wakes:
+            lines.append("")
+            lines.append("Recorded evidence-based wakes: " +
+                         ", ".join(f"{e.node_id} at batch {e.batch_index}: {e.proof_delta}"
+                                   for e in self.wakes) + ".")
+        lines.append("")
         if self.warnings:
             lines += ["## Metadata warnings — review before editing", ""]
             lines += [f"- {x}" for x in self.warnings]
@@ -332,6 +539,12 @@ class Planner:
             seq, m = ranks[0]
             lines.append(f"**Sequence:** {' → '.join(seq)}")
             lines.append("")
+            if "cooldown_fallback" in m:
+                fb = m["cooldown_fallback"]
+                lines.append(f"**Controlled cooldown fallback:** {fb['reason']}; "
+                             f"{fb['node_id']} would ordinarily retry at batch {fb['retry_after_batch']}. "
+                             "Do not repeat a failed early retry in this invocation.")
+                lines.append("")
             lines.append(f"Score **{m['score']:.3f}** (heuristic); sum of residual-cost scores **{m['estimated_cost']}**; "
                          f"**{len(m['new_eligible'])}** additional nodes become eligible after the batch.")
             lines.append("")
@@ -347,7 +560,7 @@ class Planner:
                 lines.append("**Newly eligible after batch:** " + ", ".join(m["new_eligible"]) + ".")
                 lines.append("")
         else:
-            lines.append("No selectable tasks remain after run-local deferrals; review blockers or end the run. No proof statuses were changed.")
+            lines.append("No selectable tasks remain after run-local deferrals and persistent cooldowns; review the auditable blocked frontier. No proof statuses were changed.")
             lines.append("")
         lines += ["## Alternative ranked batches", "",
                   "| Rank | Dependency-valid sequence | Score | Cost score | Newly eligible |",
@@ -355,12 +568,13 @@ class Planner:
         for i,(seq,m) in enumerate(ranks,1):
             lines.append(f"| {i} | {' → '.join(seq)} | {m['score']:.3f} | {m['estimated_cost']} | {len(m['new_eligible'])} |")
         lines += ["", "## Highest-leverage currently eligible tasks", "",
-                  "| ID | Name | Depth | Unresolved descendants | Residual cost score | Provenance |",
-                  "|---|---|---:|---:|---:|---|"]
+                  "| ID | Name | Depth | Unresolved descendants | Residual cost score | Provenance | Selection state |",
+                  "|---|---|---:|---:|---:|---|---|"]
         elig_rank = sorted(eligible, key=lambda nid: (-len(set(self.downstream_distances(nid)) & self.remaining),nid))
         for nid in elig_rank[:20]:
             n=self.nodes[nid]
-            lines.append(f"| {nid} | {n.name.replace('|','/')} | {n.depth} | {len(set(self.downstream_distances(nid)) & self.remaining)} | {self.cost(nid)[0]} | {n.provenance} |")
+            status = "cooling" if nid in self.cooldowns else "deferred" if nid in deferred else "selectable"
+            lines.append(f"| {nid} | {n.name.replace('|','/')} | {n.depth} | {len(set(self.downstream_distances(nid)) & self.remaining)} | {self.cost(nid)[0]} | {n.provenance} | {status} |")
         lines += ["", "## Operating constraints", "",
                   "1. Confirm selected tasks against the **exact** manuscript statements and ledger provenance; do not let a score override mathematical dependencies.",
                   "2. External-cited status means **verify the exact published theorem**, then use mathlib if exact or isolate an admitted, sourced Lean premise. **Do not auto-admit based on metadata alone.**",
@@ -374,6 +588,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parent.parent)
     parser.add_argument("--estimates", type=Path, default=Path("Matroid/SCHEDULER_ESTIMATES.csv"), help="relative to --root unless absolute")
+    parser.add_argument("--attempts", type=Path, default=Path("Matroid/SCHEDULER_ATTEMPTS.csv"), help="append-only event log, relative to --root unless absolute")
     parser.add_argument("--batch-size", type=int, default=2)
     parser.add_argument("--beam-width", type=int, default=120)
     parser.add_argument("--top", type=int, default=8)
@@ -386,7 +601,12 @@ def main(argv=None):
     args = parser.parse_args(argv)
     root = args.root.resolve()
     estimates = args.estimates if args.estimates.is_absolute() else root / args.estimates
-    planner = Planner(root, estimates, args.word_counts)
+    attempts = args.attempts if args.attempts.is_absolute() else root / args.attempts
+    try:
+        planner = Planner(root, estimates, args.word_counts, attempts)
+    except ValueError as e:
+        print(f"INCONSISTENCY: {e}", file=sys.stderr)
+        return 2
     if args.strict and planner.warnings:
         for w in planner.warnings: print("INCONSISTENCY:",w,file=sys.stderr)
         return 2
@@ -409,6 +629,15 @@ def main(argv=None):
         payload = {
             "active":len(planner.nodes),"available":len(planner.ready),
             "cited_premises":sorted(planner.cited),"eligible":sorted(planner.eligible(planner.ready)),
+            "selectable":sorted(planner.eligible(planner.ready) - set(planner.cooldowns) - set(args.defer_node)),
+            "last_attempted_batch_index":planner.last_batch_index,
+            "next_batch_index":planner.last_batch_index + 1,
+            "persistent_cooldowns":[cd.as_dict() for _, cd in sorted(planner.cooldowns.items())],
+            "expired_cooldowns":[cd.as_dict() for _, cd in sorted(planner.expired_cooldowns.items())],
+            "wakes":[{"event_id":e.event_id,"batch_index":e.batch_index,
+                       "node_id":e.node_id,"proof_delta":e.proof_delta,
+                       "blocker_evidence":e.blocker_evidence,"log_reference":e.log_reference}
+                      for e in planner.wakes],
             "warnings":planner.warnings,
             "run_deferred":sorted(set(args.defer_node)),
             "candidates":[{"sequence":list(seq),**m} for seq,m in ranks]

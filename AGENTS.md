@@ -10,6 +10,8 @@ The objective is to advance the manuscript's formalization efficiently while mai
 
 **Do not impose a global depth-by-depth execution order. Do not manually select preferred theorems.**
 
+**New requirement: evidence-based persistent cooldowns.** A theorem that has repeatedly stalled on the same core obstruction must not receive the highest priority again at the beginning of every invocation merely because of its downstream leverage. Cooldowns are scheduling metadata, **not** changes to mathematical truth, proof status, dependencies, or estimated proof difficulty. The current script supports only run-local deferral; the first continuation pass must implement the persistent mechanism described in §8.1 before depending on it.
+
 Topological depth remains useful for auditing the dependency graph, but it does not determine execution priority.
 
 ## 1. Authoritative project files
@@ -35,6 +37,7 @@ Scheduler inputs and outputs:
 - `scripts/test_select_frontier.py`
 - `Matroid/SCHEDULER.md`
 - `Matroid/SCHEDULER_ESTIMATES.csv`
+- `Matroid/SCHEDULER_ATTEMPTS.csv` (append-only, persistent attempt events; add this file in the first pass)
 - `Matroid/NEXT_BATCH.md`
 - `Matroid/NEXT_BATCH.json`
 
@@ -42,9 +45,19 @@ Preserve historical proof logs, partial proofs, and mathematical provenance.
 
 Do not alter mathematical requirements merely to improve scheduler scores or make an inconvenient task disappear.
 
-## 2. Automatic scheduler invocation
+## 2. Scheduler setup and invocation
 
-At the beginning of every formalization pass, run from the repository root:
+### 2.1 First run under this revised policy
+
+Before beginning new theorem work, inspect the current scheduler. As of the October 19 snapshot, `scripts/select_frontier.py` supports `--defer-node` only **within one invocation** and does not read a persistent attempt/cooldown history.
+
+**Implement the durable attempt log and deterministic cooldown logic specified in §8.1, then update `scripts/test_select_frontier.py` and `Matroid/SCHEDULER.md`.** Use the existing graph, status, and cost APIs. The script, not the agent's memory, must determine which nodes are cooling down. Do not assume this feature exists merely because it appears in `AGENTS.md`.
+
+Do not hardcode any node ID, rewrite completed mathematical proofs, or overwrite historical data. Import old attempts only when a specific log or budget entry supports the event. Unknown historical attempts remain unknown.
+
+### 2.2 Standard scheduler invocation
+
+At the beginning of every formalization pass and after every batch, run from the repository root:
 
 ```bash
 python3 -m unittest discover \
@@ -56,15 +69,11 @@ python3 scripts/select_frontier.py \
   --json Matroid/NEXT_BATCH.json
 ```
 
-The scheduler must use the current dependency graph and proof records, not a previously generated report.
+The scheduler must load **current** proof records and **persistent** attempt/cooldown records. It must automatically exclude actively cooling tasks from ordinary batch selection, including when a new Codex session begins. `--defer-node` remains available only for a new, documented stall during the **current** run.
 
-If validation fails, repair the inconsistent records before continuing.
+If validation fails, repair the inconsistent records from evidence before continuing. Read the new `Matroid/NEXT_BATCH.json` and execute the highest-ranked prerequisite-valid batch. Repeat automatically within the five-batch loop (§8.2). Do not stop solely because the first batch finished.
 
-Read `Matroid/NEXT_BATCH.json` and execute the **highest-ranked prerequisite-valid batch**.
-
-Do not substitute a manually preferred theorem, a lower-depth theorem, or a previously hardcoded target.
-
-The scheduler may select results from different topological depths. This is intentional.
+The scheduler may select nodes from different structural depths. This is intentional.
 
 ## 3. Scheduler authority and exceptions
 
@@ -99,7 +108,7 @@ When an exception occurs:
 
 Never silently substitute another task.
 
-If a blocked task remains repeatedly selected despite documented infeasibility, identify the scheduling deficiency. A temporary deferral mechanism may be added to the scheduler, but it must be explicit, auditable, and covered by tests.
+A valid, active **persistent cooldown** is not a manual override. It is a consequence of previously recorded attempts and the deterministic rules in §8.1. The scheduler must make cooldowns and their expiration visible in its generated output. Never hide an otherwise mathematically eligible node from the DAG or mark it `UNAVAILABLE` to implement cooldown.
 
 ## 4. Mathematical proof policy
 
@@ -214,13 +223,36 @@ After attempting a task:
 5. Keep unavailable measurements explicitly `UNKNOWN`.
 6. Update the estimated **remaining** cost.
 
-Do not manipulate estimates to force a desired scheduling order.
+Do not manipulate estimates to force a desired scheduling order. **In particular, do not inflate residual cost to simulate a cooldown.** Historical edit/check effort and proof progress can support an independent cost revision; cooldown activation alone cannot.
 
 A failed proof attempt is useful evidence for future cost estimation, but does not count as completing a mathematical requirement.
 
+### 6.1 Persistent attempt records
+
+Append one `ATTEMPT` record for each **substantively attempted** node in every scheduler batch. Give every attempted batch a globally increasing `batch_index` that persists across Codex sessions. When an independent change removes an existing blocker, record a separate `WAKE` event for the cooled node, without inventing a proof attempt. Keep the event log append-only, and derive the cooldown state from it on each scheduler run; do not maintain an inconsistent second source of truth.
+
+Create `Matroid/SCHEDULER_ATTEMPTS.csv` with at least:
+
+`event_id,batch_index,node_id,event_kind,outcome,blocker_key,blocker_evidence,proof_delta,edit_check_groups,log_reference`.
+
+`event_id` is a globally unique, monotonically increasing integer for deterministic ordering. `event_kind` is `ATTEMPT` or `WAKE`. For a `WAKE` event, `outcome` is `BLOCKER_REMOVED`, `edit_check_groups` is zero, and `proof_delta` identifies the **other** changed declaration or evidence that removes the obstacle. `WAKE` events do not advance batch counters and never count as theorem attempts.
+
+Use stable outcomes:
+
+- `CLOSED`: result became `KERNEL_PROVED`, `CONDITIONAL_PROOF`, or an exactly verified `CITED_ASSUMPTION`.
+- `CORE_PROGRESS`: a previously blocking central goal was discharged, a necessary mathematical obstacle changed, or a confirmed new proof route now closes an essential gap.
+- `SUPPORT_ONLY`: useful helpers were proved but the **same core obstacle** remains.
+- `NO_PROGRESS`: a serious attempt did not materially change the available route.
+- `INVALID_INTERFACE`: mathematical provenance, statement, or dependencies must be repaired before proof search resumes.
+
+Each unresolved `ATTEMPT` event must have a concise **stable blocker key** and a reference to specific proof/log evidence. A qualifying unsuccessful attempt must contain an actually executed proof route or an evidenced, independently verified feasibility blocker; a quick retry or repeated reading of the same file is not a second substantive attempt. `SUPPORT_ONLY` is genuine progress and must be preserved, but **does not reset** the same-blocker stall counter. A `CORE_PROGRESS` classification requires identifying the prior blocker and demonstrating how it was removed or materially changed—not simply pointing to more lines of compiling Lean code.
+
+Do not fabricate token use, elapsed time, attempts, or progress. Missing fields remain explicitly unknown where the schema permits. Mark an unattempted dependent second task as skipped in the batch report; do not record it as a failed proof attempt.
+
+
 ## 7. Executing a selected batch
 
-The default scheduler batch contains two tasks, potentially with an internal dependency.
+Each scheduler-selected batch contains two tasks by default, potentially with an internal dependency. **A Codex invocation must attempt multiple batches**, as described in §8; a single batch is not the default stopping point.
 
 Execute them in the order specified by `NEXT_BATCH.json`.
 
@@ -254,23 +286,50 @@ If a task becomes blocked, preserve the partial work, record the blocker and upd
 
 Do not continue indefinitely on a blocked theorem.
 
-## 8. Automatic rescheduling
+## 8. Persistent blocker-aware scheduling and the multi-batch loop
 
-After each completed or exhausted batch:
+### 8.1 Persistent cooldown: implement and enforce
 
-1. Update all mathematical and proof-status records.
-2. Run the scheduler tests.
-3. Regenerate `NEXT_BATCH.md` and `NEXT_BATCH.json`.
-4. Verify that the newly selected batch is prerequisite-valid.
-5. Report the next automatically selected batch.
+The scheduler must compute cooldowns **from the persistent attempt log** every time it starts. Continue using its existing scoring function and prerequisite-closed beam search. Persistent cooldown affects *selection eligibility only*, not theorem eligibility in the mathematical DAG or the numerator/denominator of the heuristic score.
 
-**Never manually choose the next batch in the completion report.**
+**Trigger.** When a node receives **two substantive unsuccessful attempts against the same documented blocker**, with outcomes `SUPPORT_ONLY` or `NO_PROGRESS` and no intervening `CORE_PROGRESS`, place it on cooldown. This count is cumulative across Codex invocations, not reset each run. Evidence must identify a common obstruction; unrelated failures should not be conflated. Past work may count only if its attempt and blocker are recoverable from the logs; do not invent history.
 
-The default unit of work is one scheduled batch per invocation. Completing a batch automatically triggers rescheduling, but not an unbounded additional proof campaign.
+**Duration.** The initial cooldown lasts **five subsequent attempted scheduler batches** (counted by globally increasing batch index, not by elapsed wall-clock time or Codex sessions). After it expires, the task is again considered normally. If a retry encounters the same unresolved obstruction, use **ten subsequent batches** for the next cooldown, then cap later cooldowns at **fifteen batches**. Store enough event evidence to recompute this escalating schedule deterministically.
 
-If explicitly instructed to execute multiple batches autonomously, repeat the same cycle without requesting approval between valid selections, within the specified execution budget.
+**Early wake-up.** Cancel a cooldown only when there is verifiable new evidence that the original blocker has materially changed: for example, its missing prerequisite is now available, a theorem needed for the core route has been proved, the invalid statement has been repaired, or a genuinely different route is now feasible. Record a `WAKE` event with the specific declaration/change and why it affects the blocker. Do not reset the original failed-attempt history; preserve it for audits. A regenerated schedule, another auxiliary lemma, or a revised cost score alone is **not** an early-wake event.
 
-Do not continue if the mathematical records are inconsistent or source validation exposes an unresolved correctness issue.
+**Selection and transparency.** Do not select an actively cooled node in ordinary beam-search batches. Report each cooled node's blocker, last attempt, retry-after batch, and evidence link in both `NEXT_BATCH.md` and `NEXT_BATCH.json`. The scheduler must preserve the distinction between mathematically eligible nodes and selectable nodes. It must never edit `PROOF_STATUS.csv`, `LEDGER.md`, or `DEPENDENCY_EDGES.csv` to implement a cooldown.
+
+**No deadlock or starvation.** If all mathematically eligible unresolved nodes are cooling down, the scheduler must report that condition explicitly. It may propose **one controlled early retry** of the node whose cooldown expires soonest, with a visible `cooldown_fallback` reason; it must not silently treat the cooldown as expired. If that attempt produces no core progress, do not repeatedly retry the same node in the same invocation. Otherwise stop with an auditable report of the blocked frontier. Previously cooled nodes must return to the candidate pool at expiration, without manual intervention.
+
+**Testing.** Add synthetic fixture-based tests in `scripts/test_select_frontier.py` for: persistence across scheduler restarts; two same-blocker stalls triggering cooldown; `SUPPORT_ONLY` versus `CORE_PROGRESS`; global batch-count expiry; escalating retry windows; legitimate evidence-based early wake-up; preservation of proof status and mathematical eligibility; dependency-valid batches after exclusion; all-candidates-cooled fallback without infinite retry; and detection of malformed or contradictory attempt rows. Keep the existing tests passing. Update `Matroid/SCHEDULER.md` to document the format, thresholds, and precise semantics.
+
+Run-local `--defer-node` remains a short-term control for the rest of the **current** invocation after a newly failed serious attempt. It is separate from the persistent mechanism; the scheduler must apply both exclusions without confusing them.
+
+### 8.2 Five-batch autonomous loop (default)
+
+**Default execution target: five consecutive scheduler-selected batches per Codex invocation**, generally up to ten selected task opportunities. Do not stop after the first batch or request approval between valid selections.
+
+For each batch:
+
+1. Run the scheduler against the latest graph, statuses, estimates, and persistent attempt log. Execute its highest-scoring valid sequence, never a hardcoded theorem ID.
+2. Confirm source correspondence, provenance, and direct prerequisites. Repair a proven graph/statement mismatch before attempting the theorem and rerun scheduling.
+3. Attempt selected tasks in dependency order under the matroid-first and citation policies. If the first task remains unavailable and the second depends on it, do **not** pretend the second was attempted.
+4. Use focused Lean checks during the pass. Record `CLOSED`, `CORE_PROGRESS`, `SUPPORT_ONLY`, `NO_PROGRESS`, or `INVALID_INTERFACE` for each actual attempt; give the batch its persistent index; update relevant formalization logs and estimates. Apply run-local deferral when justified by a serious unresolved attempt (typically up to six substantive edit/check groups), preserving all partial results.
+5. Recompute persistent cooldowns, update the report, and **rerun the scheduler automatically**. Continue to the next batch until five have been attempted or a genuine stopping condition applies.
+
+At the end, run a full `lake build`, the tracked `#print axioms` audits, the correspondence checks, and the scheduler test suite. Rectify any status contradicted by verification. Regenerate `NEXT_BATCH.md` and `NEXT_BATCH.json` **without run-local deferrals**, but **with the persistent cooldown state still applied**, for the next invocation.
+
+### 8.3 Stopping conditions
+
+Stop after five attempted batches. Stop earlier only when:
+
+- No sound task can be selected after the explicit cooldown fallback and run-local deferral rules.
+- The manuscript, dependency records, or trust statuses are inconsistent and cannot be repaired from source evidence.
+- A reproducible Lean/toolchain failure blocks sound verification.
+- Available context or execution resources prevent further reliable work.
+
+If fewer than three batches are attempted, state the exact reason. Do not stop merely because a task remains difficult, a cited theorem has been admitted, or one batch completed.
 
 ## 9. Dependency maintenance
 
@@ -305,22 +364,23 @@ Maintain reproducible tracked axiom-audit files.
 
 A result is not established merely because the ledger says it is complete or the code compiles with an admitted theorem.
 
-## 11. Required output after each pass
+## 11. Required output after each multi-batch run
 
 Produce a compact report containing:
 
-- Scheduler-selected batch and initial heuristic scores.
+- Number of scheduler-selected batches attempted (default target five), with their sequences and initial heuristic scores.
 - Completed, admitted, conditional, and unresolved requirements.
 - Exact Lean declarations and manuscript correspondence findings.
 - Any citations introduced or checked.
 - Newly discovered or corrected dependencies.
-- Actual resource observations and updated remaining-cost estimates.
+- Actual resource observations and updated remaining-cost estimates, **separately** from cooldowns.
+- The append-only attempt events and their stable blocker keys; active persistent cooldowns, expiry batch numbers, and any evidence-based early wake-ups.
 - Verification commands executed and their results.
 - Newly available requirements.
-- The next automatically selected batch.
+- The next automatically selected batch, computed **without run-local deferrals but with persistent cooldowns** after the run ends (for the next invocation).
 
-Update the canonical files and generated scheduler reports.
+Update the canonical files and generated scheduler reports. At the end, clear run-local `--defer-node` options and regenerate `NEXT_BATCH.md` and `NEXT_BATCH.json`. **Do not clear the persistent attempt/cooldown history.** Unresolved mathematical requirements remain unresolved. Preserve the log needed for automatic cooldown expiration.
 
 Preserve chronological logs and partial proofs.
 
-**The formalization is scheduler-directed, mathematically audited, and resource-aware. The scheduler selects the work; Codex proves or validates it; the resulting evidence updates the next scheduling decision.**
+**The formalization is scheduler-directed, mathematically audited, resource-aware, and multi-batch by default. A recurring mathematical blocker now incurs an automatic, auditable cooldown across invocations; neither proof status nor estimated difficulty is altered merely to change selection.**

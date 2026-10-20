@@ -37,24 +37,37 @@ theorem isCircuitUnion_iff_empty_or_pair {α : Type*} {N : Matroid α}
     · refine ⟨∅, ?_, ?_, ?_⟩ <;> simp
     · exact hC.isCircuitUnion
 
+/-- The binary two-sum cycle construction remains defined for a
+two-element circuit child, outside the proper-size convention. -/
+noncomputable def twoSumWithPair {α : Type u}
+    (M N : Matroid α) [M.Finite] [N.Finite]
+    (hM : Regular.{u, 0, w} M) (hN : Regular.{u, 0, w} N)
+    (p : α) (hinter : M.E ∩ N.E = {p}) : Matroid α :=
+  Classical.choose (exists_twoSum_of_regular hM hN p hinter)
+
+theorem twoSumWithPair_ground {α : Type u}
+    (M N : Matroid α) [M.Finite] [N.Finite]
+    (hM : Regular.{u, 0, w} M) (hN : Regular.{u, 0, w} N)
+    (p : α) (hinter : M.E ∩ N.E = {p}) :
+    (twoSumWithPair M N hM hN p hinter).E =
+      _root_.symmDiff M.E N.E :=
+  (Classical.choose_spec (exists_twoSum_of_regular hM hN p hinter)).1
+
 /-- For a two-element-circuit child, the complete N065 cycle formula
 reduces to replacing the parent port by the child leaf in every cycle. -/
-theorem regularTwoSum_cycle_iff_relabelPort {α : Type u}
+theorem twoSumWithPair_cycle_iff_relabelPort {α : Type u}
     (M N : Matroid α) [M.Finite] [N.Finite]
     (hM : Regular.{u, 0, w} M) (hN : Regular.{u, 0, w} N)
     (p leaf : α) (hinter : M.E ∩ N.E = {p})
     (hNE : N.E = ({p, leaf} : Set α))
     (hpair : N.IsCircuit ({p, leaf} : Set α))
-    (hlM : ¬ M.IsLoop p) (hlN : ¬ N.IsLoop p)
-    (hcM : ¬ M.IsColoop p) (hcN : ¬ N.IsColoop p)
-    (hnM : 3 ≤ M.E.ncard) (hnN : 3 ≤ N.E.ncard)
     (X : Set α) :
-    (regularTwoSum M N hM hN p hinter hlM hlN hcM hcN hnM hnN).IsCircuitUnion X ↔
+    (twoSumWithPair M N hM hN p hinter).IsCircuitUnion X ↔
       ∃ C : Set α, M.IsCircuitUnion C ∧
         ((p ∉ C ∧ X = C) ∨
           (p ∈ C ∧ X = _root_.symmDiff C {p, leaf})) := by
   have hiff :
-      (regularTwoSum M N hM hN p hinter hlM hlN hcM hcN hnM hnN).IsCircuitUnion X ↔
+      (twoSumWithPair M N hM hN p hinter).IsCircuitUnion X ↔
         TwoSumCycle M N p X :=
     (Classical.choose_spec (exists_twoSum_of_regular hM hN p hinter)).2 X
   rw [hiff]
@@ -73,5 +86,25 @@ theorem regularTwoSum_cycle_iff_relabelPort {α : Type u}
     · refine ⟨C, {p, leaf}, hC, hpair.isCircuitUnion, ?_, ?_⟩
       · simp [hpC]
       · exact hEq
+
+/-- Compatibility with the previously recorded proper-size interface.
+Its hypotheses are contradictory for a two-element child; use
+`twoSumWithPair_cycle_iff_relabelPort` for the actual minor step. -/
+theorem regularTwoSum_cycle_iff_relabelPort {α : Type u}
+    (M N : Matroid α) [M.Finite] [N.Finite]
+    (hM : Regular.{u, 0, w} M) (hN : Regular.{u, 0, w} N)
+    (p leaf : α) (hinter : M.E ∩ N.E = {p})
+    (hNE : N.E = ({p, leaf} : Set α))
+    (hpair : N.IsCircuit ({p, leaf} : Set α))
+    (hlM : ¬ M.IsLoop p) (hlN : ¬ N.IsLoop p)
+    (hcM : ¬ M.IsColoop p) (hcN : ¬ N.IsColoop p)
+    (hnM : 3 ≤ M.E.ncard) (hnN : 3 ≤ N.E.ncard)
+    (X : Set α) :
+    (regularTwoSum M N hM hN p hinter hlM hlN hcM hcN hnM hnN).IsCircuitUnion X ↔
+      ∃ C : Set α, M.IsCircuitUnion C ∧
+        ((p ∉ C ∧ X = C) ∨
+          (p ∈ C ∧ X = _root_.symmDiff C {p, leaf})) := by
+  simpa only [regularTwoSum, twoSumWithPair] using
+    twoSumWithPair_cycle_iff_relabelPort M N hM hN p leaf hinter hNE hpair X
 
 end Matroid

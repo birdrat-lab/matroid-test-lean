@@ -8,6 +8,8 @@ The determinant and weighted-basis coefficient comparison remain open. -/
 
 namespace Matroid
 
+attribute [local instance] Classical.propDecidable Classical.decEq
+
 /-- Once the determinant coefficients have been identified, their five
 classes satisfy the triangle relation by polynomial algebra. -/
 theorem triangle_identity_of_det_coefficients
@@ -41,5 +43,41 @@ theorem triangle_identity_of_rank_two_polynomial
   have hp₂ : p₂ = a * (A + s) := by nlinarith [h100, hp₃]
   have hc : c = a * (A * B - s ^ 2) := by nlinarith [h100, h010, h110]
   exact triangle_identity_of_det_coefficients a p₁ p₂ p₃ c A B s hp₁ hp₂ hp₃ hc
+
+/-- The all-triangle closure class is exactly the target-free basis class
+on the nontriangle ground. This identifies one of the five coefficients
+matroidally, before any TU determinant comparison. -/
+theorem weightedTrianglePhi_all_eq_nonTriangleBases {α R : Type*}
+    [CommSemiring R] (M : Matroid α) (hE : M.E.Finite)
+    (T : Set α) (hT : T ⊆ M.E) (w : α → R) :
+    weightedTrianglePhi M hE T T w =
+      ∑ S ∈ (hE.toFinset \ (hE.toFinset.filter (· ∈ T))).powerset,
+        if M.IsBase (S : Set α) then ∏ e ∈ S, w e else 0 := by
+  classical
+  unfold weightedTrianglePhi
+  apply Finset.sum_congr rfl
+  intro S hS
+  by_cases hB : M.IsBase (S : Set α)
+  · have hUnion : M.closure ((S : Set α) ∪ T) = M.E :=
+      hB.closure_of_superset Set.subset_union_left
+    have hInter : M.closure (S : Set α) ∩ T = T := by
+      rw [hB.closure_eq]
+      exact Set.inter_eq_self_of_subset_right hT
+    simp [hB, hB.indep, hUnion, hInter]
+  · have hBad : ¬(M.Indep (S : Set α) ∧
+        M.closure ((S : Set α) ∪ T) = M.E ∧
+        M.closure (S : Set α) ∩ T = T) := by
+      rintro ⟨hI, hUnion, hInter⟩
+      have hTcl : T ⊆ M.closure (S : Set α) := by
+        intro x hx
+        have h := hInter.symm ▸ hx
+        exact h.1
+      have hSub : (S : Set α) ∪ T ⊆ M.closure (S : Set α) :=
+        Set.union_subset (M.subset_closure _ hI.subset_ground) hTcl
+      have hEsub : M.E ⊆ M.closure (S : Set α) := by
+        rw [← hUnion]
+        exact M.closure_subset_closure_of_subset_closure hSub
+      exact hB (hI.isBase_of_ground_subset_closure hEsub)
+    rw [if_neg hBad, if_neg hB]
 
 end Matroid

@@ -307,3 +307,51 @@ Strict scheduling with N066/N185/N226/N161 deferred selected N227→N201 (score 
 ## Automated five-batch invocation closeout — 2026-10-19
 
 Selected sequences, in order: N066→N159, N185→N187, N226→N161, N133→N148, N227→N201. New available requirements: unconditional N133/N201 and cited N148. Unresolved N066/N185/N226/N161/N227 have preserved checked partial proofs and evidence-based remaining-cost scores. N159/N187 were blocked by direct prerequisites and received no fictitious effort. No DAG edge or structural depth changed. Full build passed (9197 jobs; observed shared wall time 14.05 seconds), eight scheduler tests passed, tracked axiom audit passed, and strict scheduler validation passed. No per-node time/token measurement was available, so each remains `UNKNOWN`. The clean, no-deferral next batch is N066→N159, score 4.396; all run-local deferrals are cleared.
+
+## Persistent invocation — attempted batch 21
+
+Strict scheduler selected N227→N153 (3.200). N227: one source/type feasibility group tested the existing one-stage cardinal estimate against all nine attachments. It yields `5+9*l` without a port-support invariant, short of `5*l`; no core goal was discharged. Its actual residual ordinal score is revised 4.5→5.0 on this mathematical evidence, independently of the new cooldown. N153: four focused Lean edit/check groups completed exact non-port scaling of both weighted basis sums and the `P₀/P₁` effective weight. Remaining score cleared. Both node times and token counts are `UNKNOWN`. The event log records both actual attempts; N227's second same-key stall cools five subsequent batch indices. No dependency changed.
+
+## Persistent invocation — attempted batch 22
+
+Strict scheduler selected N182→N193 (2.669). N182 reused the checked binary basis predicate, proved the finite-family bridge, and closed the 162 certificate by kernel `decide` after three route/check groups; the focused count build took about 26 seconds. Its remaining score is cleared. N193 needed four groups to define the exact nine-column `L`, prove its Gram form and target-zero basis-sum specialization, and apply N125; its remaining score is cleared. Axiom checks show neither new theorem depends on `sorryAx`. Per-node total elapsed time and token counts remain `UNKNOWN`; no dependency changed.
+
+## Persistent invocation — attempted batch 23
+
+Strict scheduler selected N183→N194 (2.878). N183 completed the complete ten-label 81/81 basis-count certificate in two check groups; focused module build was about 38 seconds, and residual score was cleared. N194 used three focused groups to prove the exact principal-cofactor/projected-Gram identity. Its actual remaining cost is 4.2, medium confidence, because the target-containing R10 basis family must still be identified with the projected four-row matrix's bases. This revision reflects the new interface obstacle, separately from any cooldown. N194 is run-locally deferred, with no persistent cooldown yet. Time/tokens per theorem remain `UNKNOWN`; no DAG edge changed.
+
+## Persistent invocation — attempted batch 24
+
+Strict scheduling with N194 run-locally deferred selected N184→N226 (3.750). N184 completed exact 81-member pointed supports, distinct erasure, and degrees five/four in two focused groups; no remaining cost. N226 used three groups to prove the depth-one target-circuit bound and sharp witness from N195, reducing factual remaining score 4.6→4.4. The arbitrary-stage active-port induction and attained `5^h` remain. Its same blocker persisted on this post-cooldown retry, so the event-derived next window is ten subsequent batches, with normal retry at index 35. This scheduling exclusion did not affect cost or trust status. Both theorem-specific time and token totals remain `UNKNOWN`; no graph edge changed.
+
+## Persistent invocation — attempted batch 25
+
+Strict scheduling selected N161→N059 (2.901). N161 used two checked groups to prove a general matroidal identification of the all-triangle closure-class mass with nontriangle basis weights, reducing factual remaining score 5.4→5.2. The other four actual TU/Cauchy–Binet coefficient comparisons remain; the same blocker on a post-cooldown retry now cools ten batches, next normal index 36. N059 used two groups to prove the standard-form kernel block is injective and spans exactly the kernel, reducing actual remaining score 6.0→5.7. The disjoint-label extension and identity-on-E contraction remain; its second same-blocker attempt cools five subsequent batches, next normal index 31. Both stay unresolved and no new admission or DAG edge was introduced. Per-theorem time/tokens are `UNKNOWN`.
+
+## Persistent invocation closeout — 2026-10-19
+
+Five strict-scheduler batches, indices 21–25, completed five unconditional tasks and preserved useful partial proofs for four unresolved manuscript tasks. N227's attempted cardinality route was recorded as `NO_PROGRESS` against a specific missing active-port invariant. Final correspondence checking added N184's support-evaluation equalities to the already completed basis-support certificate; this check did not change its status, cost, or batch event. Cost revisions were made after each attempt in `SCHEDULER_ESTIMATES.csv`; their ordinal values express remaining work only. All per-node total time/token measurements are `UNKNOWN`.
+
+The final full `lake build` passed (9202 jobs; replayed wall time about 3.8 seconds), scheduler tests passed (15), tracked transitive axiom checks passed, strict DAG/depth/status validation passed, and `git diff --check` passed. No new external premise or graph edge was needed. At next attempted index 26, persistent cooldowns exclude N059 until 31, N066 until 27, N161 until 36, N185 until 28, N226 until 35, and N227 until 27 under normal selection. The clean scheduler recommendation is N188→N152, score 2.397. No additional batch was attempted.
+
+## Following invocation — batch 26
+
+Strict selection: N188→N152 (score 2.397). N188 used four groups: exact source and automorphism predicate audit; finite basis reindexing; product/decidability bridge; focused Lean and axiom check. It is `KERNEL_PROVED` with zero residual cost. N152 used five groups: prior partial/interface audit; general `mapEquiv` cycle-union transport; valid two-element binary two-sum cycle model; swapped-ground and swapped-cycle equality; focused Lean and axiom check. It is `KERNEL_PROVED` with zero residual cost. The earlier proper-size theorem is vacuous for a two-element child, so the completed public result uses the unrestricted binary cycle construction already justified in N065. No direct edge changed. Focused build passed; per-node total elapsed time and tokens remain `UNKNOWN`.
+## Following invocation — batch 27
+
+Selected N066→N159. N066: five groups completed the two directions of the finite paired-trace ↔ quotient cycle-family correspondence, then the exact proper existence witness. `KERNEL_PROVED`; remaining cost zero. N159: two source/Lean interface groups verified and isolated the paper's three deletion/contraction/augmented basis families. The paper's displayed formula is cited precisely; the manuscript's five closure-class translation remains a local Lean bridge and N159 stays `UNRESOLVED`, residual score 2.4→3.4 (medium confidence). N159 was run-locally deferred. Focused build and N066 axiom audit passed; elapsed per-node time and tokens `UNKNOWN`.
+## Following invocation — batch 28
+
+Selected N071→N179. Three groups each completed the exact decomposition-tree datatype and the embedded-R10 circuit/three-sum exclusion theorem. Both are `KERNEL_PROVED`; residual scores cleared. N180 retains the target-component conclusion as its own obligation. Focused build and tracked axiom checks passed with no new admission. Per-node time/tokens `UNKNOWN`; no graph change.
+## Following invocation — batch 29
+
+Selected N185→N187. Two substantive N185 edit/check groups tested a four-dependency reduction. The count of such dependencies is kernel proved as 15; a direct all-five-set proof ran into Lean's 1,000,000-heartbeat limit in roughly 84 observed seconds. No 720 automorphism count or N187 stabilizer count was claimed. N185 remains `UNRESOLVED`, residual cost 5.0→5.2 (medium); same blocker key triggers persistent cooldown. N187 was ineligible after N185 stayed unresolved and received no attempt event. Focused build/axiom audit passed; total per-node time/tokens `UNKNOWN`.
+## Following invocation — batch 30
+
+Selected N227→N154. N227 used two checked groups to establish the root five-active-port count and the conditional `5*l` union bound. The stage-level active-port invariant, arbitrary-depth substitution, and attainment remain; residual ordinal cost 5.0→4.8 (medium), `UNRESOLVED`, same blocker. N154 used four source/Lean groups: exact Choe–Wagner Theorems 5.2/5.5 audit, isolated Rayleigh premise, four-class weighted sum expansions, affine ratio and positivity proofs. It is `CONDITIONAL_PROOF`, residual cost zero; `sorryAx` is visible through the premise. Focused build and axiom audit passed. Total per-node time/tokens `UNKNOWN`.
+
+## Following invocation — five-batch resource closeout
+
+Across batches 26–30, observed substantive edit/check groups were N188 4, N152 5, N066 5, N159 2, N071 3, N179 3, N185 2, N227 2, and N154 4. N187 was skipped and received no attempt event or cost revision. Historical effort is preserved in earlier sections; these counts describe this invocation only. The N185 direct five-set checker exhausted 1,000,000 Lean heartbeats after about 84 seconds, a local observation rather than a measured total for N185. All per-node total elapsed times and token counts are `UNKNOWN`.
+
+Residual-cost scores after these attempts are zero for closed N188/N152/N066/N071/N179/N154, 3.4 for N159, 5.2 for N185, and 4.8 for N227. These scores reflect remaining work and are independent of the N185/N227 persistent cooldowns. The final full build completed 9214 jobs; the tracked axiom audit, 15 scheduler tests, and strict no-deferral scheduler regeneration passed. The next scheduler selection is N159→N059; no sixth batch was attempted.

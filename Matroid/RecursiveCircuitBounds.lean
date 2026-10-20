@@ -1,6 +1,7 @@
 import Matroid.CycleExtensionality
 import Matroid.RecursiveR10
 import Matroid.TwoSumTargetCircuits
+import Matroid.R10TargetCircuits
 
 /-! Checked bridges toward the recursive target-circuit substitution claim. -/
 
@@ -72,5 +73,39 @@ theorem IsProperTwoSum.targetCircuit_ncard_le {α : Type u}
     exact (Set.ncard_union_le (C₁ \ {p}) (C₂ \ {p})).trans
       (Nat.add_le_add (hparentPort C₁ hC₁ ht₁ hp₁)
         (hchildPort C₂ hC₂ hp₂))
+
+/-- The exact depth-one target-circuit leaf bound used at the base of the
+recursive induction. This uses the complete N195 classification rather
+than a representative sample of R10 circuits. -/
+theorem r10_targetCircuit_le_five_nonTarget
+    (C : Set (Fin 10)) (hC : r10.IsCircuit C) (h0 : 0 ∈ C) :
+    (C \ {0}).ncard ≤ 5 := by
+  rcases (r10_targetCircuit_iff C).mp ⟨hC, h0⟩ with ⟨i, rfl⟩ | ⟨i, rfl⟩
+  · have hsize : ∀ i : Fin 6,
+        (r10TargetFourCircuit i).card = 4 := by
+      intro j
+      fin_cases j <;> decide
+    rw [Set.ncard_sdiff_singleton_of_mem (by simpa using r10TargetFourCircuit_target i)]
+    have hc : (r10TargetFourCircuit i : Set (Fin 10)).ncard = 4 := by
+      simpa using hsize i
+    rw [hc]
+    omega
+  · have hsize : ∀ i : Fin 9,
+        (r10TargetSixCandidate i).card = 6 := r10TargetSixCandidate_card
+    rw [Set.ncard_sdiff_singleton_of_mem (by simpa using r10TargetSixCandidate_target i)]
+    have hc : (r10TargetSixCandidate i : Set (Fin 10)).ncard = 6 := by
+      simpa using hsize i
+    rw [hc]
+
+/-- The base bound is sharp: one displayed target circuit has exactly five
+non-target elements. The recursive attainment transport is still open. -/
+theorem r10_targetCircuit_exists_five_nonTarget :
+    ∃ C : Set (Fin 10), r10.IsCircuit C ∧ 0 ∈ C ∧ (C \ {0}).ncard = 5 := by
+  refine ⟨(r10TargetSixCandidate 0 : Finset (Fin 10)) ,
+    r10TargetSixCandidate_isCircuit 0, r10TargetSixCandidate_target 0, ?_⟩
+  rw [Set.ncard_sdiff_singleton_of_mem (by simpa using r10TargetSixCandidate_target 0)]
+  have hc : (r10TargetSixCandidate 0 : Set (Fin 10)).ncard = 6 := by
+    simpa using r10TargetSixCandidate_card 0
+  rw [hc]
 
 end Matroid

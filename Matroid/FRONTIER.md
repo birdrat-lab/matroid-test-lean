@@ -2,9 +2,21 @@
 
 Computed mechanically from `Matroid/LEDGER.md` and `Matroid/DEPENDENCY_EDGES.csv`. Active scopes are `CORE_MATROID` and `MATROID_INTERFACE`; depth is the longest direct-prerequisite chain. `Matroid/DEPTHS.csv` contains the row-level calculation.
 
-**Current status (2026-10-19): 106/197 active nodes are kernel-proved; eight are directly cited assumptions (N052, N055, N068, N138, N146, N172, N173, N186); three have completed local conditional proofs (N139, N147, N150).** The clean strict scheduler counts 117 available, 80 unresolved, 452 direct active edges, and 43 eligible unresolved nodes. Structural depths are audit metadata, not an execution order. The next recommendation is **N066 → N159**, score 3.729, with no run-local deferrals in `NEXT_BATCH.md`.
+**Current status (2026-10-20): 121/197 active nodes are kernel-proved, ten are directly cited assumptions, and four have completed local conditional proofs.** The clean strict scheduler counts 135 available, 62 unresolved, 452 direct active edges, and 43 eligible unresolved nodes. Structural depths are audit metadata, not an execution order. The next recommendation, with persistent cooldowns and no run-local deferrals, is **N159 → N059**, score 2.905.
 
-## Current five-batch run
+## Following five scheduler batches (indices 26–30)
+
+| Batch | Scheduler selection and score | Outcome |
+| --- | --- | --- |
+| 26 | N188 → N152; 2.397 | Both `KERNEL_PROVED`: pointed R10 basis-polynomial equivariance and exact two-element-child relabeling. |
+| 27 | N066 → N159; 4.396 | N066 `KERNEL_PROVED`: proper three-sum existence and cycle correspondence. N159 `UNRESOLVED`: exact cited basis-family helper isolated; manuscript closure-class bridge open. |
+| 28 | N071 → N179; 4.012 | Both `KERNEL_PROVED`: exact decomposition object and R10 exclusion from proper three-sum child slots. |
+| 29 | N185 → N187; 3.938 | N185 `UNRESOLVED`: finite four-dependency count checked, 720 automorphism count open. N187 skipped because N185 remained unavailable. |
+| 30 | N227 → N154; 2.866 | N227 `UNRESOLVED`: five active ports and `5*l` local bound checked, recursive transport open. N154 `CONDITIONAL_PROOF` through the precisely sourced regular Rayleigh premise. |
+
+`FOLLOWING_FIVE_BATCH_AUDIT.md` records full source/declaration correspondence and transitive axioms. Attempt events 46–54 are append-only in `SCHEDULER_ATTEMPTS.csv`; N159 was deferred only within this run, while repeated N185/N227 blockers triggered persistent cooldowns. No new direct edge or depth was needed. Full `lake build` passed (9214 jobs), the tracked axiom audit passed, 15 scheduler tests passed, and `git diff --check` passed. N161/N185/N226/N227 are cooling until batches 36/45/35/41 respectively; N059's cooldown has expired. N060/N160 are only predicted to become eligible after the next proposed batch closes.
+
+## Earlier five-batch run
 
 | Batch | Scheduler selection | Outcome |
 | --- | --- | --- |
@@ -16,7 +28,7 @@ Computed mechanically from `Matroid/LEDGER.md` and `Matroid/DEPENDENCY_EDGES.csv
 
 The full `lake build` passed (9183 jobs), the tracked `FiveBatchAxiomAudit` printed `sorryAx` only for expected citation-relative declarations, all eight scheduler tests passed, and `git diff --check` passed. N152 and N066 were deferred only for this invocation. The final clean scheduler restored them to eligibility and selected N066→N159. The attempt details and source comparisons are in `PROOF_BUDGET.md`, `FORMALIZATION_LOG.md`, and `SOURCES.md`.
 
-## Automated five-batch run
+## Earlier automated five-batch run
 
 | Batch | Scheduler selection | Outcome |
 | --- | --- | --- |
@@ -468,3 +480,9 @@ The current strict scheduler recomputes **197 active nodes**, **452 direct activ
 Five consecutive strict-scheduler selections were attempted: N066→N159, N185→N187, N226→N161, N133→N148, and N227→N201. N133 and N201 are newly `KERNEL_PROVED`; N148 is available as a source-verified `CITED_ASSUMPTION`. N066, N185, N226, N161, and N227 remain unresolved with checked partial proofs and factual residual-cost revisions. N159/N187 were not attempted because their first-task prerequisites did not become available. No direct edge or structural depth changed; completion-state changes are synchronized between `LEDGER.md` and `DEPTHS.csv`.
 
 The clean strict scheduler now reports **197 active nodes**, **452 active direct edges**, **124 available** (including **10 directly cited assumptions**), **73 unresolved**, and **42 eligible unresolved**. All run-local deferrals were cleared. Its reproducible next recommendation in `NEXT_BATCH.md` is **N066→N159**, score **4.396**. The source and full-hypothesis comparison for each attempted task is in `CURRENT_FIVE_BATCH_AUDIT.md`; transitive axioms are tracked in `NextFiveBatchAxiomAudit.lean`. The full `lake build` passed (9197 jobs), eight scheduler tests passed, and `git diff --check` passed. Per-node time/tokens were unavailable and remain `UNKNOWN`.
+
+## Persistent-cooldown scheduler closeout — 2026-10-19
+
+The strict scheduler selected five more consecutive batches, indexed 21–25: N227→N153, N182→N193, N183→N194, N184→N226, and N161→N059. N153, N182, N183, N184, and N193 are newly `KERNEL_PROVED`. N194, N226, N161, and N059 gained checked partial Lean results but remain unresolved; N227's checked one-stage route still needs the active-port invariant. The exact manuscript correspondence and remaining obligations for all ten selections are recorded in `PERSISTENT_FIVE_BATCH_AUDIT.md`. No new citation or direct DAG edge was added, and all structural depths remain valid.
+
+The append-only `SCHEDULER_ATTEMPTS.csv` now derives persistent cooldowns across scheduler restarts. At the next attempted index 26, N059, N066, N161, N185, N226, and N227 are cooling; N194's run-local deferral has cleared. The clean strict snapshot reports **197 active nodes**, **452 direct active edges**, **129 available** (including **10 directly cited assumptions**), **68 unresolved**, **40 mathematically eligible unresolved**, and **34 ordinarily selectable**. The next automatically selected batch is **N188→N152**, score **2.397**. No incomplete node was counted as available. The full build, scheduler tests, and transitive axiom results are recorded in `FORMALIZATION_LOG.md`.
