@@ -2,7 +2,21 @@
 
 Computed mechanically from `Matroid/LEDGER.md` and `Matroid/DEPENDENCY_EDGES.csv`. Active scopes are `CORE_MATROID` and `MATROID_INTERFACE`; depth is the longest direct-prerequisite chain. `Matroid/DEPTHS.csv` contains the row-level calculation.
 
-**Current status (2026-10-20): 121/197 active nodes are kernel-proved, ten are directly cited assumptions, and four have completed local conditional proofs.** The clean strict scheduler counts 135 available, 62 unresolved, 452 direct active edges, and 43 eligible unresolved nodes. Structural depths are audit metadata, not an execution order. The next recommendation, with persistent cooldowns and no run-local deferrals, is **N159 → N059**, score 2.905.
+**Current status (2026-10-20): 124/198 active nodes are kernel-proved, 12 are directly cited assumptions, and four have completed local conditional proofs.** The clean strict scheduler counts 140 available, 58 unresolved, 454 direct active edges, 40 mathematically eligible unresolved nodes, and 35 ordinarily selectable nodes. Structural depths are audit metadata, not an execution order. The next recommendation, with persistent cooldowns and no run-local deferrals, is **N223 → N161**, score 3.340.
+
+## Citation correction and five scheduler batches (indices 31–35)
+
+N269 is the source-verified, isolated three-family proper-three-sum basis formula, split from N159 with one cited `sorryAx`; N159 remains the unresolved manuscript-specific bidirectional closure-class translation. The split adds one active node and N269→N159. Batch 34 adds the independently justified N184→N215 polynomial-interface edge; N215 moves to depth 10. All active depths and dependent counts are checked by strict scheduling.
+
+| Batch | Scheduler selection and score | Outcome |
+| --- | --- | --- |
+| 31 | N159 → N019; 3.738 | N159 partial deletion/all-triangle bridge; N019 `KERNEL_PROVED`. |
+| 32 | N223 → N225; 2.841 | N223 exact minor base/transitivity partials; N225 source-verified `CITED_ASSUMPTION`. |
+| 33 | N059 → N177; 2.644 | Both remain unresolved with checked quotient-action and strict-minor factorization partials. |
+| 34 | N215 → N216; 2.353 | Both normalized pointed R10 ratios are `KERNEL_PROVED`. |
+| 35 | N226 → N178; 3.027 | Both remain unresolved with checked root five-port and strict small-minor factorization partials. |
+
+`CITATION_SPLIT_FIVE_BATCH_AUDIT.md` records exact manuscript/declaration correspondence. Events 55–64 are append-only; N226's expired retry at batch 35 restarted a 15-batch cooldown through 50. N059/N159/N185/N227 retain their event-derived cooldowns; no `WAKE` event was warranted. Full `lake build` passed (9224 jobs), the tracked axiom audit and 15 scheduler tests passed, and `git diff --check` passed. The final recommendation cleared all run-local deferrals while preserving persistent cooldowns.
 
 ## Following five scheduler batches (indices 26–30)
 

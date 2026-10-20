@@ -1,6 +1,6 @@
 {
-  "active": 197,
-  "available": 135,
+  "active": 198,
+  "available": 140,
   "cited_premises": [
     "N037",
     "N052",
@@ -11,10 +11,11 @@
     "N148",
     "N172",
     "N173",
-    "N186"
+    "N186",
+    "N225",
+    "N269"
   ],
   "eligible": [
-    "N019",
     "N038",
     "N039",
     "N040",
@@ -44,26 +45,22 @@
     "N206",
     "N212",
     "N213",
-    "N215",
-    "N216",
     "N220",
     "N221",
     "N222",
     "N223",
-    "N225",
     "N226",
     "N227",
     "N232",
     "N238",
     "N239",
+    "N265",
     "N267"
   ],
   "selectable": [
-    "N019",
     "N038",
     "N039",
     "N040",
-    "N059",
     "N069",
     "N072",
     "N110",
@@ -75,7 +72,7 @@
     "N151",
     "N156",
     "N157",
-    "N159",
+    "N161",
     "N169",
     "N171",
     "N177",
@@ -87,29 +84,36 @@
     "N206",
     "N212",
     "N213",
-    "N215",
-    "N216",
     "N220",
     "N221",
     "N222",
     "N223",
-    "N225",
     "N232",
     "N238",
     "N239",
+    "N265",
     "N267"
   ],
-  "last_attempted_batch_index": 30,
-  "next_batch_index": 31,
+  "last_attempted_batch_index": 35,
+  "next_batch_index": 36,
   "persistent_cooldowns": [
     {
-      "node_id": "N161",
-      "blocker_key": "TRIANGLE_TU_COEFFICIENT_BRIDGE",
-      "blocker_evidence": "All-triangle class matched to nontriangle bases but four TU determinant class coefficients remain",
-      "last_attempt_batch": 25,
-      "retry_after_batch": 36,
+      "node_id": "N059",
+      "blocker_key": "FREE_QUOTIENT_LABEL_BRIDGE",
+      "blocker_evidence": "Augmented matrix quotient action checked but disjoint free regular extension and identity-on-E contraction remain",
+      "last_attempt_batch": 33,
+      "retry_after_batch": 44,
       "cooldown_batches": 10,
-      "log_reference": "Matroid/FORMALIZATION_LOG.md persistent invocation batch 25"
+      "log_reference": "Matroid/FORMALIZATION_LOG.md current invocation batch 33"
+    },
+    {
+      "node_id": "N159",
+      "blocker_key": "THREE_SUM_CLASS_TRANSLATION",
+      "blocker_evidence": "Deleted-side basis matches all-triangle closure class but contraction and augmented singleton classes still lack bidirectional bridge",
+      "last_attempt_batch": 31,
+      "retry_after_batch": 37,
+      "cooldown_batches": 5,
+      "log_reference": "Matroid/FORMALIZATION_LOG.md current invocation batch 31"
     },
     {
       "node_id": "N185",
@@ -123,11 +127,11 @@
     {
       "node_id": "N226",
       "blocker_key": "RECURSIVE_CIRCUIT_INDUCTION",
-      "blocker_evidence": "Depth one bound and sharp witness proved but arbitrary nine attachment induction and attainment remain",
-      "last_attempt_batch": 24,
-      "retry_after_batch": 35,
-      "cooldown_batches": 10,
-      "log_reference": "Matroid/FORMALIZATION_LOG.md persistent invocation batch 24"
+      "blocker_evidence": "Root five-port count and 5l bound checked but arbitrary nine-stage support transport and attainment remain",
+      "last_attempt_batch": 35,
+      "retry_after_batch": 51,
+      "cooldown_batches": 15,
+      "log_reference": "Matroid/FORMALIZATION_LOG.md current invocation batch 35"
     },
     {
       "node_id": "N227",
@@ -141,12 +145,12 @@
   ],
   "expired_cooldowns": [
     {
-      "node_id": "N059",
-      "blocker_key": "FREE_QUOTIENT_LABEL_BRIDGE",
-      "blocker_evidence": "Kernel-block map is exact but disjoint-label extension and identity-on-E contraction remain",
+      "node_id": "N161",
+      "blocker_key": "TRIANGLE_TU_COEFFICIENT_BRIDGE",
+      "blocker_evidence": "All-triangle class matched to nontriangle bases but four TU determinant class coefficients remain",
       "last_attempt_batch": 25,
-      "retry_after_batch": 31,
-      "cooldown_batches": 5,
+      "retry_after_batch": 36,
+      "cooldown_batches": 10,
       "log_reference": "Matroid/FORMALIZATION_LOG.md persistent invocation batch 25"
     }
   ],
@@ -156,28 +160,28 @@
   "candidates": [
     {
       "sequence": [
-        "N159",
-        "N059"
+        "N223",
+        "N161"
       ],
-      "score": 2.9048,
-      "estimated_cost": 9.1,
-      "completed_value": 9.7,
+      "score": 3.3401,
+      "estimated_cost": 9.9,
+      "completed_value": 16.0,
       "unlock_value": 16.0,
-      "future_value": 7.33,
+      "future_value": 10.67,
       "new_eligible": [
-        "N060",
-        "N160"
+        "N164",
+        "N224"
       ],
       "remaining_descendants": 3
     },
     {
       "sequence": [
         "N223",
-        "N225"
+        "N040"
       ],
-      "score": 2.8411,
-      "estimated_cost": 6.23,
-      "completed_value": 9.7,
+      "score": 2.8916,
+      "estimated_cost": 8.3,
+      "completed_value": 16.0,
       "unlock_value": 8.0,
       "future_value": 0,
       "new_eligible": [
@@ -187,91 +191,91 @@
     },
     {
       "sequence": [
-        "N159",
-        "N177"
+        "N223",
+        "N180"
       ],
-      "score": 2.7177,
-      "estimated_cost": 6.93,
-      "completed_value": 9.7,
-      "unlock_value": 8.0,
-      "future_value": 11.33,
-      "new_eligible": [
-        "N160"
-      ],
-      "remaining_descendants": 4
-    },
-    {
-      "sequence": [
-        "N159",
-        "N215"
-      ],
-      "score": 2.7108,
-      "estimated_cost": 6.8,
-      "completed_value": 9.7,
-      "unlock_value": 8.0,
-      "future_value": 7.33,
-      "new_eligible": [
-        "N160"
-      ],
-      "remaining_descendants": 3
-    },
-    {
-      "sequence": [
-        "N159",
-        "N216"
-      ],
-      "score": 2.7108,
-      "estimated_cost": 6.8,
-      "completed_value": 9.7,
-      "unlock_value": 8.0,
-      "future_value": 7.33,
-      "new_eligible": [
-        "N160"
-      ],
-      "remaining_descendants": 3
-    },
-    {
-      "sequence": [
-        "N159",
-        "N178"
-      ],
-      "score": 2.6599,
-      "estimated_cost": 6.93,
-      "completed_value": 9.7,
-      "unlock_value": 8.0,
-      "future_value": 7.33,
-      "new_eligible": [
-        "N160"
-      ],
-      "remaining_descendants": 3
-    },
-    {
-      "sequence": [
-        "N059",
-        "N177"
-      ],
-      "score": 2.6436,
-      "estimated_cost": 9.23,
-      "completed_value": 16.0,
-      "unlock_value": 8.0,
-      "future_value": 4.0,
-      "new_eligible": [
-        "N060"
-      ],
-      "remaining_descendants": 1
-    },
-    {
-      "sequence": [
-        "N059",
-        "N215"
-      ],
-      "score": 2.6374,
-      "estimated_cost": 9.1,
+      "score": 2.8916,
+      "estimated_cost": 8.3,
       "completed_value": 16.0,
       "unlock_value": 8.0,
       "future_value": 0,
       "new_eligible": [
-        "N060"
+        "N224"
+      ],
+      "remaining_descendants": 0
+    },
+    {
+      "sequence": [
+        "N223",
+        "N116"
+      ],
+      "score": 2.8504,
+      "estimated_cost": 8.42,
+      "completed_value": 16.0,
+      "unlock_value": 8.0,
+      "future_value": 0,
+      "new_eligible": [
+        "N224"
+      ],
+      "remaining_descendants": 0
+    },
+    {
+      "sequence": [
+        "N161",
+        "N040"
+      ],
+      "score": 2.8485,
+      "estimated_cost": 8.8,
+      "completed_value": 16.0,
+      "unlock_value": 8.0,
+      "future_value": 10.67,
+      "new_eligible": [
+        "N164"
+      ],
+      "remaining_descendants": 3
+    },
+    {
+      "sequence": [
+        "N161",
+        "N180"
+      ],
+      "score": 2.8485,
+      "estimated_cost": 8.8,
+      "completed_value": 16.0,
+      "unlock_value": 8.0,
+      "future_value": 10.67,
+      "new_eligible": [
+        "N164"
+      ],
+      "remaining_descendants": 3
+    },
+    {
+      "sequence": [
+        "N223",
+        "N220"
+      ],
+      "score": 2.8136,
+      "estimated_cost": 8.53,
+      "completed_value": 16.0,
+      "unlock_value": 8.0,
+      "future_value": 0,
+      "new_eligible": [
+        "N224"
+      ],
+      "remaining_descendants": 0
+    },
+    {
+      "sequence": [
+        "N223",
+        "N221"
+      ],
+      "score": 2.8136,
+      "estimated_cost": 8.53,
+      "completed_value": 16.0,
+      "unlock_value": 8.0,
+      "future_value": 0,
+      "new_eligible": [
+        "N224"
       ],
       "remaining_descendants": 0
     }

@@ -355,3 +355,31 @@ Selected N227→N154. N227 used two checked groups to establish the root five-ac
 Across batches 26–30, observed substantive edit/check groups were N188 4, N152 5, N066 5, N159 2, N071 3, N179 3, N185 2, N227 2, and N154 4. N187 was skipped and received no attempt event or cost revision. Historical effort is preserved in earlier sections; these counts describe this invocation only. The N185 direct five-set checker exhausted 1,000,000 Lean heartbeats after about 84 seconds, a local observation rather than a measured total for N185. All per-node total elapsed times and token counts are `UNKNOWN`.
 
 Residual-cost scores after these attempts are zero for closed N188/N152/N066/N071/N179/N154, 3.4 for N159, 5.2 for N185, and 4.8 for N227. These scores reflect remaining work and are independent of the N185/N227 persistent cooldowns. The final full build completed 9214 jobs; the tracked axiom audit, 15 scheduler tests, and strict no-deferral scheduler regeneration passed. The next scheduler selection is N159→N059; no sixth batch was attempted.
+
+## Citation-boundary migration before batch 31
+
+The N159 prior two source/interface groups and 3.4 remaining-cost score stay historical and unchanged. N269 is the exact already-verified cited formula in `External.ThreeSumBases`; remaining citation-matching work is zero and no new proof attempt or edit/check cycle is charged. The new edge N269→N159 is mathematical, while persistent cooldown and attempt history are unchanged. Per-node total elapsed time and tokens remain `UNKNOWN`.
+
+## Current invocation — batch 31
+
+N159 used two substantive edit/check groups: extracting side coindependence from the exact proper-3-sum cocircuit hypotheses, then proving deleted-side basis iff the all-triangle closure class under the manuscript's independence and spanning conditions. The contraction/empty and augmented/singleton equivalences still block the full bidirectional compatibility claim. Residual cost 3.4→3.0 (medium), independently of its persistent cooldown. N019 used one group to apply the exact mathlib minimal basis-hitting cocircuit characterization, with residual cost cleared. Focused build and transitive axiom checks passed. Per-node total time/tokens `UNKNOWN`.
+
+## Current invocation — batch 32
+
+N223 used two substantive groups to define exact-label R10-minor containment, prove its recursive base case, and check its transitivity under existing minors. The general proper-two-sum child-reduction/minor-commutation theorem through nine stages is missing; remaining ordinal cost 3.83→4.7 (medium), `UNRESOLVED`, blocker `RECURSIVE_R10_MINOR_TRANSPORT`. N225 used two source/Lean groups to match Oxley Proposition 14.5.3(i), isolate the binary premise, and check the labeled real-R10 transport. N225 is `CITED_ASSUMPTION` with remaining cost cleared. All focused checks and the tracked transitive axiom audit passed. Per-node total time/tokens `UNKNOWN`.
+
+## Current invocation — batch 33
+
+N059 used two source/Lean groups after reviewing its prior attempts: checked `standardForm_augmented_mulVec_quotient`, the exact action of the augmented matrix through the proposed quotient map. The unchanged core missing interface is a disjoint labeled regular extension with free deletion and identity-on-E contraction, plus the converse. Residual cost 5.7→5.4 (medium), `UNRESOLVED`; the repeated `FREE_QUOTIENT_LABEL_BRIDGE` blocker triggers its escalating ten-batch cooldown independently of cost. N177 used two groups to prove every strict minor loses an original label and factors through one deletion or contraction, but the K3,3 edge-embedding realization into `IsGraphic`/`IsCographic` remains. Residual 3.53→4.2 (medium), `UNRESOLVED`. Focused build and axiom audit passed; per-node total time/tokens `UNKNOWN`.
+
+## Current invocation — batch 34
+
+N215 used two substantive source/Lean groups to compare the exact manuscript P₀ᵉ/P₁ᵉ formula, N139's effective-weight definition, and N184's pointed support sums, then check the theorem and its transitive axioms. N216 used one Lean group to check the reciprocal target ratio in `ℝ≥0∞`. Both normalized R10 identities are `KERNEL_PROVED` with residual cost cleared; the general proper-two-sum substitution remains separately conditional through N139. The N184→N215 dependency records the actual pointed-polynomial interface, independently of scheduler scores. The focused build passed; per-node total time and tokens are `UNKNOWN`.
+
+## Current invocation — batch 35
+
+N226 used two substantive source/Lean groups to prove the five-active-root-port count and `5*l` support inequality from the exact N200 circuit family. Its full nine-stage circuit induction and attainment remain, so N226 is `UNRESOLVED`, `SUPPORT_ONLY`, and its factual remaining cost decreases 4.4→4.2 (medium). The same `RECURSIVE_CIRCUIT_INDUCTION` blocker after expiration triggers a fifteen-batch persistent cooldown; that scheduling effect was not used to set the cost. N178 used two Lean edit/check groups, the first resolving a set-membership API name, to prove two lost labels and strict factorization through a nine-label single-step R10 minor. The proper K₃,₃ planar realization and original-label graph transport remain; N178 is `UNRESOLVED`, `SUPPORT_ONLY`, with observed residual 4.4 (medium) versus the earlier 3.53 heuristic. The focused build and tracked axiom audit passed. Per-node total elapsed time and tokens are `UNKNOWN`.
+
+## Current invocation — five-batch resource closeout
+
+Events 55–64 record every substantively attempted selected node in batches 31–35. Observed edit/check groups were N159 2, N019 1, N223 2, N225 2, N059 2, N177 2, N215 2, N216 1, N226 2, and N178 2. These are route/check groups, not measured token or wall-clock totals; those per-node measurements remain `UNKNOWN`. Closed N019/N215/N216/N225 have no remaining scheduled cost. Residual scores now reflect observed proof work: N159 3.0, N223 4.7, N059 5.4, N177 4.2, N226 4.2, and N178 4.4. The N269 split added no artificial attempt or historical-cost estimate. Persistent cooldowns are derived solely from the attempt log. Full `lake build` passed (9224 jobs), the tracked axiom audit, 15 scheduler tests, and strict no-deferral report passed. The next selected batch is N223→N161 (3.340).

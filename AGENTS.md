@@ -10,7 +10,9 @@ The objective is to advance the manuscript's formalization efficiently while mai
 
 **Do not impose a global depth-by-depth execution order. Do not manually select preferred theorems.**
 
-**New requirement: evidence-based persistent cooldowns.** A theorem that has repeatedly stalled on the same core obstruction must not receive the highest priority again at the beginning of every invocation merely because of its downstream leverage. Cooldowns are scheduling metadata, **not** changes to mathematical truth, proof status, dependencies, or estimated proof difficulty. The current script supports only run-local deferral; the first continuation pass must implement the persistent mechanism described in §8.1 before depending on it.
+**Current one-time correctness task:** repair the citation boundary for N159, as specified in §2.1, before executing the next automatically scheduled batch. This is a provenance/dependency correction, **not** a hardcoded theorem priority. After the repair, the scheduler retains complete authority over proof selection.
+
+**Persistent cooldowns are part of the workflow.** Their state must be derived from the append-only attempt log across invocations. A cooldown changes scheduling availability only, never mathematical proof status, DAG edges, or intrinsic proof cost.
 
 Topological depth remains useful for auditing the dependency graph, but it does not determine execution priority.
 
@@ -37,7 +39,7 @@ Scheduler inputs and outputs:
 - `scripts/test_select_frontier.py`
 - `Matroid/SCHEDULER.md`
 - `Matroid/SCHEDULER_ESTIMATES.csv`
-- `Matroid/SCHEDULER_ATTEMPTS.csv` (append-only, persistent attempt events; add this file in the first pass)
+- `Matroid/SCHEDULER_ATTEMPTS.csv` (append-only, persistent attempt events)
 - `Matroid/NEXT_BATCH.md`
 - `Matroid/NEXT_BATCH.json`
 
@@ -47,13 +49,28 @@ Do not alter mathematical requirements merely to improve scheduler scores or mak
 
 ## 2. Scheduler setup and invocation
 
-### 2.1 First run under this revised policy
+### 2.1 One-time citation-boundary repair: N159 (mandatory before the next batch)
 
-Before beginning new theorem work, inspect the current scheduler. As of the October 19 snapshot, `scripts/select_frontier.py` supports `--defer-node` only **within one invocation** and does not read a persistent attempt/cooldown history.
+The current files combine two different mathematical obligations under N159. **Separate them before beginning proof work**:
 
-**Implement the durable attempt log and deterministic cooldown logic specified in §8.1, then update `scripts/test_select_frontier.py` and `Matroid/SCHEDULER.md`.** Use the existing graph, status, and cost APIs. The script, not the agent's memory, must determine which nodes are cooling down. Do not assume this feature exists merely because it appears in `AGENTS.md`.
+**N269 — external three-sum basis formula.** Add one active ledger requirement, using the next unused ID if `N269` has since been occupied. Its exact statement is the published *three-family proper 3-sum basis characterization* already represented by `Matroid.External.properThreeSum_isBase_iff` in `Matroid/External/ThreeSumBases.lean`. The documented source is Bérczi–Mátravölgyi–Schwarcz, *Reconfiguration of Basis Pairs in Regular Matroids*, §2, displayed formula after Lemma 2.3. Independently check that the source's hypotheses, labels, coindependent triangle, properness, and all three basis families match the Lean declaration. Preserve that declaration and its existing isolated `sorry`; do not broaden or duplicate it. Classify N269 `EXTERNAL_CITED`, with trust status `CITED_ASSUMPTION` **only after** the exact source check succeeds. Include the source location and the `sorryAx` in the provenance and axiom ledger. If the correspondence fails, leave N269 unresolved and repair the narrow interface; do not declare it available based on a vague citation.
 
-Do not hardcode any node ID, rewrite completed mathematical proofs, or overwrite historical data. Import old attempts only when a specific log or budget entry supports the event. Unknown historical attempts remain unknown.
+**N159 — manuscript-specific closure-class translation.** Retain N159 as a separate, active requirement attached to `lem:seymour-three-sum-five` and its existing manuscript statement. Reclassify its provenance as `MANUSCRIPT_PROVED` (the claim is supplied by the lemma's manuscript proof), not `EXTERNAL_CITED`. Its required local proof translates the cited three-family basis characterization into the five closure classes defined by
+
+```text
+L_H(S_H) = closure_H(S_H) ∩ T
+L_N(S_N) = closure_N(S_N) ∩ T
+```
+
+for nontriangle side subsets satisfying the manuscript's independence and `S ∪ T` spanning conditions. Under the exact proper 3-sum hypotheses, prove **both directions** of the basis compatibility statement: the compatible pairs are `(T, ∅)`, `(∅, T)`, and `({t_i}, {t_j})` for distinct `i,j`. Pay attention to which side is contracted/deleted in each cited family and to the augmented-basis case; do not guess a rank-to-closure conversion. Use N158's five-class restriction, the binary triangle relation, and the available matroid rank/closure/minor API. If a representation bridge is genuinely needed, isolate it and return to the original labeled matroid statement. **N159 itself must not contain a `sorry`.** If fully proved using N269, mark it `CONDITIONAL_PROOF` because of the transitive external premise. If it is genuinely proved without N269, it may be `KERNEL_PROVED` after an axiom audit.
+
+**Dependency/schema migration.** At minimum add the direct edge `N269 -> N159`; preserve the genuine existing prerequisites of N159 (including N066 and N158) and the downstream `N159 -> N160`. Add other edges only when mathematically justified, not merely to match a convenient Lean proof route. Update `LEDGER.md`, `PROOF_STATUS.csv`, `DEPENDENCY_EDGES.csv`, `DEPTHS.csv`, `SOURCES.md`, `FORMALIZATION_LOG.md`, and `SCHEDULER_ESTIMATES.csv` as appropriate. Preserve the existing provenance normalization history; note that N269 is a new *split interface*, not a new manuscript claim. Recompute all active depths and dependent counters, and update any totals: do not preserve a stale 197-node denominator. Check that the scheduler parses the newly added ID, sees N269 as available only if its external statement was verified, and leaves N159 unresolved. Recompute `NEXT_BATCH.md`/`.json` from the repaired data. Add tests if the new node exposes a parsing, eligibility, or status-propagation issue.
+
+**Stop conditions for the migration.** The migration is a short, mandatory correctness repair, not a reason to hold the run hostage to solving N159. If the local closure-class proof is not quickly available, leave N159 `UNRESOLVED`, preserve any partial lemmas, and proceed to the scheduler's next batch. This migration alone does **not** count as a scheduler batch or artificial proof attempt. Do not reset any existing cooldown or fabricate an attempt event. Record the correction once, so future runs do not repeat it.
+
+**Generalizable rule:** when a cited external theorem and an additional manuscript-specific specialization, equivalence, or consequence appear in one ledger item, split the exact cited premise from the local mathematical bridge. The former may be admitted after exact source matching; the latter requires a full Lean proof. Make this correction whenever source inspection of a selected requirement reveals it. Do not perform a speculative manuscript-wide reclassification pass in place of the scheduled proof work.
+
+**Scheduler readiness.** Verify that persistent cooldowns and their tests are installed and passing; the latest archive implements them. If the working copy lacks them, restore or implement §8.1 first rather than pretending that run-local `--defer-node` provides persistence.
 
 ### 2.2 Standard scheduler invocation
 
@@ -152,7 +169,7 @@ For a result classified `EXTERNAL_CITED`:
 
 Record the author, reference, theorem number or page, mathematical statement, and any translation into project-specific notation.
 
-Do not admit a theorem merely because the ledger labels it `EXTERNAL_CITED`.
+Do not admit a theorem merely because the ledger labels it `EXTERNAL_CITED`. **The admission must be no stronger than the exact cited source.** When the manuscript adds a derived interpretation, closure/rank translation, weighted identity, or specialization not literally covered by the citation, split that derived claim into a manuscript-local proof obligation (see §2.1).
 
 For uncited standard results, first search mathlib and assess whether the result is an immediate consequence of available lemmas. If it requires nontrivial external theory, establish an authoritative citation before applying the citation policy.
 
@@ -231,7 +248,7 @@ A failed proof attempt is useful evidence for future cost estimation, but does n
 
 Append one `ATTEMPT` record for each **substantively attempted** node in every scheduler batch. Give every attempted batch a globally increasing `batch_index` that persists across Codex sessions. When an independent change removes an existing blocker, record a separate `WAKE` event for the cooled node, without inventing a proof attempt. Keep the event log append-only, and derive the cooldown state from it on each scheduler run; do not maintain an inconsistent second source of truth.
 
-Create `Matroid/SCHEDULER_ATTEMPTS.csv` with at least:
+Maintain `Matroid/SCHEDULER_ATTEMPTS.csv` with at least:
 
 `event_id,batch_index,node_id,event_kind,outcome,blocker_key,blocker_evidence,proof_delta,edit_check_groups,log_reference`.
 
@@ -288,9 +305,9 @@ Do not continue indefinitely on a blocked theorem.
 
 ## 8. Persistent blocker-aware scheduling and the multi-batch loop
 
-### 8.1 Persistent cooldown: implement and enforce
+### 8.1 Persistent cooldown: verify and enforce
 
-The scheduler must compute cooldowns **from the persistent attempt log** every time it starts. Continue using its existing scoring function and prerequisite-closed beam search. Persistent cooldown affects *selection eligibility only*, not theorem eligibility in the mathematical DAG or the numerator/denominator of the heuristic score.
+The scheduler must compute cooldowns **from the persistent attempt log** every time it starts; this feature was implemented in the most recent audited version. Continue using its existing scoring function and prerequisite-closed beam search. Persistent cooldown affects *selection eligibility only*, not theorem eligibility in the mathematical DAG or the numerator/denominator of the heuristic score.
 
 **Trigger.** When a node receives **two substantive unsuccessful attempts against the same documented blocker**, with outcomes `SUPPORT_ONLY` or `NO_PROGRESS` and no intervening `CORE_PROGRESS`, place it on cooldown. This count is cumulative across Codex invocations, not reset each run. Evidence must identify a common obstruction; unrelated failures should not be conflated. Past work may count only if its attempt and blocker are recoverable from the logs; do not invent history.
 
@@ -302,7 +319,7 @@ The scheduler must compute cooldowns **from the persistent attempt log** every t
 
 **No deadlock or starvation.** If all mathematically eligible unresolved nodes are cooling down, the scheduler must report that condition explicitly. It may propose **one controlled early retry** of the node whose cooldown expires soonest, with a visible `cooldown_fallback` reason; it must not silently treat the cooldown as expired. If that attempt produces no core progress, do not repeatedly retry the same node in the same invocation. Otherwise stop with an auditable report of the blocked frontier. Previously cooled nodes must return to the candidate pool at expiration, without manual intervention.
 
-**Testing.** Add synthetic fixture-based tests in `scripts/test_select_frontier.py` for: persistence across scheduler restarts; two same-blocker stalls triggering cooldown; `SUPPORT_ONLY` versus `CORE_PROGRESS`; global batch-count expiry; escalating retry windows; legitimate evidence-based early wake-up; preservation of proof status and mathematical eligibility; dependency-valid batches after exclusion; all-candidates-cooled fallback without infinite retry; and detection of malformed or contradictory attempt rows. Keep the existing tests passing. Update `Matroid/SCHEDULER.md` to document the format, thresholds, and precise semantics.
+**Testing.** Verify that synthetic fixture-based tests in `scripts/test_select_frontier.py` cover: persistence across scheduler restarts; two same-blocker stalls triggering cooldown; `SUPPORT_ONLY` versus `CORE_PROGRESS`; global batch-count expiry; escalating retry windows; legitimate evidence-based early wake-up; preservation of proof status and mathematical eligibility; dependency-valid batches after exclusion; all-candidates-cooled fallback without infinite retry; and detection of malformed or contradictory attempt rows. Keep all existing tests passing. Add missing cases if the working copy lacks them. Verify `Matroid/SCHEDULER.md` documents the format, thresholds, and precise semantics.
 
 Run-local `--defer-node` remains a short-term control for the rest of the **current** invocation after a newly failed serious attempt. It is separate from the persistent mechanism; the scheduler must apply both exclusions without confusing them.
 
@@ -372,6 +389,7 @@ Produce a compact report containing:
 - Completed, admitted, conditional, and unresolved requirements.
 - Exact Lean declarations and manuscript correspondence findings.
 - Any citations introduced or checked.
+- Any citation-boundary splits (especially one-time N269/N159), their revised statuses/edges, and their effect on active node counts.
 - Newly discovered or corrected dependencies.
 - Actual resource observations and updated remaining-cost estimates, **separately** from cooldowns.
 - The append-only attempt events and their stable blocker keys; active persistent cooldowns, expiry batch numbers, and any evidence-based early wake-ups.
@@ -383,4 +401,4 @@ Update the canonical files and generated scheduler reports. At the end, clear ru
 
 Preserve chronological logs and partial proofs.
 
-**The formalization is scheduler-directed, mathematically audited, resource-aware, and multi-batch by default. A recurring mathematical blocker now incurs an automatic, auditable cooldown across invocations; neither proof status nor estimated difficulty is altered merely to change selection.**
+**The formalization is scheduler-directed, mathematically audited, resource-aware, and multi-batch by default. The N159/N269 correction is one-time ledger maintenance; subsequent task selection remains automatic. Cited external statements must not swallow manuscript-specific proof obligations, and persistent cooldowns affect scheduling, not mathematical truth.**

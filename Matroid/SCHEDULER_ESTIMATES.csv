@@ -3,7 +3,7 @@ N133,,high,Completed exact manuscript hyperplane-complement to mathlib dual-circ
 N148,,high,Completed relative to source-verified Oxley two-sum duality and circuit classification; isolated cocircuit premise with manuscript-predicate target specialization
 N201,,high,Complete nine labeled size-five target-cocircuit family and per-edge incidence proved from N196 maximal-negative classification with finite checked cases
 N227,4.8,medium,Checked exact five active root ports and their 5l replacement cardinal bound; recursive nine-stage support transport and attained bound still require new invariant
-N154,,high,"Completed positive-weight effective-ratio monotonicity by local four-class expansion and algebra from source-verified Choe-Wagner Rayleigh premise; conditional trust"
+N154,,high,Completed positive-weight effective-ratio monotonicity by local four-class expansion and algebra from source-verified Choe-Wagner Rayleigh premise; conditional trust
 N153,,high,Completed exact non-port scaling of both basis sums and P0/P1 ratio by kernel Lean proof
 N138,,high,Completed as source-verified cited premise; no remaining proof cost is scheduled; historical abstract independence proof retained
 N068,,high,Completed as source-verified Oxley Corollary 7.1.26 regularity premise; no remaining N068 obligation is scheduled
@@ -13,11 +13,16 @@ N146,,high,Source-verified Oxley Proposition 7.1.20 admitted narrowly; no remain
 N152,,high,Completed exact two-element-child binary two-sum and swapped-label matroid equality using generic circuit-union relabeling and cycle extensionality
 N188,,high,Completed both R10 pointed basis-polynomial pushforward equalities over every commutative semiring by reindexing the full basis sums
 N161,5.2,medium,All-triangle class now identified with nontriangle bases; four weighted TU Cauchy-Binet class comparisons and determinant update still remain
-N059,5.7,medium,Standard-form kernel-block map now proved injective and onto the exact kernel; disjoint-label extension free deletion contraction isomorphism and regular converse remain
-N066,,high,"Completed exact proper three-sum existence and matching-trace cycle family by binary quotient; no remaining scheduled cost"
-N159,3.4,medium,"Exact published deletion-contraction three-family formula isolated; remaining manuscript closure-class translation needs matroid minor and rank bridges absent from present infrastructure"
-N071,,high,"Completed exact rooted labeled decomposition tree definition with finite regular nodes and all three proper sum variants; no remaining scheduled cost"
-N179,,high,"Completed no-triangle transfer for arbitrary embedded R10 copy and exclusion of either proper three-sum child position; no remaining scheduled cost"
+N059,5.4,medium,Standard-form augmented matrix now checked to map through the proposed quotient as the original coordinates; disjoint-label extension free deletion contraction isomorphism and regular converse remain
+N177,4.2,medium,Every strict minor now factors through one original-label deletion or contraction; source-verified K33 witnesses still need a graph edge-relabel transport into IsGraphic/IsCographic before minor closure applies
+N066,,high,Completed exact proper three-sum existence and matching-trace cycle family by binary quotient; no remaining scheduled cost
+N159,3.0,medium,Proper-side coindependence and deletion-base/all-triangle class are proved; contraction-base/empty and augmented-base/singleton equivalences remain without a direct matroid API bridge
+N019,,high,Exact mathlib cocircuit minimal-basis-hitting equivalence applied and focused Lean axiom audit passed
+N223,4.7,medium,Exact-labeled R10 minor predicate and base case checked; arbitrary nine-stage proof needs a proper-two-sum minor commutation theorem not present in current local interface
+N225,,high,Oxley Proposition 14.5.3(i) exactly supplies R10 nongraphic and noncographic status on the binary A10; checked field-transfer bridge to manuscript labels
+N269,,high,Exact published three-family proper 3-sum basis formula already isolated in External.ThreeSumBases and reverified at the source; no remaining citation-matching work
+N071,,high,Completed exact rooted labeled decomposition tree definition with finite regular nodes and all three proper sum variants; no remaining scheduled cost
+N179,,high,Completed no-triangle transfer for arbitrary embedded R10 copy and exclusion of either proper three-sum child position; no remaining scheduled cost
 N182,,high,Completed exact ten-label basis-family bridge and 162 count by kernel decide using existing binary independence certificate
 N193,,high,Completed exact nine-term R10 pointed Gram determinant and P0 basis-sum identity from N125
 N183,,high,Completed 81 containing and 81 omitting basis counts for every original label by exact kernel finite certificate
@@ -36,7 +41,10 @@ N218,,high,Completed as the manuscript recursive pointed-stage predicate with ex
 N195,,high,Completed by finite binary target-circuit enumeration and exact manuscript K33 matching/double-star label bridge
 N147,,high,Completed local closure substitution conditional only on previously source-verified N146 circuit premise
 N150,,high,Completed rank-add-one proof conditional only on previously source-verified N138 basis premise
-N226,4.4,medium,Depth-one R10 target-circuit bound and sharp witness now proved from complete N195 classification; arbitrary-stage active-port induction regularity transport and attained 5^h remain
+N226,4.2,medium,Exact five-active-root-port and 5l support count now checked; nine-stage circuit transport and arbitrary-depth attainment still require stage invariant
 N200,,high,Completed by exact nine-circuit injectivity and per-label finite incidence certificate; no remaining proof cost
 N196,,high,Completed by exhaustive finite span certificate and exact maximality bridge; no remaining cost
 N267,4.5,medium,Exact K4 graphic object and N266 signature now defined; remaining finite graphic independence spanning and closure table plus five weighted polynomial equalities
+N215,,high,Canonical R10 port effective weight equals the exact pointed support P0/P1 by checked local Lean proof; no remaining atomic ratio work
+N216,,high,Target pointed basis ratio equals the exact reciprocal support P1/P0 by checked local Lean proof in extended nonnegative reals
+N178,4.4,medium,Two lost labels and strict single-step factorization checked; exact labeled planar realization of proper K33 minors and dual transport remain

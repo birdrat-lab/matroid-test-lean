@@ -48,4 +48,23 @@ theorem standardForm_kernelBlock_surjOn_kernel
     simpa [Matrix.fromRows_mulVec, Matrix.neg_mulVec] using hi.symm
   · simp [Matrix.fromRows_mulVec, v]
 
+/-- The displayed augmentation `Â = (I K)` maps through the standard-form
+quotient exactly as its original-coordinate block. Thus added relation
+coordinates disappear under the proposed quotient map; this is the
+linear-algebra identity needed before the labeled matroid contraction. -/
+theorem standardForm_augmented_mulVec_quotient
+    {r c : Type*} [Fintype r] [Fintype c]
+    [DecidableEq r] [DecidableEq c] (D : Matrix r c ℝ)
+    (v : r ⊕ c → ℝ) (w : c → ℝ) :
+    (Matrix.fromCols (1 : Matrix r r ℝ) D).mulVec
+      ((Matrix.fromCols (1 : Matrix (r ⊕ c) (r ⊕ c) ℝ)
+        (Matrix.fromRows (-D) (1 : Matrix c c ℝ))).mulVec
+          (Sum.elim v w)) =
+      (Matrix.fromCols (1 : Matrix r r ℝ) D).mulVec v := by
+  rw [Matrix.fromCols_mulVec_sumElim]
+  simp only [Matrix.one_mulVec]
+  rw [Matrix.mulVec_add, Matrix.mulVec_mulVec]
+  rw [standardForm_mul_kernelBlock]
+  simp
+
 end Matroid

@@ -10,7 +10,8 @@ contraction/deletion families and the middle family of augmented bases with
 three distinct triangle indices. The paper assumes binary factors and a
 coindependent common triangle; our finite regular proper-sum interface is a
 specialization. This premise does not itself assert the manuscript's
-closure-class compatibility translation (N159).
+closure-class compatibility translation (N159). The exact cited premise is
+tracked separately as N269.
 -/
 
 namespace Matroid.External

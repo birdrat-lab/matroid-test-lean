@@ -4,10 +4,10 @@ _Generated proposal; not a mathematical certification or an authorization to adm
 
 ## Snapshot
 
-- Active nodes: **197**; active edges: **452**.
-- Available: **135** (including **10** directly cited assumptions); unresolved: **62**.
-- Eligible unresolved nodes: **43**; structural depths are **not** scheduling restrictions.
-- Ordinarily selectable now: **39**; next attempted batch index: **31**.
+- Active nodes: **198**; active edges: **454**.
+- Available: **140** (including **12** directly cited assumptions); unresolved: **58**.
+- Eligible unresolved nodes: **40**; structural depths are **not** scheduling restrictions.
+- Ordinarily selectable now: **35**; next attempted batch index: **36**.
 - Proposed batch size: **2**; cost estimates are ordinal proxies, **not token/time forecasts**.
 - Rules: exact manuscript correspondence, matroid-first proof search, cited external premise only after exact-source validation.
 
@@ -15,63 +15,64 @@ _Generated proposal; not a mathematical certification or an authorization to adm
 
 | Node | Blocker | Last attempt | Retry after batch | Evidence |
 |---|---|---:|---:|---|
-| N161 | TRIANGLE_TU_COEFFICIENT_BRIDGE | 25 | 36 | Matroid/FORMALIZATION_LOG.md persistent invocation batch 25 — All-triangle class matched to nontriangle bases but four TU determinant class coefficients remain |
+| N059 | FREE_QUOTIENT_LABEL_BRIDGE | 33 | 44 | Matroid/FORMALIZATION_LOG.md current invocation batch 33 — Augmented matrix quotient action checked but disjoint free regular extension and identity-on-E contraction remain |
+| N159 | THREE_SUM_CLASS_TRANSLATION | 31 | 37 | Matroid/FORMALIZATION_LOG.md current invocation batch 31 — Deleted-side basis matches all-triangle closure class but contraction and augmented singleton classes still lack bidirectional bridge |
 | N185 | R10_AUTOMORPHISM_720_CERT | 29 | 45 | Matroid/FORMALIZATION_LOG.md following invocation batch 29 — Four-dependency count checked but direct five-set bridge timed out at one million heartbeats and 720 automorphism count remains absent |
-| N226 | RECURSIVE_CIRCUIT_INDUCTION | 24 | 35 | Matroid/FORMALIZATION_LOG.md persistent invocation batch 24 — Depth one bound and sharp witness proved but arbitrary nine attachment induction and attainment remain |
+| N226 | RECURSIVE_CIRCUIT_INDUCTION | 35 | 51 | Matroid/FORMALIZATION_LOG.md current invocation batch 35 — Root five-port count and 5l bound checked but arbitrary nine-stage support transport and attainment remain |
 | N227 | RECURSIVE_COCIRCUIT_INDUCTION | 30 | 41 | Matroid/FORMALIZATION_LOG.md following invocation batch 30 — Five active root ports and their 5l union bound checked but nine-stage cocircuit support transport and attainment remain |
 
-Expired cooldowns, now selectable when prerequisites permit: N059 (retry batch 31).
+Expired cooldowns, now selectable when prerequisites permit: N161 (retry batch 36).
 
 ## Recommended batch
 
-**Sequence:** N159 → N059
+**Sequence:** N223 → N161
 
-Score **2.905** (heuristic); sum of residual-cost scores **9.1**; **2** additional nodes become eligible after the batch.
+Score **3.340** (heuristic); sum of residual-cost scores **9.9**; **2** additional nodes become eligible after the batch.
 
 | Task | Depth | Provenance | Est. residual cost | Evidence | Immediate descendants |
 |---|---:|---|---:|---|---:|
-| N159 — Three-sum basis compatibility | 9 | EXTERNAL_CITED | 3.4 | Exact published deletion-contraction three-family formula isolated; remaining manuscript closure-class translation needs matroid minor and rank bridges absent from present infrastructure | 1 |
-| N059 — Regular free quotient form | 7 | MANUSCRIPT_PROVED | 5.7 | Standard-form kernel-block map now proved injective and onto the exact kernel; disjoint-label extension free deletion contraction isomorphism and regular converse remain | 1 |
+| N223 — Recursive R10 minor | 9 | MANUSCRIPT_PROVED | 4.7 | Exact-labeled R10 minor predicate and base case checked; arbitrary nine-stage proof needs a proper-two-sum minor commutation theorem not present in current local interface | 1 |
+| N161 — Triangle five-sum identity | 7 | MANUSCRIPT_PROVED | 5.2 | All-triangle class now identified with nontriangle bases; four weighted TU Cauchy-Binet class comparisons and determinant update still remain | 3 |
 
-**Newly eligible after batch:** N060, N160.
+**Newly eligible after batch:** N164, N224.
 
 ## Alternative ranked batches
 
 | Rank | Dependency-valid sequence | Score | Cost score | Newly eligible |
 |---:|---|---:|---:|---:|
-| 1 | N159 → N059 | 2.905 | 9.1 | 2 |
-| 2 | N223 → N225 | 2.841 | 6.23 | 1 |
-| 3 | N159 → N177 | 2.718 | 6.93 | 1 |
-| 4 | N159 → N215 | 2.711 | 6.8 | 1 |
-| 5 | N159 → N216 | 2.711 | 6.8 | 1 |
-| 6 | N159 → N178 | 2.660 | 6.93 | 1 |
-| 7 | N059 → N177 | 2.644 | 9.23 | 1 |
-| 8 | N059 → N215 | 2.637 | 9.1 | 1 |
+| 1 | N223 → N161 | 3.340 | 9.9 | 2 |
+| 2 | N223 → N040 | 2.892 | 8.3 | 1 |
+| 3 | N223 → N180 | 2.892 | 8.3 | 1 |
+| 4 | N223 → N116 | 2.850 | 8.42 | 1 |
+| 5 | N161 → N040 | 2.849 | 8.8 | 1 |
+| 6 | N161 → N180 | 2.849 | 8.8 | 1 |
+| 7 | N223 → N220 | 2.814 | 8.53 | 1 |
+| 8 | N223 → N221 | 2.814 | 8.53 | 1 |
 
 ## Highest-leverage currently eligible tasks
 
 | ID | Name | Depth | Unresolved descendants | Residual cost score | Provenance | Selection state |
 |---|---|---:|---:|---:|---|---|
 | N185 | R10 automorphism order | 7 | 6 | 5.2 | CERTIFICATE_DERIVED | cooling |
-| N159 | Three-sum basis compatibility | 9 | 4 | 3.4 | EXTERNAL_CITED | selectable |
-| N161 | Triangle five-sum identity | 7 | 4 | 5.2 | MANUSCRIPT_PROVED | cooling |
+| N159 | Three-sum basis compatibility | 9 | 4 | 3.0 | MANUSCRIPT_PROVED | cooling |
+| N161 | Triangle five-sum identity | 7 | 4 | 5.2 | MANUSCRIPT_PROVED | selectable |
 | N267 | Weighted K4 triangle signature | 7 | 3 | 4.5 | MANUSCRIPT_PROVED | selectable |
-| N019 | Cocircuit basis hitting | 8 | 1 | 2.2 | EXTERNAL_UNCITED_STANDARD | selectable |
-| N059 | Regular free quotient form | 7 | 1 | 5.7 | MANUSCRIPT_PROVED | selectable |
+| N059 | Regular free quotient form | 7 | 1 | 5.4 | MANUSCRIPT_PROVED | cooling |
 | N072 | Seymour decomposition theorem | 10 | 1 | 2.4 | EXTERNAL_CITED | selectable |
 | N151 | Connectedness at recursive glue | 9 | 1 | 4.5 | PROVENANCE_UNRESOLVED | selectable |
-| N177 | Proper R10 minor class | 8 | 1 | 3.53 | MANUSCRIPT_PROVED | selectable |
+| N177 | Proper R10 minor class | 8 | 1 | 4.2 | MANUSCRIPT_PROVED | selectable |
 | N206 | Parallel-target closure union | 9 | 1 | 4.5 | PROVENANCE_UNRESOLVED | selectable |
 | N212 | Zero-weight R10 minor limit | 9 | 1 | 2.2 | EXTERNAL_UNCITED_STANDARD | selectable |
 | N213 | Infinite-weight R10 minor limit | 9 | 1 | 2.2 | EXTERNAL_UNCITED_STANDARD | selectable |
-| N223 | Recursive R10 minor | 9 | 1 | 3.83 | MANUSCRIPT_PROVED | selectable |
-| N225 | R10 nongraphic/noncographic status | 7 | 1 | 2.4 | EXTERNAL_CITED | selectable |
-| N226 | Recursive target-circuit substitution | 9 | 1 | 4.4 | MANUSCRIPT_PROVED | cooling |
+| N223 | Recursive R10 minor | 9 | 1 | 4.7 | MANUSCRIPT_PROVED | selectable |
+| N226 | Recursive target-circuit substitution | 9 | 1 | 4.2 | MANUSCRIPT_PROVED | cooling |
 | N227 | Recursive target-cocircuit substitution | 11 | 1 | 4.8 | MANUSCRIPT_PROVED | cooling |
 | N038 | Empty cut gives coloop | 9 | 0 | 2.2 | EXTERNAL_UNCITED_STANDARD | selectable |
 | N039 | Full cut gives loop | 9 | 0 | 2.2 | EXTERNAL_UNCITED_STANDARD | selectable |
 | N040 | Target-extension criterion | 9 | 0 | 3.6 | MANUSCRIPT_PROVED | selectable |
 | N069 | Three-sum preserves regularity | 9 | 0 | 2.4 | EXTERNAL_CITED | selectable |
+| N110 | Negative support in a representation | 10 | 0 | 3.97 | MANUSCRIPT_PROVED | selectable |
+| N116 | Regular real representations parameterize by weights | 8 | 0 | 3.72 | MANUSCRIPT_PROVED | selectable |
 
 ## Operating constraints
 
