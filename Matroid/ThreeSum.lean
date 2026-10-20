@@ -176,6 +176,78 @@ theorem threeSumCycle_side_restrict {α : Type*}
     have hdF : x ∈ D → x ∈ N.E := fun hx => hD hx
     tauto
 
+/-- A matching pair of factor cycles can be described by a single
+triangle trace and its two surviving parts. This is the set-theoretic
+normal form needed before applying the binary quotient criterion. -/
+theorem threeSumCycle_iff_common_trace {α : Type*}
+    {M N : Matroid α} {T X : Set α}
+    (hinter : M.E ∩ N.E = T) :
+    ThreeSumCycle M N T X ↔
+      X ⊆ symmDiff M.E N.E ∧
+      ∃ Q : Set α, Q ⊆ T ∧
+        M.IsCircuitUnion ((X ∩ M.E) ∪ Q) ∧
+        N.IsCircuitUnion ((X ∩ N.E) ∪ Q) := by
+  constructor
+  · rintro ⟨C, D, hC, hD, htrace, rfl⟩
+    have hside := threeSumCycle_side_restrict hC.subset_ground
+      hD.subset_ground hinter htrace
+    refine ⟨ThreeSumCycle.subset_symmDiff_ground
+      ⟨C, D, hC, hD, htrace, rfl⟩ hinter,
+      C ∩ T, Set.inter_subset_right, ?_, ?_⟩
+    · convert hC using 1
+      rw [hside.1]
+      ext x
+      simp only [Set.mem_union, Set.mem_sdiff, Set.mem_inter_iff]
+      tauto
+    · convert hD using 1
+      rw [hside.2, htrace]
+      ext x
+      simp only [Set.mem_union, Set.mem_sdiff, Set.mem_inter_iff]
+      tauto
+  · rintro ⟨hX, Q, hQT, hC, hD⟩
+    refine ⟨(X ∩ M.E) ∪ Q, (X ∩ N.E) ∪ Q,
+      hC, hD, ?_, ?_⟩
+    · ext x
+      have hEF : (x ∈ M.E ∧ x ∈ N.E) ↔ x ∈ T := by
+        simpa only [Set.mem_inter_iff] using Set.ext_iff.mp hinter x
+      have hX' : x ∈ X → (x ∈ M.E ∧ x ∉ N.E) ∨
+          (x ∈ N.E ∧ x ∉ M.E) := by
+        intro hx
+        exact Set.mem_symmDiff.mp (hX hx)
+      have hQ' : x ∈ Q → x ∈ T := fun hx => hQT hx
+      simp only [Set.mem_inter_iff, Set.mem_union]
+      tauto
+    · ext x
+      have hEF : (x ∈ M.E ∧ x ∈ N.E) ↔ x ∈ T := by
+        simpa only [Set.mem_inter_iff] using Set.ext_iff.mp hinter x
+      have hX' : x ∈ X → (x ∈ M.E ∧ x ∉ N.E) ∨
+          (x ∈ N.E ∧ x ∉ M.E) := by
+        intro hx
+        exact Set.mem_symmDiff.mp (hX hx)
+      have hQ' : x ∈ Q → x ∈ T := fun hx => hQT hx
+      simp only [Set.mem_symmDiff, Set.mem_union, Set.mem_inter_iff]
+      tauto
+
+/-- The common trace can be chosen as an actual finite set of triangle
+labels. This is the form used by the finite binary-span calculation. -/
+theorem threeSumCycle_iff_finite_common_trace {α : Type*}
+    {M N : Matroid α} {T X : Set α}
+    (hinter : M.E ∩ N.E = T) (hT : T.Finite) :
+    ThreeSumCycle M N T X ↔
+      X ⊆ symmDiff M.E N.E ∧
+      ∃ q : Finset α, (q : Set α) ⊆ T ∧
+        M.IsCircuitUnion ((X ∩ M.E) ∪ (q : Set α)) ∧
+        N.IsCircuitUnion ((X ∩ N.E) ∪ (q : Set α)) := by
+  rw [threeSumCycle_iff_common_trace hinter]
+  constructor
+  · rintro ⟨hX, Q, hQT, hC, hD⟩
+    let hQ : Q.Finite := hT.subset hQT
+    refine ⟨hX, hQ.toFinset, ?_, ?_, ?_⟩
+    · simpa only [Set.Finite.coe_toFinset] using hQT
+    · simpa only [Set.Finite.coe_toFinset] using hC
+    · simpa only [Set.Finite.coe_toFinset] using hD
+  · rintro ⟨hX, q, hqT, hC, hD⟩
+    exact ⟨hX, q, hqT, hC, hD⟩
 /-- A binary cycle has the same column sum on a finite retained part as
 on the removed triangle trace. -/
 theorem binary_sum_sdiff_eq_sum_inter {α V : Type*}
@@ -194,6 +266,19 @@ theorem binary_sum_sdiff_eq_sum_inter {α V : Type*}
   have hsplit' : (∑ e ∈ s \ t, φ e) + (∑ e ∈ s ∩ t, φ e) = 0 := by
     simpa only [add_comm] using hsplit
   exact (eq_neg_of_add_eq_zero_left hsplit').trans hneg
+
+/-- In characteristic two, adjoining a disjoint triangle trace gives a
+binary cycle exactly when the retained and trace column sums agree. -/
+theorem binary_sum_union_eq_zero_iff {α V : Type*}
+    [DecidableEq α] [AddCommGroup V] [Module (ZMod 2) V]
+    (φ : α → V) (s t : Finset α) (hdisj : Disjoint s t) :
+    (∑ e ∈ s ∪ t, φ e = 0) ↔
+      (∑ e ∈ s, φ e) = ∑ e ∈ t, φ e := by
+  have htwo : (2 : ZMod 2) = 0 := by decide
+  have hneg : -(∑ e ∈ t, φ e) = ∑ e ∈ t, φ e := by
+    have hz : (2 : ZMod 2) • (∑ e ∈ t, φ e) = 0 := by simp [htwo]
+    exact (neg_eq_iff_add_eq_zero).2 (by simpa only [two_smul] using hz)
+  rw [Finset.sum_union hdisj, add_eq_zero_iff_eq_neg, hneg]
 
 /-- Binary cycle addition preserves the matching trace condition. -/
 theorem ThreeSumCycle.symmDiff {α : Type u}

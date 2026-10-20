@@ -283,3 +283,27 @@ The strict rerun selected N196→N267. Per-node elapsed time and tokens are `UNK
 The focused `lake build Matroid.R10MaxNegative Matroid.K4Triangle Matroid.NextFiveBatchAxiomAudit` passed (1929 jobs). No direct edge changed. Run-local deferrals N066/N185/N226/N267 are cleared after this five-batch invocation.
 
 Final shared checks: full `lake build` passed (9192 jobs); eight scheduler unit tests passed; `git diff --check` passed. A strict rerun after batch 5 with all four run-local deferrals selected N161→N153, and the final clean strict rerun selected N066→N159. The latter is the reproducible next-invocation recommendation, not an extra sixth batch. Per-node time and token measurements remain `UNKNOWN`.
+
+## Automated five-batch invocation, batch 1 — 2026-10-19
+
+Strict scheduler: N066→N159, score 4.0912. N066 had three substantive edit/check groups: common-trace normal form, finite triangle trace conversion, and binary union-sum criterion. Focused `lake build Matroid.ThreeSum Matroid.NextFiveBatchAxiomAudit` passed (1929 jobs), with ordinary axioms on all three helpers. The full quotient cycle correspondence and matroid existence are still missing after multiple prior documented attempts. Remaining ordinal cost 4.8→4.3, medium confidence; time/tokens `UNKNOWN`. N066 is run-locally deferred after this good-faith attempt; N159 could not be attempted because its direct N066 prerequisite remains unresolved. No DAG edge changed.
+
+## Automated five-batch invocation, batch 2 — 2026-10-19
+
+Strict scheduling with N066 deferred selected N185→N187 (score 3.5795). N185 received substantive matrix-certificate and matroid-bridge edit/check groups: decidable tests of all nonempty column subsets, rank-five bases, and exact permutation acceptance were proved equivalent to R10 independence, bases, and automorphism. The 720 cardinality certificate remains missing, as does the ancillary verifier described by the manuscript. N185 stays `UNRESOLVED` with evidence-based ordinal remaining cost 5.8→5.0, medium confidence, and run-local deferral. N187 requires N185 and was not eligible at execution time. Per-node elapsed time and tokens are `UNKNOWN`; no direct dependency or depth changed.
+
+## Automated five-batch invocation, batch 3 — 2026-10-19
+
+Strict scheduler with N066/N185 deferred selected N226→N161 (score 3.006). N226 received a checked single-stage cardinality induction lemma using its prior N146-dependent circuit dichotomy; the global nine-attachment bound and attainment remain. Its evidence-based ordinal residual cost is 5.0→4.6, medium confidence. N161 received a checked three-variable coefficient-extraction bridge from the rank-two determinant polynomial to the triangle identity; its actual weighted TU/Cauchy–Binet class-coefficient identification remains. Its residual cost is 6.0→5.4, medium confidence. Both manuscript results remain `UNRESOLVED` and are run-locally deferred after these substantive attempts. No edge or depth changed; per-node elapsed time and tokens remain `UNKNOWN`.
+
+## Automated five-batch invocation, batch 4 — 2026-10-19
+
+Strict scheduler with N066/N185/N226/N161 deferred selected N133→N148 (score 2.710). N133 used two proof groups: exact manuscript N018 predicate/mathlib duality comparison, and a checked maximal-nonspanning converse proof. It is `KERNEL_PROVED`; residual cost is cleared. N148 used source/hypothesis verification of Oxley 2011 Proposition 7.1.20 and Oxley 1990 p. 182, then one isolated external cocircuit premise and a checked target-side manuscript wrapper. It is `CITED_ASSUMPTION`; residual cost is cleared. The premise and wrapper show `sorryAx`, with the trust boundary recorded in `SOURCES.md`. No direct edge or depth changed. Per-node elapsed time and tokens remain `UNKNOWN`.
+
+## Automated five-batch invocation, batch 5 — 2026-10-19
+
+Strict scheduling with N066/N185/N226/N161 deferred selected N227→N201 (score 3.417). N227 used the checked N148/N133 target-cocircuit interface to prove one-stage substitution and a cardinality bound. The remaining full recursive leaf induction and attainment were not priced in its low-confidence 3.0 heuristic; factual ordinal residual cost is 4.5, medium confidence, and N227 remains `UNRESOLVED`. N201 used N196's complete maximal-negative certificate to derive the nine distinct six-element target cocircuits, exclude all other six-element target cocircuits, and prove each non-target label occurs five times; it is `KERNEL_PROVED` with residual cost cleared. The N201 finite checker completed in a focused Lean build. No edge or depth changed; per-node elapsed time/tokens remain `UNKNOWN`.
+
+## Automated five-batch invocation closeout — 2026-10-19
+
+Selected sequences, in order: N066→N159, N185→N187, N226→N161, N133→N148, N227→N201. New available requirements: unconditional N133/N201 and cited N148. Unresolved N066/N185/N226/N161/N227 have preserved checked partial proofs and evidence-based remaining-cost scores. N159/N187 were blocked by direct prerequisites and received no fictitious effort. No DAG edge or structural depth changed. Full build passed (9197 jobs; observed shared wall time 14.05 seconds), eight scheduler tests passed, tracked axiom audit passed, and strict scheduler validation passed. No per-node time/token measurement was available, so each remains `UNKNOWN`. The clean, no-deferral next batch is N066→N159, score 4.396; all run-local deferrals are cleared.

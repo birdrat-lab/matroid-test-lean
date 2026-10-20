@@ -1,15 +1,19 @@
 id,residual_cost,confidence,reason
+N133,,high,Completed exact manuscript hyperplane-complement to mathlib dual-circuit equivalence by kernel proof
+N148,,high,Completed relative to source-verified Oxley two-sum duality and circuit classification; isolated cocircuit premise with manuscript-predicate target specialization
+N201,,high,Complete nine labeled size-five target-cocircuit family and per-edge incidence proved from N196 maximal-negative classification with finite checked cases
+N227,4.5,medium,One-stage cocircuit substitution and cardinality bound proved relative to cited N148; arbitrary-depth nine-attachment induction and attainment still require regularity and finite stage transport
 N138,,high,Completed as source-verified cited premise; no remaining proof cost is scheduled; historical abstract independence proof retained
 N068,,high,Completed as source-verified Oxley Corollary 7.1.26 regularity premise; no remaining N068 obligation is scheduled
 N055,,high,Completed via Oxley 2011 Proposition 6.6.5 with an isolated cited premise; N052 supplies the fixed labeled TU realization
 N118,2.0,low,Externally cited signed TU circuit dependence; target normalization matters
 N146,,high,Source-verified Oxley Proposition 7.1.20 admitted narrowly; no remaining N146 obligation is scheduled
 N152,4.5,medium,Exact child-cycle and two-sum cycle-relabel formulas now checked; full matroid relabeling still needs generic mapEquiv circuit-union transport and an extensionality bridge
-N161,6.0,medium,Polynomial final step proved but no formal Cauchy-Binet coefficient bridge from five closure-class sums to determinant of the triangle update; manuscript-local identity cannot be admitted
+N161,5.4,medium,Rank-two polynomial coefficient extraction and final identity proved; weighted TU Cauchy-Binet equality and five closure-class coefficient comparison remain
 N059,6.0,medium,"Standard-form kernel equation now checked; still requires faithful disjoint-label extension, free deletion, quotient-to-contraction isomorphism, and the regular converse"
-N066,4.8,medium,"Checked quotient zero iff matched finite triangle correction, side restriction, and binary trace sum; still needs two-way cycle transport and matroid existence on exact ground"
+N066,4.3,medium,"Checked finite common-trace normal form and characteristic-two trace-union equation in addition to quotient correction; remaining conversion between finite side sums and the quotient matroid cycle family"
 N182,3.5,medium,Earlier kernel decide attempts exhausted limits; shared finite checker likely needed
-N185,5.8,medium,Exact matroid and finite-subset basis-preservation criteria now checked; no 720-element exhaustive certificate or ancillary verifier is present
+N185,5.0,medium,Decidable independence and rank-five basis certificates are proved equivalent to the exact labeled R10 matroid and automorphism property; exhaustive 720-element cardinality certificate remains absent
 N204,,high,"Completed manuscript-local parallel target construction with a fresh label, exact proper glue relation and N065 existence bridge; no external citation applies"
 N139,,high,Completed local factorization and extended ratio conditional on N138; no remaining proof cost is scheduled
 N172,,high,"Completed as source-verified Oxley Lemma 6.6.9 deletion premise; exact K3,3 graph and labeled binary-to-real bridge checked"
@@ -22,7 +26,7 @@ N218,,high,Completed as the manuscript recursive pointed-stage predicate with ex
 N195,,high,Completed by finite binary target-circuit enumeration and exact manuscript K33 matching/double-star label bridge
 N147,,high,Completed local closure substitution conditional only on previously source-verified N146 circuit premise
 N150,,high,Completed rank-add-one proof conditional only on previously source-verified N138 basis premise
-N226,5.0,medium,Cycle extensionality and exact proper-stage circuit bridge checked; full recursive leaf-count bound and attainment induction still require regularity/finite transport through arbitrary recorded stages
+N226,4.6,medium,Proper-stage target-circuit cardinality bound now proved from cited N146; full recursive leaf-count bound and attainment still require regularity and finite transport through arbitrary recorded stages
 N200,,high,Completed by exact nine-circuit injectivity and per-label finite incidence certificate; no remaining proof cost
 N196,,high,Completed by exhaustive finite span certificate and exact maximality bridge; no remaining cost
 N267,4.5,medium,Exact K4 graphic object and N266 signature now defined; remaining finite graphic independence spanning and closure table plus five weighted polynomial equalities
